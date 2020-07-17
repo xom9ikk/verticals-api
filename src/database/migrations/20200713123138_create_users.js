@@ -1,10 +1,10 @@
 exports.up = (knex) => knex.schema.createTable('users', (table) => {
   table
-    .uuid('uuid')
-    .primary()
-    .defaultTo(knex.raw('uuid_generate_v4()'));
+    .increments('id')
+    .primary();
   table
     .string('email')
+    .unique()
     .notNullable();
   table
     .string('password')
@@ -17,6 +17,7 @@ exports.up = (knex) => knex.schema.createTable('users', (table) => {
     .notNullable();
   table
     .string('username')
+    .unique()
     .notNullable();
   table
     .timestamp('created_at')

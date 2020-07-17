@@ -44,7 +44,7 @@ class CheckMiddleware {
         throw new BackendError.Forbidden('Invalid token');
       }
 
-      req.token = token;
+      res.locals.parsedBearerToken = token;
       next();
     } catch (e) {
       next(e);

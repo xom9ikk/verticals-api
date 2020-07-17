@@ -4,12 +4,12 @@ class TokenService {
   }
 
   add({
-    refreshToken, token, uuid, ip,
+    refreshToken, token, userId, ip,
   }) {
     return this.DB.insert({
       refresh_token: refreshToken,
       token,
-      uuid,
+      user_id: userId,
       ip,
     }).returning('*');
   }

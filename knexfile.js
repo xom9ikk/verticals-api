@@ -2,7 +2,7 @@ module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: 'localhost',
+      host: '0.0.0.0',
       database: 'verticals',
       port: 5432,
     },

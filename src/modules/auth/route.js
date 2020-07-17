@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { AuthController } = require('./controller');
+const { AuthAdapter } = require('./adapter');
 const { SchemaValidator, CheckMiddleware } = require('../../middlewares');
 
 const { RequestPart } = SchemaValidator;
@@ -84,7 +84,7 @@ router.post(
   '/register',
   SchemaValidator.validate(RequestPart.body, 'register'),
   CheckMiddleware.isUserExist,
-  AuthController.register,
+  AuthAdapter.register,
 );
 
 /**
@@ -146,7 +146,7 @@ router.post(
 router.post(
   '/login',
   SchemaValidator.validate(RequestPart.body, 'login'),
-  AuthController.login,
+  AuthAdapter.login,
 );
 
 /**
@@ -201,7 +201,7 @@ router.post(
 router.post(
   '/refresh',
   SchemaValidator.validate(RequestPart.body, 'refresh'),
-  AuthController.refresh,
+  AuthAdapter.refresh,
 );
 
 /**
@@ -249,13 +249,13 @@ router.post(
 router.post(
   '/logout',
   CheckMiddleware.isAuthenticated,
-  AuthController.logout,
+  AuthAdapter.logout,
 );
 
 router.get(
   '/me',
   CheckMiddleware.isAuthenticated,
-  AuthController.me,
+  AuthAdapter.me,
 );
 
 module.exports = router;

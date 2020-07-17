@@ -1,4 +1,4 @@
-const selectorAll = ['uuid', 'email', 'name', 'surname', 'username'];
+const selectorAll = ['id', 'email', 'name', 'surname', 'username'];
 
 class UserService {
   get DB() {
@@ -6,13 +6,14 @@ class UserService {
   }
 
   async create(user) {
-    const response = await this.DB.insert(user).returning('uuid');
+    const response = await this.DB.insert(user).returning('id');
     return response[0];
   }
 
-  getByUuid(uuid) {
+  getById(id) {
+    console.log('get by id', id);
     return this.DB.select(selectorAll).where({
-      uuid,
+      id,
     }).first();
   }
 
@@ -28,17 +29,17 @@ class UserService {
     }).first();
   }
 
-  getPasswordByEmail(email) {
+  getUserWithPasswordByEmail(email) {
     return this.DB.select(
-      ['uuid', 'password'],
+      ['id', 'password'],
     ).where({
       email,
     }).first();
   }
 
-  getPasswordByUsername(username) {
+  getUserWithPasswordByUsername(username) {
     return this.DB.select(
-      ['uuid', 'password'],
+      ['id', 'password'],
     ).where({
       username,
     }).first();

@@ -4,6 +4,7 @@ exports.up = (knex) => knex.schema.createTable('columns', (table) => {
     .primary();
   table
     .integer('board_id')
+    .unsigned()
     .notNullable()
     .references('id')
     .inTable('boards');

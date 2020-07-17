@@ -12,7 +12,7 @@ class SchemaValidator {
     };
     this.ajv = ajv({
       allErrors: true,
-      removeAdditional: 'all',
+      removeAdditional: true,
     });
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
   }

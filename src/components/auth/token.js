@@ -10,12 +10,12 @@ class TokenComponent {
     this.secret = JWT_SECRET;
   }
 
-  async issueTokenPair({ uuid, ip }) {
+  async issueTokenPair({ userId, ip }) {
     const { expiresIn, secret } = this;
     const refreshToken = uuidV4();
     const token = jwt.sign(
       {
-        uuid,
+        userId,
         timestamp: new Date().getMilliseconds(),
       },
       secret,
@@ -24,7 +24,7 @@ class TokenComponent {
     await TokenService.add({
       refreshToken,
       token,
-      uuid,
+      userId,
       ip,
     });
     return {

@@ -9,9 +9,10 @@ exports.up = (knex) => knex.schema.createTable('tokens', (table) => {
     .string('token')
     .notNullable();
   table
-    .uuid('uuid')
+    .integer('user_id')
+    .unsigned()
     .notNullable()
-    .references('uuid')
+    .references('id')
     .inTable('users');
   table
     .string('ip')

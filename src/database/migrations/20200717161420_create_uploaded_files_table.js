@@ -4,6 +4,7 @@ exports.up = (knex) => knex.schema.createTable('files', (table) => {
     .primary();
   table
     .integer('comment_id')
+    .unsigned()
     .notNullable()
     .references('id')
     .inTable('comments');

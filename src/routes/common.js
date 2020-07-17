@@ -21,6 +21,7 @@ class RoutesHandler {
     const isCustomError = error instanceof GeneralError;
     const { status = 500, msg } = error;
     if (!isCustomError) {
+      console.error('errorHandler', error);
       return new BackendResponse(res, status, 'Internal') && process.exit(1);
     }
     return new BackendResponse(res, status, msg);
