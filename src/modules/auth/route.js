@@ -258,4 +258,6 @@ router.get(
   AuthAdapter.me,
 );
 
-module.exports = router;
+module.exports = {
+  auth: router,
+};

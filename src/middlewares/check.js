@@ -31,12 +31,12 @@ class CheckMiddleware {
     try {
       const token = CheckMiddleware.extractToken(req);
       if (!token) {
-        throw new BackendError.BadRequest('Token does not contain Bearer');
+        throw new BackendError.Forbidden('Token does not contain Bearer');
       }
 
       const isValidTokenSignature = await CheckMiddleware.isValidTokenSignature(token);
       if (!isValidTokenSignature) {
-        throw new BackendError.BadRequest('Invalid token signature');
+        throw new BackendError.Forbidden('Invalid token signature');
       }
 
       const isActiveToken = await ValidatorComponent.isActiveToken(token);

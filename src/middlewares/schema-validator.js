@@ -2,6 +2,7 @@ const ajv = require('ajv');
 const { BackendError } = require('../components');
 
 const { AuthSchema } = require('../modules/auth/schemas');
+const { BoardSchema } = require('../modules/board/schemas');
 
 class SchemaValidator {
   constructor() {
@@ -15,12 +16,39 @@ class SchemaValidator {
       removeAdditional: true,
     });
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
+    Object.keys(BoardSchema).map((key) => this.ajv.addSchema(BoardSchema[key], key));
   }
 
   errorResponse(schemaErrors) {
     const [firstError] = schemaErrors;
     const fieldWithError = firstError.dataPath.slice(1);
-    throw new BackendError.BadRequest(`Field '${fieldWithError}' in request do not match expected`);
+    const {
+      keyword,
+      params: {
+        missingProperty, limit, allowedValues,
+      },
+      message,
+    } = firstError;
+    console.log(firstError);
+    if (keyword === 'required') {
+      throw new BackendError.BadRequest(`The required parameter '${missingProperty}' is missing`);
+    }
+    if (keyword === 'maxLength') {
+      throw new BackendError.BadRequest(`Field '${fieldWithError}' should not be longer than ${limit} characters`);
+    }
+    if (keyword === 'minLength') {
+      throw new BackendError.BadRequest(`Field '${fieldWithError}' should be longer than ${limit} characters`);
+    }
+    if (keyword === 'type') {
+      throw new BackendError.BadRequest(`Field '${fieldWithError}' ${message}`);
+    }
+    if (keyword === 'enum') {
+      throw new BackendError.BadRequest(`Field '${fieldWithError}' ${message}: [${allowedValues}]`);
+    }
+    if (fieldWithError) {
+      throw new BackendError.BadRequest(`Field '${fieldWithError}' do not match expected`);
+    }
+    throw new BackendError.BadRequest('Request field(s) do not match expected');
   }
 
   validate(type, schemaName) {

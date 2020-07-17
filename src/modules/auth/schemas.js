@@ -83,66 +83,6 @@ class AuthSchema {
     },
     required: ['refreshToken'],
   }
-
-  passwordReset = {
-    type: 'object',
-    properties: {
-      email: {
-        type: 'string',
-        lowercase: true,
-        format: 'email',
-      },
-      target: {
-        type: 'integer',
-        enum: [0, 1, 2],
-      },
-    },
-    required: ['email', 'target'],
-  }
-
-  passwordRecovery = {
-    type: 'object',
-    properties: {
-      password: {
-        type: 'string',
-        minLength: 6,
-        maxLength: 32,
-      },
-      hash: {
-        type: 'string',
-        minLength: 1,
-      },
-    },
-    required: ['password', 'hash'],
-  }
-
-  passwordChange = {
-    type: 'object',
-    properties: {
-      oldPassword: {
-        type: 'string',
-        minLength: 6,
-        maxLength: 32,
-      },
-      newPassword: {
-        type: 'string',
-        minLength: 6,
-        maxLength: 32,
-      },
-    },
-    required: ['oldPassword', 'newPassword'],
-  }
-
-  confirmEmail = {
-    type: 'object',
-    properties: {
-      hash: {
-        type: 'string',
-        minLength: 1,
-      },
-    },
-    required: ['hash'],
-  }
 }
 
 module.exports = {
