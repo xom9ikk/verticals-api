@@ -1,0 +1,76 @@
+version: "3.5"
+services:
+  verticals_backend_postgresql:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: prod_user
+      POSTGRES_PASSWORD: prod_password_uygf2836gyi
+      POSTGRES_DB: verticals
+    ports:
+      - "127.0.0.1:5433:5432"
+    networks:
+      - verticals_backend_metrics_net
+    volumes:
+      - './postgresql.conf:/var/lib/postgresql/data/postgresql.conf'
+      - 'verticals_backend_postgresql_data:/var/lib/postgresql'
+
+  verticals_backend:
+    container_name: verticals_backend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "0.0.0.0:3000:3000"
+      - "0.0.0.0:3001:3001"
+      - "0.0.0.0:3002:3002"
+    volumes:
+      - './logs:/app/logs'
+    networks:
+      - verticals_backend_metrics_net
+
+  verticals_backend_swagger:
+    image: swaggerapi/swagger-ui
+    container_name: verticals_backend_swagger
+    environment:
+      URL: http://xom9ik.com:3000/doc.json
+    ports:
+      - "0.0.0.0:3003:8080"
+    networks:
+      - verticals_backend_metrics_net
+
+  verticals_backend_grafana:
+    image: grafana/grafana
+    container_name: verticals_backend_grafana
+    ports:
+      - "127.0.0.1:4000:3000"
+    networks:
+      - verticals_backend_metrics_net
+    volumes:
+      - 'verticals_backend_grafana_data:/var/lib/grafana'
+
+  verticals_backend_prometheus:
+    image: prom/prometheus
+    container_name: verticals_backend_prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+      - "127.0.0.1:9090:9090/udp"
+    networks:
+      - verticals_backend_metrics_net
+    command: --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - './prometheus.yml:/etc/prometheus/prometheus.yml'
+      - 'verticals_backend_prometheus_data:/var/lib/prometheus'
+
+
+volumes:
+  verticals_backend_postgresql_data:
+    driver: local
+  verticals_backend_grafana_data:
+    driver: local
+  verticals_backend_prometheus_data:
+    driver: local
+networks:
+  verticals_backend_metrics_net:
+    ipam:
+      driver: default

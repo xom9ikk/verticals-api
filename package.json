@@ -1,0 +1,46 @@
+{
+  "name": "verticals-backend",
+  "version": "0.1.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "dev": "pm2 start --no-daemon",
+    "dev:nodemon": "cross-env NODE_ENV=development nodemon --inspect=127.0.0.1:3340 ./src/server.js --watch ./src",
+    "lint": "eslint --ext .js ./src",
+    "lint:fix": "eslint --ext .js ./src --fix"
+  },
+  "author": "xom9ik <xom9ik.code@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^6.12.3",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "chalk": "^4.1.0",
+    "express": "^4.17.1",
+    "helmet": "^3.23.3",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.3.0",
+    "pm2": "^4.4.0",
+    "prom-client": "^12.0.0",
+    "swagger-jsdoc": "^4.0.0",
+    "uuid": "^8.2.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "cz-conventional-changelog": "^3.2.0",
+    "eslint": "^7.4.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "jest": "^26.1.0",
+    "nodemon": "^2.0.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
