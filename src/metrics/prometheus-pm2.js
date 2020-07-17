@@ -29,9 +29,11 @@ const getAggregatedRegistry = (instancesData) => {
 
     try {
       const bus = await pm2exec('launchBus');
+
       bus.on(`process:${instanceId}`, (packet) => {
         registersPerInstance[packet.data.instanceId] = packet.data.register;
         registersReady += 1;
+
         if (registersReady === instancesCount) {
           resolve(prom.AggregatorRegistry.aggregate(registersPerInstance));
         }
@@ -40,7 +42,6 @@ const getAggregatedRegistry = (instancesData) => {
       reject(e);
     }
   });
-
   requestNeighboursData(instancesData);
   return registryPromise;
 };
@@ -63,8 +64,12 @@ module.exports = async (req, res) => {
   try {
     await pm2exec('connect', false);
     const instancesData = await pm2exec('list');
-    const register = await getAggregatedRegistry(instancesData);
-    responseData = register.metrics();
+    if (instancesData.length === 1) { // 1 instance
+      responseData = prom.register.metrics();
+    } else {
+      const register = await getAggregatedRegistry(instancesData);
+      responseData = register.metrics();
+    }
   } catch (err) {
     console.error(err);
   } finally {

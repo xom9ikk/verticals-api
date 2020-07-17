@@ -1,7 +1,7 @@
 const cluster = require('cluster');
 const knex = require('knex');
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV;
 const dbConfig = require('../../knexfile')[env];
 
 class Database {
@@ -10,23 +10,14 @@ class Database {
       ...dbConfig,
       pool: {
         ...dbConfig.pool,
-        // afterCreate: (connection, callback) => {
-        //   connection.query('SET timezone to \'UTC\'', (err) => {
-        //     const { host, port } = dbConfig.connection;
-        //     // console.log(`PostgreSQL connection established by ${host}:${port}`);
-        //     callback(err, connection);
-        //   });
-        // },
       },
     });
     this.knex.migrate.latest();
-    // if (cluster.isMaster) {
-    //   console.log('Migrate DB');
-    //   if (env === 'development') {
-    //     // Drop tables tokens & users
-    //     // this.knex.seed.run();
-    //   }
-    // }
+    if (cluster.isMaster) {
+      console.log('migrate:latest');
+      // Drop tables
+      // this.knex.seed.run();
+    }
   }
 }
 

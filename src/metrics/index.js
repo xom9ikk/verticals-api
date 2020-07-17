@@ -18,7 +18,7 @@ const _counterRequests = new promClient.Counter({
   labelNames: ['worker', 'status', 'method', 'route'],
 });
 
-const worker = cluster.worker ? `worker_${cluster.worker.id}` : 'master';
+const worker = cluster.worker ? `worker_${NODE_APP_INSTANCE}` : 'master';
 
 class Metrics {
   static counterRequests({ status, method, route }) {
@@ -33,9 +33,10 @@ class Metrics {
   static start() {
     const app = express();
     promClient.collectDefaultMetrics({ timeout: METRICS_TIMEOUT });
+    app.set('trust proxy', true);
     app.get(METRICS_ROUTE, pm2Cluster);
     app.listen(METRICS_PORT, METRICS_HOST, () => {
-      console.log(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT} on worker ${NODE_APP_INSTANCE}`);
+      console.log(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE} on worker ${NODE_APP_INSTANCE}`);
     });
   }
 }

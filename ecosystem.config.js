@@ -6,8 +6,8 @@ module.exports = {
     args: [
       '--color',
     ],
-    // instances: 'max',
-    instances: 1,
+    // instances: 1,
+    instances: 'max',
     exec_mode: 'cluster',
     env: {
       NODE_ENV: 'development',
@@ -18,7 +18,7 @@ module.exports = {
       JWT_SECRET: 'verticals_secret_yB4wh92erhF',
       CORS_ORIGIN: '*',
       METRICS_ENABLED: true,
-      METRICS_PORT: 3002,
+      METRICS_PORT: 3001,
       METRICS_HOST: '0.0.0.0',
       METRICS_ROUTE: '/metrics',
       METRICS_TIMEOUT: 5000,

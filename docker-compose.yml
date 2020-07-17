@@ -11,19 +11,24 @@ services:
       - "127.0.0.1:5433:5432"
     networks:
       - verticals_backend_metrics_net
+    command: postgres -c config_file=/etc/postgresql.conf
+    #    command:
+#      - "psql -c max_connections=2000 -c shared_buffers=256MB"
     volumes:
-      - './postgresql.conf:/var/lib/postgresql/data/postgresql.conf'
       - 'verticals_backend_postgresql_data:/var/lib/postgresql'
+#      - './postgresql.conf:/var/lib/postgresql/data/postgresql.auto.conf'
+      - './postgresql.conf:/etc/postgresql.conf'
 
   verticals_backend:
     container_name: verticals_backend
     build:
       context: ./
       dockerfile: Dockerfile
+    depends_on:
+      - verticals_backend_postgresql
     ports:
       - "0.0.0.0:3000:3000"
       - "0.0.0.0:3001:3001"
-      - "0.0.0.0:3002:3002"
     volumes:
       - './logs:/app/logs'
     networks:
