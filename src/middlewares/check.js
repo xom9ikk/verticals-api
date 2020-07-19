@@ -1,3 +1,4 @@
+const { UserService } = require('../services');
 const { BackendError, TokenComponent } = require('../components');
 const { ValidatorComponent } = require('../components');
 
@@ -27,6 +28,10 @@ class CheckMiddleware {
     }
   }
 
+  static getDataFromToken(token) {
+    return TokenComponent.verifyToken(token);
+  }
+
   async isAuthenticated(req, res, next) {
     try {
       const token = CheckMiddleware.extractToken(req);
@@ -34,7 +39,7 @@ class CheckMiddleware {
         throw new BackendError.Forbidden('Token does not contain Bearer');
       }
 
-      const isValidTokenSignature = await CheckMiddleware.isValidTokenSignature(token);
+      const isValidTokenSignature = CheckMiddleware.isValidTokenSignature(token);
       if (!isValidTokenSignature) {
         throw new BackendError.Forbidden('Invalid token signature');
       }
@@ -64,6 +69,20 @@ class CheckMiddleware {
       if (isExistUsername) {
         throw new BackendError.Conflict(`User with username ${username} already registered`);
       }
+      next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getUser(req, res, next) {
+    try {
+      const { parsedBearerToken } = res.locals;
+      const { userId } = CheckMiddleware.getDataFromToken(parsedBearerToken);
+
+      const user = await UserService.getById(userId);
+
+      res.locals.user = user;
       next();
     } catch (e) {
       next(e);

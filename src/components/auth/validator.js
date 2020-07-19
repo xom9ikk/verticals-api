@@ -12,7 +12,7 @@ class ValidatorComponent {
   }
 
   async isActiveToken(token) {
-    const activeToken = await TokenService.findByToken(token);
+    const activeToken = await TokenService.getByToken(token);
     return !!activeToken;
   }
 }

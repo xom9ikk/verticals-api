@@ -12,10 +12,10 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: `${__dirname}/src/database/migrations`,
+      directory: `${__dirname}/src/knex/migrations`,
     },
     seeds: {
-      directory: `${__dirname}/src/database/seeds`,
+      directory: `${__dirname}/src/knex/seeds`,
     },
   },
 
@@ -34,10 +34,10 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: `${__dirname}/src/database/migrations`,
+      directory: `${__dirname}/src/knex/migrations`,
     },
     seeds: {
-      directory: `${__dirname}/src/database/seeds`,
+      directory: `${__dirname}/src/knex/seeds`,
     },
   },
 };

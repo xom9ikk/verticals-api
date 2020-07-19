@@ -1,11 +1,11 @@
 const express = require('express');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const Database = require('./database');
+const { Knex } = require('./knex');
 const { Metrics } = require('./metrics');
 const { morganLogger } = require('./morgan');
 
-global.knex = new Database().knex;
+global.knex = new Knex().knex;
 const routes = require('./routes');
 
 const {

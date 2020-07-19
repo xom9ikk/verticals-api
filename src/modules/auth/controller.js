@@ -49,13 +49,13 @@ class AuthController {
   }
 
   async refresh({ refreshToken, ip }) {
-    const pairTokens = await TokenService.findByRefreshToken(refreshToken);
+    const pairTokens = await TokenService.getByRefreshToken(refreshToken);
 
     if (!pairTokens) {
       throw new BackendError.Forbidden(`Invalid refresh token: ${refreshToken}`);
     }
 
-    const { user_id: userId } = pairTokens;
+    const { userId } = pairTokens;
     const [tokens] = await Promise.all([
       TokenComponent.issueTokenPair({
         userId,

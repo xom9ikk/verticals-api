@@ -1,41 +1,46 @@
 class TokenService {
-  get DB() {
-    return knex('tokens');
+  constructor() {
+    this.db = knex('tokens');
   }
 
-  add({
-    refreshToken, token, userId, ip,
-  }) {
-    return this.DB.insert({
-      refresh_token: refreshToken,
-      token,
-      user_id: userId,
-      ip,
-    }).returning('*');
+  add(pairTokens) {
+    return this.db
+      .insert(pairTokens)
+      .returning('*');
   }
 
-  findByRefreshToken(refreshToken) {
-    return this.DB.select('*').where({
-      refresh_token: refreshToken,
-    }).first();
+  getByRefreshToken(refreshToken) {
+    return this.db
+      .select('*')
+      .where({
+        refreshToken,
+      })
+      .first();
   }
 
-  findByToken(token) {
-    return this.DB.select('*').where({
-      token,
-    }).first();
+  getByToken(token) {
+    return this.db
+      .select('*')
+      .where({
+        token,
+      })
+      .first();
   }
 
   removeByRefreshToken(refreshToken) {
-    return this.DB.where({
-      refresh_token: refreshToken,
-    }).del();
+    return this.db
+      .where({
+        refreshToken,
+      })
+      .del();
   }
 
   removeByToken(token) {
-    return this.DB.where({
-      token,
-    }).del();
+    return this.db
+      .where({
+        token,
+      })
+      .del();
   }
 }
 

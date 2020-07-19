@@ -1,10 +1,12 @@
-const { BackendError } = require('../../components');
+const { BoardService } = require('../../services');
 
 class BoardController {
-  async create({
-    title, position, cardType, description, color,
-  }) {
-    // TODO:
+  async create(board) {
+    await BoardService.create(board);
+  }
+
+  async update({ userId, boardId, patch }) {
+    console.log(patch);
   }
 }
 

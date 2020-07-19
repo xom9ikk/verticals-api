@@ -79,6 +79,13 @@ router.post(
   CheckMiddleware.isAuthenticated,
   BoardAdapter.create,
 );
+router.patch(
+  '/:boardId',
+  // SchemaValidator.validate(RequestPart.body, 'patchBoard'),
+  CheckMiddleware.isAuthenticated,
+  CheckMiddleware.getUser,
+  BoardAdapter.update,
+);
 
 module.exports = {
   board: router,

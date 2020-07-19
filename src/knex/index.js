@@ -2,8 +2,11 @@ const cluster = require('cluster');
 const knex = require('knex');
 const { Formatter } = require('../utils');
 
-const env = process.env.NODE_ENV;
-const dbConfig = require('../../knexfile')[env];
+const {
+  NODE_ENV,
+  NODE_APP_INSTANCE,
+} = process.env;
+const dbConfig = require('../../knexfile')[NODE_ENV];
 
 class Knex {
   constructor() {
@@ -16,7 +19,7 @@ class Knex {
       wrapIdentifier: (value, origImpl) => (value === '*' ? value : origImpl(Formatter.convertToSnakeCase(value))),
     });
     this.knex.migrate.latest();
-    if (cluster.isMaster) {
+    if (cluster.isMaster || NODE_APP_INSTANCE === '0') {
       console.log('migrate:latest');
       // Drop tables
       // this.knex.seed.run();
@@ -24,4 +27,6 @@ class Knex {
   }
 }
 
-module.exports = Database;
+module.exports = {
+  Knex,
+};
