@@ -63,8 +63,8 @@ class AuthAdapter {
 
   async me(req, res, next) {
     try {
-      const { token } = req;
-      const user = await AuthController.me({ token });
+      const { userId } = res.locals;
+      const user = await AuthController.me({ userId });
       return BackendResponse.Success(res, 'User successfully received', user);
     } catch (e) {
       next(e);

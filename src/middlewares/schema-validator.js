@@ -6,14 +6,9 @@ const { BoardSchema } = require('../modules/board/schemas');
 
 class SchemaValidator {
   constructor() {
-    this.RequestPart = {
-      body: 'body',
-      query: 'query',
-      params: 'params',
-    };
     this.ajv = ajv({
       allErrors: true,
-      removeAdditional: true,
+      removeAdditional: 'all',
     });
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
     Object.keys(BoardSchema).map((key) => this.ajv.addSchema(BoardSchema[key], key));

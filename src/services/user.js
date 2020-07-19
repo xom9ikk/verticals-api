@@ -1,8 +1,11 @@
-const selectorAll = ['id', 'email', 'name', 'surname', 'username'];
+const { Database } = require('../database');
+const { tables } = require('../database/tables');
 
-class UserService {
+const selectorAll = ['email', 'name', 'surname', 'username'];
+
+class UserService extends Database {
   constructor() {
-    this.db = knex('users');
+    super(tables.users);
   }
 
   async create(user) {
@@ -40,6 +43,14 @@ class UserService {
   }
 
   getUserWithPasswordByEmail(email) {
+    console.log(this.db.select(
+      ['id', 'password'],
+    )
+      .where({
+        email,
+      })
+      .first().toSQL()
+      .toNative());
     return this.db.select(
       ['id', 'password'],
     )

@@ -21,6 +21,20 @@ class BoardService extends Database {
       )
       .first();
   }
+
+  async update(id, board) {
+    const response = await this.db
+      .where({ id })
+      .update(board)
+      .returning('id');
+    return response[0];
+  }
+
+  removeById(id) {
+    return this.db
+      .where({ id })
+      .del();
+  }
 }
 
 module.exports = {

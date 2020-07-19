@@ -4,11 +4,11 @@ const { CollectionIterator } = require('./collection-iterator');
 
 class Formatter {
   static deepConvertToCamelCase(data) {
-    return CollectionIterator.deepIterate(data, camelCase);
+    return CollectionIterator.deepIterateKeys(data, camelCase);
   }
 
   static deepConvertToSnakeCase(data) {
-    return CollectionIterator.deepIterate(data, snakeCase);
+    return CollectionIterator.deepIterateKeys(data, snakeCase);
   }
 
   static convertToSnakeCase(data) {

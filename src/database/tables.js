@@ -3,5 +3,6 @@ module.exports = {
     boards: 'boards',
     tokens: 'tokens',
     users: 'users',
+    boardsAccess: 'boards_access',
   },
 };

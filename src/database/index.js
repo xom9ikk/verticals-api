@@ -1,6 +1,10 @@
 class Database {
   constructor(tableName) {
-    this.db = knex(tableName);
+    this.tableName = tableName;
+  }
+
+  get db() {
+    return knex(this.tableName);
   }
 }
 

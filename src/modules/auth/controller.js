@@ -71,10 +71,10 @@ class AuthController {
     if (!removeTokenPair) {
       throw new BackendError.NotFound(`Logout failed. Token ${token} not found`);
     }
+    return true;
   }
 
-  async me({ token }) {
-    const { userId } = TokenComponent.verifyToken(token);
+  async me({ userId }) {
     const user = await UserService.getById(userId);
     if (!user) {
       throw new BackendError.NotFound('User not found');

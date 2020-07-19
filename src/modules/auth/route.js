@@ -1,8 +1,12 @@
 const router = require('express').Router();
 const { AuthAdapter } = require('./adapter');
-const { SchemaValidator, CheckMiddleware } = require('../../middlewares');
+const {
+  SchemaValidator,
+  CheckMiddleware,
+  FetchMiddleware,
+} = require('../../middlewares');
+const { RequestPart } = require('../../enums');
 
-const { RequestPart } = SchemaValidator;
 /**
  * @swagger
  * definitions:
@@ -255,6 +259,7 @@ router.post(
 router.get(
   '/me',
   CheckMiddleware.isAuthenticated,
+  FetchMiddleware.getUserId,
   AuthAdapter.me,
 );
 

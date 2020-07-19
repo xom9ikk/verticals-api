@@ -7,10 +7,13 @@ class BoardAdapter {
       const {
         title, position, cardType, description, color,
       } = req.body;
-      await BoardController.create({
+      const {
+        userId,
+      } = res.locals;
+      const boardId = await BoardController.create(userId, {
         title, position, cardType, description, color,
       });
-      return BackendResponse.Created(res, 'Board successfully created');
+      return BackendResponse.Created(res, 'Board successfully created', { boardId });
     } catch (e) {
       next(e);
     }
@@ -18,25 +21,32 @@ class BoardAdapter {
 
   async update(req, res, next) {
     try {
-      const { user: { id: userId } } = res.locals;
-      const {
-        title, position, cardType, description, color,
-      } = req.body;
+      const { userId } = res.locals;
       const { boardId } = req.params;
 
       await BoardController.update({
         userId,
         boardId,
-        patch: {
-          title,
-          position,
-          cardType,
-          description,
-          color,
-        },
+        patch: req.body,
       });
 
-      return BackendResponse.Created(res, 'Board successfully updated');
+      return BackendResponse.Success(res, 'Board successfully updated');
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async remove(req, res, next) {
+    try {
+      const { userId } = res.locals;
+      const { boardId } = req.params;
+
+      await BoardController.remove({
+        userId,
+        boardId,
+      });
+
+      return BackendResponse.Success(res, 'Board successfully removed');
     } catch (e) {
       next(e);
     }

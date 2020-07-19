@@ -1,6 +1,9 @@
-class TokenService {
+const { Database } = require('../database');
+const { tables } = require('../database/tables');
+
+class TokenService extends Database {
   constructor() {
-    this.db = knex('tokens');
+    super(tables.tokens);
   }
 
   add(pairTokens) {

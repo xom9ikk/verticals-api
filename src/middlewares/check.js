@@ -1,4 +1,3 @@
-const { UserService } = require('../services');
 const { BackendError, TokenComponent } = require('../components');
 const { ValidatorComponent } = require('../components');
 
@@ -26,10 +25,6 @@ class CheckMiddleware {
     } catch (e) {
       return false;
     }
-  }
-
-  static getDataFromToken(token) {
-    return TokenComponent.verifyToken(token);
   }
 
   async isAuthenticated(req, res, next) {
@@ -69,20 +64,6 @@ class CheckMiddleware {
       if (isExistUsername) {
         throw new BackendError.Conflict(`User with username ${username} already registered`);
       }
-      next();
-    } catch (e) {
-      next(e);
-    }
-  }
-
-  async getUser(req, res, next) {
-    try {
-      const { parsedBearerToken } = res.locals;
-      const { userId } = CheckMiddleware.getDataFromToken(parsedBearerToken);
-
-      const user = await UserService.getById(userId);
-
-      res.locals.user = user;
       next();
     } catch (e) {
       next(e);

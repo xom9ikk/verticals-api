@@ -12,7 +12,7 @@ exports.up = (knex) => knex.schema.createTable('boards', (table) => {
     .integer('card_type')
     .notNullable();
   table
-    .string('description');
+    .string('description', 4096);
   table
     .integer('color');
   table
