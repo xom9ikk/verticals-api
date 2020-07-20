@@ -9,7 +9,7 @@ class ColumnSchema {
       title: {
         type: 'string',
         minLength: 1,
-        maxLength: 256,
+        maxLength: 255,
       },
       position: {
         type: 'integer',
@@ -57,7 +57,7 @@ class ColumnSchema {
       title: {
         type: 'string',
         minLength: 1,
-        maxLength: 256,
+        maxLength: 255,
       },
       position: {
         type: 'integer',

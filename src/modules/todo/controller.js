@@ -69,8 +69,6 @@ class TodoController {
   }
 
   async update({ userId, todoId, patch }) {
-    console.log('userId', userId);
-    console.log('todoId', todoId);
     const boardId = await TodoService.getBoardIdByTodoId(todoId);
 
     if (boardId === undefined) {

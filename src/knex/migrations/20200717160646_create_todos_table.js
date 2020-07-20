@@ -15,7 +15,7 @@ exports.up = (knex) => knex.schema.createTable('todos', (table) => {
     .integer('position')
     .notNullable();
   table
-    .string('description');
+    .string('description', 4096);
   table
     .integer('status')
     .defaultTo(0);

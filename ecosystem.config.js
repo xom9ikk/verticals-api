@@ -14,7 +14,7 @@ module.exports = {
       DEBUG_COLORS: true,
       HOST: '0.0.0.0',
       PORT: 3000,
-      JWT_EXPIRE: '1H',
+      JWT_EXPIRE: '1Y',
       JWT_SECRET: 'verticals_secret_yB4wh92erhF',
       CORS_ORIGIN: '*',
       METRICS_ENABLED: true,
@@ -32,6 +32,7 @@ module.exports = {
     },
     env_production: {
       NODE_ENV: 'production',
+      JWT_EXPIRE: '1H',
     },
   }],
 };

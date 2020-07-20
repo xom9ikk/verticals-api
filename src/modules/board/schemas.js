@@ -5,7 +5,7 @@ class BoardSchema {
       title: {
         type: 'string',
         minLength: 1,
-        maxLength: 256,
+        maxLength: 255,
       },
       position: {
         type: 'integer',
@@ -42,7 +42,7 @@ class BoardSchema {
       title: {
         type: 'string',
         minLength: 1,
-        maxLength: 256,
+        maxLength: 255,
       },
       position: {
         type: 'integer',

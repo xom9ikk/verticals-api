@@ -17,16 +17,6 @@ class TodoService extends Database {
         id,
       })
       .first();
-    console.log(this.columns
-      .select([
-        'boardId',
-      ])
-      .whereIn(
-        'id',
-        subquery,
-      )
-      .first().toSQL()
-      .toNative());
     const response = await this.columns
       .select([
         'boardId',
@@ -78,7 +68,6 @@ class TodoService extends Database {
   }
 
   getByBoardIds(boardIds) {
-    console.log('getByBoardIds', boardIds);
     const subquery = this.columns
       .select([
         'id',

@@ -9,7 +9,7 @@ exports.up = (knex) => knex.schema.createTable('comments', (table) => {
     .references('id')
     .inTable('todos');
   table
-    .string('text');
+    .string('text', 4096);
   table
     .integer('reply_comment_id')
     .references('id')
