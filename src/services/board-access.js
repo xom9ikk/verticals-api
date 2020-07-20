@@ -1,21 +1,23 @@
 const { Database } = require('../database');
-const { tables } = require('../database/tables');
 
 class BoardAccessService extends Database {
-  constructor() {
-    super(tables.boardsAccess);
-  }
-
   async create(userId, boardId) {
-    const response = await this.db
-      .insert({ userId, boardId })
+    const response = await this.boardsAccess
+      .insert({
+        userId,
+        boardId,
+      })
       .returning('id');
     return response[0];
   }
 
   get(userId, boardId) {
-    return this.db
-      .select(['id', 'userId', 'boardId'])
+    return this.boardsAccess
+      .select([
+        'id',
+        'userId',
+        'boardId',
+      ])
       .where({
         userId,
         boardId,
@@ -24,8 +26,10 @@ class BoardAccessService extends Database {
   }
 
   async getAllBoardIdsByUserId(userId) {
-    const response = await this.db
-      .select(['boardId'])
+    const response = await this.boardsAccess
+      .select([
+        'boardId',
+      ])
       .where({
         userId,
       });
@@ -33,8 +37,10 @@ class BoardAccessService extends Database {
   }
 
   removeByBoardId(boardId) {
-    return this.db
-      .where({ boardId })
+    return this.boardsAccess
+      .where({
+        boardId,
+      })
       .del();
   }
 }

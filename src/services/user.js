@@ -1,23 +1,21 @@
 const { Database } = require('../database');
-const { tables } = require('../database/tables');
-
-const selectorAll = ['email', 'name', 'surname', 'username'];
 
 class UserService extends Database {
-  constructor() {
-    super(tables.users);
-  }
-
   async create(user) {
-    const response = await this.db
+    const response = await this.users
       .insert(user)
       .returning('id');
     return response[0];
   }
 
   getById(id) {
-    return this.db
-      .select(selectorAll)
+    return this.users
+      .select([
+        'email',
+        'name',
+        'surname',
+        'username',
+      ])
       .where({
         id,
       })
@@ -25,8 +23,13 @@ class UserService extends Database {
   }
 
   getByEmail(email) {
-    return this.db
-      .select(selectorAll)
+    return this.users
+      .select([
+        'email',
+        'name',
+        'surname',
+        'username',
+      ])
       .where({
         email,
       })
@@ -34,8 +37,13 @@ class UserService extends Database {
   }
 
   getByUsername(username) {
-    return this.db
-      .select(selectorAll)
+    return this.users
+      .select([
+        'email',
+        'name',
+        'surname',
+        'username',
+      ])
       .where({
         username,
       })
@@ -43,17 +51,11 @@ class UserService extends Database {
   }
 
   getUserWithPasswordByEmail(email) {
-    console.log(this.db.select(
-      ['id', 'password'],
-    )
-      .where({
-        email,
-      })
-      .first().toSQL()
-      .toNative());
-    return this.db.select(
-      ['id', 'password'],
-    )
+    return this.users
+      .select([
+        'id',
+        'password',
+      ])
       .where({
         email,
       })
@@ -61,10 +63,11 @@ class UserService extends Database {
   }
 
   getUserWithPasswordByUsername(username) {
-    return this.db
-      .select(
-        ['id', 'password'],
-      )
+    return this.users
+      .select([
+        'id',
+        'password',
+      ])
       .where({
         username,
       })

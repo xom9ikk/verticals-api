@@ -1,10 +1,28 @@
+const { tables } = require('./tables');
+
 class Database {
-  constructor(tableName) {
-    this.tableName = tableName;
+  get tokens() {
+    return knex(tables.tokens);
   }
 
-  get db() {
-    return knex(this.tableName);
+  get users() {
+    return knex(tables.users);
+  }
+
+  get boards() {
+    return knex(tables.boards);
+  }
+
+  get boardsAccess() {
+    return knex(tables.boardsAccess);
+  }
+
+  get columns() {
+    return knex(tables.columns);
+  }
+
+  get todos() {
+    return knex(tables.todos);
   }
 }
 

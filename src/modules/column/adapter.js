@@ -4,13 +4,8 @@ const { ColumnController } = require('./controller');
 class ColumnAdapter {
   async create(req, res, next) {
     try {
-      const {
-        boardId, title, position, description, color, isCollapsed,
-      } = req.body;
       const { userId } = res.locals;
-      const columnId = await ColumnController.create(userId, {
-        boardId, title, position, description, color, isCollapsed,
-      });
+      const columnId = await ColumnController.create(userId, req.body);
       return BackendResponse.Created(res, 'Column successfully created', { columnId });
     } catch (e) {
       next(e);

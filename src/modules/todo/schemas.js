@@ -1,56 +1,66 @@
-class ColumnSchema {
-  createColumn = {
-    type: 'object',
-    properties: {
-      boardId: {
-        type: 'integer',
-        minimum: 1,
-      },
-      title: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 256,
-      },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
-      description: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 4096,
-      },
-      color: {
-        type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
-      },
-      isCollapsed: {
-        type: 'boolean',
-      },
-    },
-    required: ['boardId', 'title', 'position'],
-  }
-  getColumn = {
+class TodoSchema {
+  createTodo = {
     type: 'object',
     properties: {
       columnId: {
         type: 'integer',
+        minimum: 1,
+      },
+      title: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 256,
+      },
+      position: {
+        type: 'integer',
+        minimum: 0,
+      },
+      description: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 4096,
+      },
+      status: {
+        type: 'number',
+        enum: [0, 1, 2],
+      },
+      color: {
+        type: 'number',
+        enum: [0, 1, 2, 3, 4, 5, 6],
+      },
+      isArchived: {
+        type: 'boolean',
+      },
+      isNotificationsEnabled: {
+        type: 'boolean',
       },
     },
-    required: ['columnId'],
+    required: ['columnId', 'title', 'position'],
   }
-  getColumnsQuery = {
+  getTodo = {
+    type: 'object',
+    properties: {
+      todoId: {
+        type: 'integer',
+      },
+    },
+    required: ['todoId'],
+  }
+  getTodosQuery = {
     type: 'object',
     properties: {
       boardId: {
         type: 'integer',
       },
+      columnId: {
+        type: 'integer',
+      },
     },
   }
-  patchColumnBody = {
+  patchTodoBody = {
     type: 'object',
     properties: {
-      boardId: {
+      columnId: {
         type: 'integer',
         minimum: 1,
       },
@@ -68,43 +78,52 @@ class ColumnSchema {
         minLength: 1,
         maxLength: 4096,
       },
+      status: {
+        type: 'number',
+        enum: [0, 1, 2],
+      },
       color: {
         type: 'number',
         enum: [0, 1, 2, 3, 4, 5, 6],
       },
-      isCollapsed: {
+      isArchived: {
+        type: 'boolean',
+      },
+      isNotificationsEnabled: {
         type: 'boolean',
       },
     },
     anyOf: [
-      { required: ["boardId"] },
+      { required: ["columnId"] },
       { required: ["title"] },
       { required: ["position"] },
       { required: ["description"] },
+      { required: ["status"] },
       { required: ["color"] },
-      { required: ["isCollapsed"] },
+      { required: ["isArchived"] },
+      { required: ["isNotificationsEnabled"] },
     ],
   }
-  patchColumnParams = {
+  patchTodoParams = {
     type: 'object',
     properties: {
-      columnId: {
+      todoId: {
         type: 'integer',
       },
     },
-    required: ['columnId'],
+    required: ['todoId'],
   }
-  deleteColumnParams = {
+  deleteTodoParams = {
     type: 'object',
     properties: {
-      columnId: {
+      todoId: {
         type: 'integer',
       },
     },
-    required: ['columnId'],
+    required: ['todoId'],
   }
 }
 
 module.exports = {
-  ColumnSchema: new ColumnSchema(),
+  TodoSchema: new TodoSchema(),
 };

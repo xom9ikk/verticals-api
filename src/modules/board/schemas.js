@@ -25,7 +25,7 @@ class BoardSchema {
         enum: [0, 1, 2, 3, 4, 5, 6],
       },
     },
-    required: ['title', 'position'],
+    required: ['title', 'position', 'cardType'],
   }
   getBoard = {
     type: 'object',

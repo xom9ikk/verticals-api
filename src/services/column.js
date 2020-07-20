@@ -1,20 +1,15 @@
 const { Database } = require('../database');
-const { tables } = require('../database/tables');
 
 class ColumnService extends Database {
-  constructor() {
-    super(tables.columns);
-  }
-
-  async create(board) {
-    const response = await this.db
-      .insert(board)
+  async create(column) {
+    const response = await this.columns
+      .insert(column)
       .returning('id');
     return response[0];
   }
 
   async getBoardIdByColumnId(id) {
-    const response = await this.db
+    const response = await this.columns
       .select([
         'boardId',
       ])
@@ -26,7 +21,7 @@ class ColumnService extends Database {
   }
 
   getById(id) {
-    return this.db
+    return this.columns
       .select([
         'id',
         'boardId',
@@ -43,7 +38,7 @@ class ColumnService extends Database {
   }
 
   getByColumnIds(columnIds) {
-    return this.db
+    return this.columns
       .select([
         'id',
         'boardId',
@@ -60,7 +55,7 @@ class ColumnService extends Database {
   }
 
   getByBoardIds(boardIds) {
-    return this.db
+    return this.columns
       .select([
         'id',
         'boardId',
@@ -76,17 +71,21 @@ class ColumnService extends Database {
       );
   }
 
-  async update(id, board) {
-    const response = await this.db
-      .where({ id })
-      .update(board)
+  async update(id, column) {
+    const response = await this.columns
+      .where({
+        id,
+      })
+      .update(column)
       .returning('id');
     return response[0];
   }
 
   removeById(id) {
-    return this.db
-      .where({ id })
+    return this.columns
+      .where({
+        id,
+      })
       .del();
   }
 }

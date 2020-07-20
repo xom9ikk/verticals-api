@@ -58,7 +58,12 @@ class ColumnController {
   }
 
   async update({ userId, columnId, patch }) {
-    const { boardId } = patch;
+    const boardId = await ColumnService.getBoardIdByColumnId(columnId);
+
+    if (boardId === undefined) {
+      throw new BackendError.Forbidden('This account is not allowed to edit this column');
+    }
+
     const isAccess = await BoardAccessService.get(userId, boardId);
 
     if (!isAccess) {
@@ -87,7 +92,6 @@ class ColumnController {
       throw new BackendError.Forbidden('This account is not allowed to remove this column');
     }
 
-    await BoardAccessService.removeByBoardId(columnId);
     await ColumnService.removeById(columnId);
     return true;
   }

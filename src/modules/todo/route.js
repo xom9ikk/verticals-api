@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { ColumnAdapter } = require('./adapter');
+const { TodoAdapter } = require('./adapter');
 const {
   SchemaValidator,
   CheckMiddleware,
@@ -21,14 +21,14 @@ const { RequestPart } = require('../../enums');
 /**
  * @swagger
  * definitions:
- *   CreateColumnRequest:
+ *   CreateTodoRequest:
  *    type: object
  *    required:
- *      - boardId
+ *      - columnId
  *      - title
  *      - position
  *    properties:
- *      boardId:
+ *      columnId:
  *        type: integer
  *      title:
  *        type: string
@@ -36,25 +36,30 @@ const { RequestPart } = require('../../enums');
  *        type: integer
  *      description:
  *        type: string
+ *      status:
+ *        type: integer
+ *        enum: [0, 1, 2]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isCollapsed:
+ *      isArchived:
  *        type: boolean
- *   CreateColumnResponse:
+ *      isNotificationsEnabled:
+ *        type: boolean
+ *   CreateTodoResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           columnId:
+ *           todoId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/column:
+ * /v1/todo:
  *   post:
  *     tags:
- *       - Column
+ *       - Todo
  *     description: Create new column
  *     produces:
  *       - application/json
@@ -67,12 +72,12 @@ const { RequestPart } = require('../../enums');
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/CreateColumnRequest'
+ *          $ref: '#/definitions/CreateTodoRequest'
  *     responses:
  *       200:
- *         description: "Column successfully created"
+ *         description: "Todo successfully created"
  *         schema:
- *          $ref: '#/definitions/CreateColumnResponse'
+ *          $ref: '#/definitions/CreateTodoResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -80,22 +85,22 @@ const { RequestPart } = require('../../enums');
  */
 router.post(
   '/',
-  SchemaValidator.validate(RequestPart.body, 'createColumn'),
+  SchemaValidator.validate(RequestPart.body, 'createTodo'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  ColumnAdapter.create,
+  TodoAdapter.create,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetColumnResponse:
+ *   GetTodoResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           boardId:
+ *           columnId:
  *             type: integer
  *           title:
  *             type: string
@@ -103,18 +108,23 @@ router.post(
  *             type: integer
  *           description:
  *             type: string
+ *           status:
+ *             type: integer
+ *             enum: [0, 1, 2]
  *           color:
  *             type: integer
  *             enum: [0, 1, 2, 3, 4, 5, 6]
- *           isCollapsed:
+ *           isArchived:
+ *             type: boolean
+ *           isNotificationsEnabled:
  *             type: boolean
  *       message:
  *         type: string
- * /v1/column/:columnId
+ * /v1/todo/:todoId
  *   get:
  *     tags:
- *       - Column
- *     description: Get column info by id
+ *       - Todo
+ *     description: Get todo info by id
  *     produces:
  *       - application/json
  *     parameters:
@@ -123,51 +133,53 @@ router.post(
  *         type: string
  *         required: true
  *       - in: path
- *         name: columnId
+ *         name: todoId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Column information successfully received"
+ *         description: "Todo information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetColumnResponse'
+ *          $ref: '#/definitions/GetTodoResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.get(
-  '/:columnId',
+  '/:todoId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getColumn'),
+  SchemaValidator.validate(RequestPart.params, 'getTodo'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  ColumnAdapter.get,
+  TodoAdapter.get,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetAllColumnsRequest:
+ *   GetAllTodosRequest:
  *    type: object
  *    properties:
  *      boardId:
  *        type: integer
- *   GetAllColumnsResponse:
+ *      columnId:
+ *        type: integer
+ *   GetAllTodosResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           columnId:
+ *           todoId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/column
+ * /v1/todo
  *   get:
  *     tags:
- *       - Column
- *     description: Get all columns to which you have access
+ *       - Todo
+ *     description: Get all todos to which you have access
  *     produces:
  *       - application/json
  *     parameters:
@@ -179,12 +191,12 @@ router.get(
  *         in: query
  *         required: false
  *         schema:
- *          $ref: '#/definitions/GetAllColumnsRequest'
+ *          $ref: '#/definitions/GetAllTodosRequest'
  *     responses:
  *       200:
- *         description: "Columns information successfully received"
+ *         description: "Todos information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetAllColumnsResponse'
+ *          $ref: '#/definitions/GetAllTodosResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -193,19 +205,19 @@ router.get(
 router.get(
   '/',
   FormatterMiddleware.castToInteger(RequestPart.query),
-  SchemaValidator.validate(RequestPart.query, 'getColumnsQuery'),
+  SchemaValidator.validate(RequestPart.query, 'getTodosQuery'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  ColumnAdapter.getAll,
+  TodoAdapter.getAll,
 );
 
 /**
  * @swagger
  * definitions:
- *   UpdateColumnRequest:
+ *   UpdateTodoRequest:
  *    type: object
  *    properties:
- *      boardId:
+ *      columnId:
  *        type: integer
  *      title:
  *        type: string
@@ -213,21 +225,26 @@ router.get(
  *        type: integer
  *      description:
  *        type: string
+ *      status:
+ *        type: integer
+ *        enum: [0, 1, 2]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isCollapsed:
+ *      isArchived:
  *        type: boolean
- *   UpdateColumnResponse:
+ *      isNotificationsEnabled:
+ *        type: boolean
+ *   UpdateTodoResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/column/:columnId
+ * /v1/todo/:todoId
  *   patch:
  *     tags:
- *       - Column
- *     description: Update column
+ *       - Todo
+ *     description: Update todo
  *     produces:
  *       - application/json
  *     parameters:
@@ -239,48 +256,48 @@ router.get(
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/UpdateColumnRequest'
+ *          $ref: '#/definitions/UpdateTodoRequest'
  *       - in: path
- *         name: columnId
+ *         name: todoId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Column successfully updated"
+ *         description: "Todo successfully updated"
  *         schema:
- *          $ref: '#/definitions/UpdateColumnResponse'
+ *          $ref: '#/definitions/UpdateTodoResponse'
  *       403:
- *         description: "This account is not allowed to edit this column"
+ *         description: "This account is not allowed to edit this todo"
  *         schema:
- *          $ref: '#/definitions/UpdateColumnResponse'
+ *          $ref: '#/definitions/UpdateTodoResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.patch(
-  '/:columnId',
+  '/:todoId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchColumnBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchColumnParams'),
+  SchemaValidator.validate(RequestPart.body, 'patchTodoBody'),
+  SchemaValidator.validate(RequestPart.params, 'patchTodoParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  ColumnAdapter.update,
+  TodoAdapter.update,
 );
 
 /**
  * @swagger
  * definitions:
- *   DeleteColumnResponse:
+ *   DeleteTodoResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/column/:columnId:
+ * /v1/todo/:todoId:
  *   delete:
  *     tags:
- *       - Column
- *     description: Delete column
+ *       - Todo
+ *     description: Delete todo
  *     produces:
  *       - application/json
  *     parameters:
@@ -289,32 +306,32 @@ router.patch(
  *        type: string
  *        required: true
  *      - in: path
- *        name: columnId
+ *        name: todoId
  *        type: integer
  *        required: true
  *     responses:
  *       200:
- *         description: "Column successfully deleted"
+ *         description: "Todo successfully deleted"
  *         schema:
- *          $ref: '#/definitions/DeleteColumnResponse'
+ *          $ref: '#/definitions/DeleteTodoResponse'
  *       403:
- *         description: "This account is not allowed to delete this column"
+ *         description: "This account is not allowed to delete this todo"
  *         schema:
- *          $ref: '#/definitions/DeleteColumnResponse'
+ *          $ref: '#/definitions/DeleteTodoResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.delete(
-  '/:columnId',
+  '/:todoId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteColumnParams'),
+  SchemaValidator.validate(RequestPart.params, 'deleteTodoParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  ColumnAdapter.remove,
+  TodoAdapter.remove,
 );
 
 module.exports = {
-  columnRouter: router,
+  todoRouter: router,
 };

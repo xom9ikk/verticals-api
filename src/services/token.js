@@ -1,19 +1,14 @@
 const { Database } = require('../database');
-const { tables } = require('../database/tables');
 
 class TokenService extends Database {
-  constructor() {
-    super(tables.tokens);
-  }
-
   add(pairTokens) {
-    return this.db
+    return this.tokens
       .insert(pairTokens)
       .returning('*');
   }
 
   getByRefreshToken(refreshToken) {
-    return this.db
+    return this.tokens
       .select('*')
       .where({
         refreshToken,
@@ -22,7 +17,7 @@ class TokenService extends Database {
   }
 
   getByToken(token) {
-    return this.db
+    return this.tokens
       .select('*')
       .where({
         token,
@@ -31,7 +26,7 @@ class TokenService extends Database {
   }
 
   removeByRefreshToken(refreshToken) {
-    return this.db
+    return this.tokens
       .where({
         refreshToken,
       })
@@ -39,7 +34,7 @@ class TokenService extends Database {
   }
 
   removeByToken(token) {
-    return this.db
+    return this.tokens
       .where({
         token,
       })

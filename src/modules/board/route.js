@@ -23,6 +23,10 @@ const { RequestPart } = require('../../enums');
  * definitions:
  *   CreateBoardRequest:
  *    type: object
+ *    required:
+ *      - title
+ *      - position
+ *      - cardType
  *    properties:
  *      title:
  *        type: string
@@ -119,7 +123,7 @@ router.post(
  *         type: string
  *         required: true
  *       - in: path
- *         name: type
+ *         name: boardId
  *         type: integer
  *         required: true
  *     responses:
@@ -186,13 +190,32 @@ router.get(
 /**
  * @swagger
  * definitions:
- *   PatchBoardResponse:
+ *   UpdateBoardRequest:
+ *    type: object
+ *    required:
+ *      - title
+ *      - position
+ *      - cardType
+ *    properties:
+ *      title:
+ *        type: string
+ *      position:
+ *        type: integer
+ *      cardType:
+ *        type: string
+ *        enum: [0, 1, 2, 3, 4]
+ *      description:
+ *        type: string
+ *      color:
+ *        type: integer
+ *        enum: [0, 1, 2, 3, 4, 5, 6]
+ *   UpdateBoardResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
  * /v1/board/:boardId
- *   post:
+ *   patch:
  *     tags:
  *       - Board
  *     description: Update board
@@ -203,19 +226,24 @@ router.get(
  *         name: Authorization
  *         type: string
  *         required: true
+ *       - name: body
+ *         in: body
+ *         required: true
+ *         schema:
+ *          $ref: '#/definitions/UpdateBoardRequest'
  *       - in: path
- *         name: type
+ *         name: boardId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
  *         description: "Board successfully updated"
  *         schema:
- *          $ref: '#/definitions/PatchBoardResponse'
+ *          $ref: '#/definitions/UpdateBoardResponse'
  *       403:
  *         description: "This account is not allowed to edit this board"
  *         schema:
- *          $ref: '#/definitions/PatchBoardResponse'
+ *          $ref: '#/definitions/UpdateBoardResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -240,7 +268,7 @@ router.patch(
  *       message:
  *         type: string
  * /v1/board/:boardId:
- *   post:
+ *   delete:
  *     tags:
  *       - Board
  *     description: Delete board
@@ -252,7 +280,7 @@ router.patch(
  *        type: string
  *        required: true
  *      - in: path
- *        name: type
+ *        name: boardId
  *        type: integer
  *        required: true
  *     responses:

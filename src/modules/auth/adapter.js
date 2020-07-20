@@ -4,14 +4,9 @@ const { AuthController } = require('./controller');
 class AuthAdapter {
   async register(req, res, next) {
     try {
-      const {
-        body: {
-          email, password, name, surname, username,
-        },
-        ip,
-      } = req;
       const tokens = await AuthController.register({
-        email, password, name, surname, username, ip,
+        ...req.body,
+        ip: req.ip,
       });
       return BackendResponse.Created(res, 'User successfully registered', tokens);
     } catch (e) {
