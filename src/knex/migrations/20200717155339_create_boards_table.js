@@ -10,7 +10,7 @@ exports.up = (knex) => knex.schema.createTable('boards', (table) => {
     .notNullable();
   table
     .integer('card_type')
-    .notNullable();
+    .defaultTo(0);
   table
     .string('description', 4096);
   table

@@ -17,7 +17,8 @@ exports.up = (knex) => knex.schema.createTable('todos', (table) => {
   table
     .string('description');
   table
-    .integer('status');
+    .integer('status')
+    .defaultTo(0);
   table
     .integer('color');
   table
