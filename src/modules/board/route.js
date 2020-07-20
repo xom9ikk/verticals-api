@@ -54,6 +54,10 @@ const { RequestPart } = require('../../enums');
  *     produces:
  *       - application/json
  *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
  *       - name: body
  *         in: body
  *         required: true
@@ -80,27 +84,114 @@ router.post(
 /**
  * @swagger
  * definitions:
- *   PatchBoardRequest:
- *    type: object
- *    properties:
- *      title:
- *        type: string
- *      position:
- *        type: integer
- *      cardType:
- *        type: string
- *        enum: [0, 1, 2, 3, 4]
- *      description:
- *        type: string
- *      color:
- *        type: integer
- *        enum: [0, 1, 2, 3, 4, 5, 6]
+ *   GetBoardResponse:
+ *     type: object
+ *     properties:
+ *       data:
+ *         type: object
+ *         properties:
+ *           id:
+ *             type: integer
+ *           title:
+ *             type: string
+ *           position:
+ *             type: integer
+ *           cardType:
+ *             type: string
+ *             enum: [0, 1, 2, 3, 4]
+ *           description:
+ *             type: string
+ *           color:
+ *             type: integer
+ *             enum: [0, 1, 2, 3, 4, 5, 6]
+ *            message:
+ *              type: string
+ * /v1/board/:boardId
+ *   get:
+ *     tags:
+ *       - Board
+ *     description: Get board info by id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *       - in: path
+ *         name: type
+ *         type: integer
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: "Board information successfully received"
+ *         schema:
+ *          $ref: '#/definitions/GetBoardResponse'
+ *       422:
+ *         description: "Field [field] in request do not match expected"
+ *         schema:
+ *          $ref: '#/definitions/ErrorResponse'
+ */
+router.get(
+  '/:boardId',
+  FormatterMiddleware.castToInteger(RequestPart.params),
+  SchemaValidator.validate(RequestPart.params, 'getBoard'),
+  CheckMiddleware.isAuthenticated,
+  FetchMiddleware.getUserId,
+  BoardAdapter.get,
+);
+
+/**
+ * @swagger
+ * definitions:
+ *   GetAllBoardsResponse:
+ *     type: object
+ *     properties:
+ *       data:
+ *         type: object
+ *         properties:
+ *           boardId:
+ *             type: integer
+ *       message:
+ *         type: string
+ * /v1/board
+ *   get:
+ *     tags:
+ *       - Board
+ *     description: Get all boards to which you have access
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         type: string
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: "Boards information successfully received"
+ *         schema:
+ *          $ref: '#/definitions/GetAllBoardsResponse'
+ *       422:
+ *         description: "Field [field] in request do not match expected"
+ *         schema:
+ *          $ref: '#/definitions/ErrorResponse'
+ */
+router.get(
+  '/',
+  CheckMiddleware.isAuthenticated,
+  FetchMiddleware.getUserId,
+  BoardAdapter.getAll,
+);
+
+/**
+ * @swagger
+ * definitions:
  *   PatchBoardResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/board:
+ * /v1/board/:boardId
  *   post:
  *     tags:
  *       - Board
@@ -108,16 +199,19 @@ router.post(
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: body
- *         in: body
+ *       - in: header
+ *         name: Authorization
+ *         type: string
  *         required: true
- *         schema:
- *          $ref: '#/definitions/PatchBoardRequest'
+ *       - in: path
+ *         name: type
+ *         type: integer
+ *         required: true
  *     responses:
  *       200:
  *         description: "Board successfully updated"
  *         schema:
- *          $ref: '#/definitions/CreateBoardResponse'
+ *          $ref: '#/definitions/PatchBoardResponse'
  *       403:
  *         description: "This account is not allowed to edit this board"
  *         schema:
@@ -140,48 +234,36 @@ router.patch(
 /**
  * @swagger
  * definitions:
- *   PatchBoardRequest:
- *    type: object
- *    properties:
- *      title:
- *        type: string
- *      position:
- *        type: integer
- *      cardType:
- *        type: string
- *        enum: [0, 1, 2, 3, 4]
- *      description:
- *        type: string
- *      color:
- *        type: integer
- *        enum: [0, 1, 2, 3, 4, 5, 6]
- *   PatchBoardResponse:
+ *   DeleteBoardResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/board:
+ * /v1/board/:boardId:
  *   post:
  *     tags:
  *       - Board
- *     description: Create new board
+ *     description: Delete board
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: body
- *         in: body
- *         required: true
- *         schema:
- *          $ref: '#/definitions/PatchBoardRequest'
+ *      - in: header
+ *        name: Authorization
+ *        type: string
+ *        required: true
+ *      - in: path
+ *        name: type
+ *        type: integer
+ *        required: true
  *     responses:
  *       200:
- *         description: "Board successfully updated"
+ *         description: "Board successfully deleted"
  *         schema:
- *          $ref: '#/definitions/CreateBoardResponse'
+ *          $ref: '#/definitions/DeleteBoardResponse'
  *       403:
- *         description: "This account is not allowed to edit this board"
+ *         description: "This account is not allowed to delete this board"
  *         schema:
- *          $ref: '#/definitions/PatchBoardResponse'
+ *          $ref: '#/definitions/DeleteBoardResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:

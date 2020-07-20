@@ -19,6 +19,27 @@ class BoardAdapter {
     }
   }
 
+  async get(req, res, next) {
+    try {
+      const { userId } = res.locals;
+      const { boardId } = req.params;
+      const board = await BoardController.get(userId, boardId);
+      return BackendResponse.Created(res, 'Board information successfully received', { board });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getAll(req, res, next) {
+    try {
+      const { userId } = res.locals;
+      const board = await BoardController.getAll(userId);
+      return BackendResponse.Created(res, 'Boards information successfully received', { board });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async update(req, res, next) {
     try {
       const { userId } = res.locals;

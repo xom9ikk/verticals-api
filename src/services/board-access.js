@@ -23,6 +23,15 @@ class BoardAccessService extends Database {
       .first();
   }
 
+  async getAllBoardIdsByUserId(userId) {
+    const response = await this.db
+      .select(['boardId'])
+      .where({
+        userId,
+      });
+    return response.map((row) => row.boardId);
+  }
+
   removeByBoardId(boardId) {
     return this.db
       .where({ boardId })

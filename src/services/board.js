@@ -15,11 +15,34 @@ class BoardService extends Database {
 
   getById(id) {
     return this.db
-      .select(['id'])
+      .select([
+        'id',
+        'title',
+        'position',
+        'cardType',
+        'description',
+        'color',
+      ])
       .where(
         { id },
       )
       .first();
+  }
+
+  getByBoardIds(boardIds) {
+    return this.db
+      .select([
+        'id',
+        'title',
+        'position',
+        'cardType',
+        'description',
+        'color',
+      ])
+      .whereIn(
+        'id',
+        boardIds,
+      );
   }
 
   async update(id, board) {

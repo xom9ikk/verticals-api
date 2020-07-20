@@ -27,6 +27,15 @@ class BoardSchema {
     },
     required: ['title', 'position'],
   }
+  getBoard = {
+    type: 'object',
+    properties: {
+      boardId: {
+        type: 'integer',
+      },
+    },
+    required: ['boardId'],
+  }
   patchBoardBody = {
     type: 'object',
     properties: {
