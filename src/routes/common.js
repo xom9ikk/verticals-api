@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { BackendResponse } = require('../components');
 const { GeneralError } = require('../components/error');
 
@@ -16,7 +17,10 @@ class RoutesHandler {
     next();
   }
 
-  // eslint-disable-next-line no-unused-vars
+  parseErrorHandler(error, req, res, _) {
+    return new BackendResponse(res, 400, 'Invalid JSON. Change the body and try again');
+  }
+
   errorHandler(error, req, res, _) {
     const isCustomError = error instanceof GeneralError;
     const { status = 500, msg } = error;

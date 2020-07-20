@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { BoardAdapter } = require('./adapter');
+const { ColumnAdapter } = require('./adapter');
 const {
   SchemaValidator,
   CheckMiddleware,
@@ -21,36 +21,37 @@ const { RequestPart } = require('../../enums');
 /**
  * @swagger
  * definitions:
- *   CreateBoardRequest:
+ *   CreateColumnRequest:
  *    type: object
  *    properties:
+ *      boardId:
+ *        type: integer
  *      title:
  *        type: string
  *      position:
  *        type: integer
- *      cardType:
- *        type: string
- *        enum: [0, 1, 2, 3, 4]
  *      description:
  *        type: string
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
- *   CreateBoardResponse:
+ *      isCollapsed:
+ *        type: boolean
+ *   CreateColumnResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           boardId:
+ *           columnId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/board:
+ * /v1/column:
  *   post:
  *     tags:
- *       - Board
- *     description: Create new board
+ *       - Column
+ *     description: Create new column
  *     produces:
  *       - application/json
  *     parameters:
@@ -62,12 +63,12 @@ const { RequestPart } = require('../../enums');
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/CreateBoardRequest'
+ *          $ref: '#/definitions/CreateColumnRequest'
  *     responses:
  *       200:
- *         description: "Board successfully created"
+ *         description: "Column successfully created"
  *         schema:
- *          $ref: '#/definitions/CreateBoardResponse'
+ *          $ref: '#/definitions/CreateColumnResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -75,16 +76,16 @@ const { RequestPart } = require('../../enums');
  */
 router.post(
   '/',
-  SchemaValidator.validate(RequestPart.body, 'createBoard'),
+  SchemaValidator.validate(RequestPart.body, 'createColumn'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  BoardAdapter.create,
+  ColumnAdapter.create,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetBoardResponse:
+ *   GetColumnResponse:
  *     type: object
  *     properties:
  *       data:
@@ -106,11 +107,11 @@ router.post(
  *             enum: [0, 1, 2, 3, 4, 5, 6]
  *            message:
  *              type: string
- * /v1/board/:boardId
+ * /v1/column/:columnId
  *   get:
  *     tags:
- *       - Board
- *     description: Get board info by id
+ *       - Column
+ *     description: Get column info by id
  *     produces:
  *       - application/json
  *     parameters:
@@ -124,41 +125,41 @@ router.post(
  *         required: true
  *     responses:
  *       200:
- *         description: "Board information successfully received"
+ *         description: "Column information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetBoardResponse'
+ *          $ref: '#/definitions/GetColumnResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.get(
-  '/:boardId',
+  '/:columnId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getBoard'),
+  SchemaValidator.validate(RequestPart.params, 'getColumn'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  BoardAdapter.get,
+  ColumnAdapter.get,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetAllBoardsResponse:
+ *   GetAllColumnsResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           boardId:
+ *           columnId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/board
+ * /v1/column
  *   get:
  *     tags:
- *       - Board
- *     description: Get all boards to which you have access
+ *       - Column
+ *     description: Get all columns to which you have access
  *     produces:
  *       - application/json
  *     parameters:
@@ -168,9 +169,9 @@ router.get(
  *         required: true
  *     responses:
  *       200:
- *         description: "Boards information successfully received"
+ *         description: "Columns information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetAllBoardsResponse'
+ *          $ref: '#/definitions/GetAllColumnsResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -178,24 +179,26 @@ router.get(
  */
 router.get(
   '/',
+  FormatterMiddleware.castToInteger(RequestPart.query),
+  SchemaValidator.validate(RequestPart.query, 'getColumnsQuery'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  BoardAdapter.getAll,
+  ColumnAdapter.getAll,
 );
 
 /**
  * @swagger
  * definitions:
- *   PatchBoardResponse:
+ *   PatchColumnResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/board/:boardId
+ * /v1/column/:columnId
  *   post:
  *     tags:
- *       - Board
- *     description: Create new board
+ *       - Column
+ *     description: Create new column
  *     produces:
  *       - application/json
  *     parameters:
@@ -209,41 +212,41 @@ router.get(
  *         required: true
  *     responses:
  *       200:
- *         description: "Board successfully updated"
+ *         description: "Column successfully updated"
  *         schema:
- *          $ref: '#/definitions/PatchBoardResponse'
+ *          $ref: '#/definitions/PatchColumnResponse'
  *       403:
- *         description: "This account is not allowed to edit this board"
+ *         description: "This account is not allowed to edit this column"
  *         schema:
- *          $ref: '#/definitions/PatchBoardResponse'
+ *          $ref: '#/definitions/PatchColumnResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.patch(
-  '/:boardId',
+  '/:columnId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchBoardBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchBoardParams'),
+  SchemaValidator.validate(RequestPart.body, 'patchColumnBody'),
+  SchemaValidator.validate(RequestPart.params, 'patchColumnParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  BoardAdapter.update,
+  ColumnAdapter.update,
 );
 
 /**
  * @swagger
  * definitions:
- *   DeleteBoardResponse:
+ *   DeleteColumnResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/board/:boardId:
+ * /v1/column/:columnId:
  *   post:
  *     tags:
- *       - Board
- *     description: Delete board
+ *       - Column
+ *     description: Delete column
  *     produces:
  *       - application/json
  *     parameters:
@@ -257,27 +260,27 @@ router.patch(
  *        required: true
  *     responses:
  *       200:
- *         description: "Board successfully deleted"
+ *         description: "Column successfully deleted"
  *         schema:
- *          $ref: '#/definitions/DeleteBoardResponse'
+ *          $ref: '#/definitions/DeleteColumnResponse'
  *       403:
- *         description: "This account is not allowed to delete this board"
+ *         description: "This account is not allowed to delete this column"
  *         schema:
- *          $ref: '#/definitions/DeleteBoardResponse'
+ *          $ref: '#/definitions/DeleteColumnResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.delete(
-  '/:boardId',
+  '/:columnId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteBoardParams'),
+  SchemaValidator.validate(RequestPart.params, 'deleteColumnParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  BoardAdapter.remove,
+  ColumnAdapter.remove,
 );
 
 module.exports = {
-  boardRouter: router,
+  columnRouter: router,
 };

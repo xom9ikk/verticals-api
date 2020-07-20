@@ -264,5 +264,5 @@ router.get(
 );
 
 module.exports = {
-  auth: router,
+  authRouter: router,
 };

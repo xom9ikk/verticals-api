@@ -28,7 +28,9 @@ class BackendResponse {
       route: res.req.originalUrl,
     });
     return res.status(_status).json({
-      data,
+      data: {
+        ...data,
+      },
       message: msg,
     });
   }

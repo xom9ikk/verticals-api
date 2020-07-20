@@ -1,8 +1,9 @@
 module.exports = {
   tables: {
-    boards: 'boards',
     tokens: 'tokens',
     users: 'users',
+    boards: 'boards',
     boardsAccess: 'boards_access',
+    columns: 'columns',
   },
 };

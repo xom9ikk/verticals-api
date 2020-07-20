@@ -1,7 +1,11 @@
-class BoardSchema {
-  createBoard = {
+class ColumnSchema {
+  createColumn = {
     type: 'object',
     properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
       title: {
         type: 'string',
         minLength: 1,
@@ -10,10 +14,6 @@ class BoardSchema {
       position: {
         type: 'integer',
         minimum: 0,
-      },
-      cardType: {
-        type: 'integer',
-        enum: [0, 1, 2, 3, 4],
       },
       description: {
         type: 'string',
@@ -24,21 +24,36 @@ class BoardSchema {
         type: 'number',
         enum: [0, 1, 2, 3, 4, 5, 6],
       },
+      isCollapsed: {
+        type: 'boolean',
+      },
     },
-    required: ['title', 'position'],
+    required: ['boardId', 'title', 'position'],
   }
-  getBoard = {
+  getColumn = {
+    type: 'object',
+    properties: {
+      columnId: {
+        type: 'integer',
+      },
+    },
+    required: ['columnId'],
+  }
+  getColumnsQuery = {
     type: 'object',
     properties: {
       boardId: {
         type: 'integer',
       },
     },
-    required: ['boardId'],
   }
-  patchBoardBody = {
+  patchColumnBody = {
     type: 'object',
     properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
       title: {
         type: 'string',
         minLength: 1,
@@ -48,10 +63,6 @@ class BoardSchema {
         type: 'integer',
         minimum: 0,
       },
-      cardType: {
-        type: 'integer',
-        enum: [0, 1, 2, 3, 4],
-      },
       description: {
         type: 'string',
         minLength: 1,
@@ -60,36 +71,40 @@ class BoardSchema {
       color: {
         type: 'number',
         enum: [0, 1, 2, 3, 4, 5, 6],
+      },
+      isCollapsed: {
+        type: 'boolean',
       },
     },
     anyOf: [
       { required: ["title"] },
       { required: ["position"] },
-      { required: ["cardType"] },
       { required: ["description"] },
       { required: ["color"] },
-    ]
+      { required: ["isCollapsed"] },
+    ],
+    required: ['boardId'],
   }
-  patchBoardParams = {
+  patchColumnParams = {
     type: 'object',
     properties: {
-      boardId: {
+      columnId: {
         type: 'integer',
       },
     },
-    required: ['boardId'],
+    required: ['columnId'],
   }
-  deleteBoardParams = {
+  deleteColumnParams = {
     type: 'object',
     properties: {
-      boardId: {
+      columnId: {
         type: 'integer',
       },
     },
-    required: ['boardId'],
+    required: ['columnId'],
   }
 }
 
 module.exports = {
-  BoardSchema: new BoardSchema(),
+  ColumnSchema: new ColumnSchema(),
 };

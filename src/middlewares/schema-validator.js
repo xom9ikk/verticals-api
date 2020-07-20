@@ -3,6 +3,7 @@ const { BackendError } = require('../components');
 
 const { AuthSchema } = require('../modules/auth/schemas');
 const { BoardSchema } = require('../modules/board/schemas');
+const { ColumnSchema } = require('../modules/column/schemas');
 
 class SchemaValidator {
   constructor() {
@@ -12,6 +13,7 @@ class SchemaValidator {
     });
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
     Object.keys(BoardSchema).map((key) => this.ajv.addSchema(BoardSchema[key], key));
+    Object.keys(ColumnSchema).map((key) => this.ajv.addSchema(ColumnSchema[key], key));
   }
 
   errorResponse(schemaErrors) {

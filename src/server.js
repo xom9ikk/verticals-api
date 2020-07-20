@@ -7,6 +7,7 @@ const { morganLogger } = require('./morgan');
 
 global.knex = new Knex().knex;
 const routes = require('./routes');
+const { parseErrorHandler } = require('./routes/common');
 
 const {
   PORT,
@@ -20,6 +21,7 @@ app.use(helmet());
 app.set('trust proxy', true);
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(parseErrorHandler);
 morganLogger(app);
 app.use(routes);
 app.listen(PORT, HOST, () => {

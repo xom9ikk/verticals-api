@@ -61,16 +61,8 @@ class AuthSchema {
     },
     required: ['password'],
     anyOf: [
-      {
-        required: [
-          "email"
-        ]
-      },
-      {
-        required: [
-          "username"
-        ]
-      },
+      { required: ["email"] },
+      { required: ["username"] },
     ]
   }
 

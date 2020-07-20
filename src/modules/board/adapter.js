@@ -7,9 +7,7 @@ class BoardAdapter {
       const {
         title, position, cardType, description, color,
       } = req.body;
-      const {
-        userId,
-      } = res.locals;
+      const { userId } = res.locals;
       const boardId = await BoardController.create(userId, {
         title, position, cardType, description, color,
       });
@@ -24,7 +22,7 @@ class BoardAdapter {
       const { userId } = res.locals;
       const { boardId } = req.params;
       const board = await BoardController.get(userId, boardId);
-      return BackendResponse.Created(res, 'Board information successfully received', { board });
+      return BackendResponse.Success(res, 'Board information successfully received', { board });
     } catch (e) {
       next(e);
     }
@@ -33,8 +31,8 @@ class BoardAdapter {
   async getAll(req, res, next) {
     try {
       const { userId } = res.locals;
-      const board = await BoardController.getAll(userId);
-      return BackendResponse.Created(res, 'Boards information successfully received', { board });
+      const boards = await BoardController.getAll(userId);
+      return BackendResponse.Success(res, 'Boards information successfully received', { boards });
     } catch (e) {
       next(e);
     }
