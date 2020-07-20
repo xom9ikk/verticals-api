@@ -22,7 +22,7 @@ class BoardAdapter {
       const { userId } = res.locals;
       const { boardId } = req.params;
       const board = await BoardController.get(userId, boardId);
-      return BackendResponse.Success(res, 'Board information successfully received', { board });
+      return BackendResponse.Success(res, 'Board information successfully received', board);
     } catch (e) {
       next(e);
     }

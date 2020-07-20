@@ -22,7 +22,7 @@ class ColumnAdapter {
       const { userId } = res.locals;
       const { columnId } = req.params;
       const column = await ColumnController.get(userId, columnId);
-      return BackendResponse.Success(res, 'Column information successfully received', { column });
+      return BackendResponse.Success(res, 'Column information successfully received', column);
     } catch (e) {
       next(e);
     }

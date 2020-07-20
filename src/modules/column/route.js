@@ -91,22 +91,21 @@ router.post(
  *       data:
  *         type: object
  *         properties:
- *           id:
+ *           boardId:
  *             type: integer
  *           title:
  *             type: string
  *           position:
  *             type: integer
- *           cardType:
- *             type: string
- *             enum: [0, 1, 2, 3, 4]
  *           description:
  *             type: string
  *           color:
  *             type: integer
  *             enum: [0, 1, 2, 3, 4, 5, 6]
- *            message:
- *              type: string
+ *           isCollapsed:
+ *             type: boolean
+ *       message:
+ *         type: string
  * /v1/column/:columnId
  *   get:
  *     tags:
@@ -145,6 +144,11 @@ router.get(
 /**
  * @swagger
  * definitions:
+ *   GetAllColumnsRequest:
+ *    type: object
+ *    properties:
+ *      boardId:
+ *        type: integer
  *   GetAllColumnsResponse:
  *     type: object
  *     properties:
@@ -167,6 +171,11 @@ router.get(
  *         name: Authorization
  *         type: string
  *         required: true
+ *       - name: query
+ *         in: query
+ *         required: false
+ *         schema:
+ *          $ref: '#/definitions/GetAllColumnsRequest'
  *     responses:
  *       200:
  *         description: "Columns information successfully received"
@@ -198,7 +207,7 @@ router.get(
  *   post:
  *     tags:
  *       - Column
- *     description: Create new column
+ *     description: Update column
  *     produces:
  *       - application/json
  *     parameters:

@@ -195,7 +195,7 @@ router.get(
  *   post:
  *     tags:
  *       - Board
- *     description: Create new board
+ *     description: Update board
  *     produces:
  *       - application/json
  *     parameters:
