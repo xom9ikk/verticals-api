@@ -1,66 +1,51 @@
-class TodoSchema {
-  createTodo = {
-    type: 'object',
-    properties: {
-      columnId: {
-        type: 'integer',
-        minimum: 1,
-      },
-      title: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 255,
-      },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
-      description: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 4096,
-      },
-      status: {
-        type: 'number',
-        enum: [0, 1, 2],
-      },
-      color: {
-        type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
-      },
-      isArchived: {
-        type: 'boolean',
-      },
-      isNotificationsEnabled: {
-        type: 'boolean',
-      },
-    },
-    required: ['columnId', 'title', 'position'],
-  }
-  getTodo = {
+class CommentSchema {
+  createComment = {
     type: 'object',
     properties: {
       todoId: {
         type: 'integer',
         minimum: 1,
       },
+      text: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 4096,
+      },
+      isEdited: {
+        type: 'boolean',
+      },
+      replyCommentId: {
+        type: 'integer',
+        minimum: 1,
+      },
     },
     required: ['todoId'],
   }
-  getTodosQuery = {
+  getComment = {
+    type: 'object',
+    properties: {
+      commentId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['commentId'],
+  }
+  getCommentsQuery = {
     type: 'object',
     properties: {
       boardId: {
         type: 'integer',
-        minimum: 1,
       },
       columnId: {
         type: 'integer',
-        minimum: 1,
+      },
+      todoId: {
+        type: 'integer',
       },
     },
   }
-  patchTodoBody = {
+  patchCommentBody = {
     type: 'object',
     properties: {
       columnId: {
@@ -107,28 +92,28 @@ class TodoSchema {
       { required: ["isNotificationsEnabled"] },
     ],
   }
-  patchTodoParams = {
+  patchCommentParams = {
     type: 'object',
     properties: {
-      todoId: {
+      commentId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    required: ['commentId'],
   }
-  deleteTodoParams = {
+  deleteCommentParams = {
     type: 'object',
     properties: {
-      todoId: {
+      commentId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    required: ['commentId'],
   }
 }
 
 module.exports = {
-  TodoSchema: new TodoSchema(),
+  CommentSchema: new CommentSchema(),
 };

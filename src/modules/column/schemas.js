@@ -35,6 +35,7 @@ class ColumnSchema {
     properties: {
       columnId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['columnId'],
@@ -44,6 +45,7 @@ class ColumnSchema {
     properties: {
       boardId: {
         type: 'integer',
+        minimum: 1,
       },
     },
   }
@@ -90,6 +92,7 @@ class ColumnSchema {
     properties: {
       columnId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['columnId'],
@@ -99,6 +102,7 @@ class ColumnSchema {
     properties: {
       columnId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['columnId'],

@@ -6,5 +6,6 @@ module.exports = {
     boardsAccess: 'boards_access',
     columns: 'columns',
     todos: 'todos',
+    comments: 'comments',
   },
 };

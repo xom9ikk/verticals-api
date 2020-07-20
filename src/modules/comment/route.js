@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { TodoAdapter } = require('./adapter');
+const { CommentAdapter } = require('./adapter');
 const {
   SchemaValidator,
   CheckMiddleware,
@@ -21,46 +21,34 @@ const { RequestPart } = require('../../enums');
 /**
  * @swagger
  * definitions:
- *   CreateTodoRequest:
+ *   CreateCommentRequest:
  *    type: object
  *    required:
- *      - columnId
- *      - title
- *      - position
+ *      - todoId
  *    properties:
- *      columnId:
+ *      todoId:
  *        type: integer
- *      title:
+ *      text:
  *        type: string
- *      position:
- *        type: integer
- *      description:
+ *      isEdited:
+ *        type: boolean
+ *      replyCommentId:
  *        type: string
- *      status:
- *        type: integer
- *        enum: [0, 1, 2]
- *      color:
- *        type: integer
- *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isArchived:
- *        type: boolean
- *      isNotificationsEnabled:
- *        type: boolean
- *   CreateTodoResponse:
+ *   CreateCommentResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           todoId:
+ *           commentId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/todo:
+ * /v1/comment:
  *   post:
  *     tags:
- *       - Todo
- *     description: Create new todo
+ *       - Comment
+ *     description: Create new comment
  *     produces:
  *       - application/json
  *     parameters:
@@ -72,12 +60,12 @@ const { RequestPart } = require('../../enums');
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/CreateTodoRequest'
+ *          $ref: '#/definitions/CreateCommentRequest'
  *     responses:
  *       200:
- *         description: "Todo successfully created"
+ *         description: "Comment successfully created"
  *         schema:
- *          $ref: '#/definitions/CreateTodoResponse'
+ *          $ref: '#/definitions/CreateCommentResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -85,46 +73,36 @@ const { RequestPart } = require('../../enums');
  */
 router.post(
   '/',
-  SchemaValidator.validate(RequestPart.body, 'createTodo'),
+  SchemaValidator.validate(RequestPart.body, 'createComment'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  TodoAdapter.create,
+  CommentAdapter.create,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetTodoResponse:
+ *   GetCommentResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           columnId:
+ *           todoId:
  *             type: integer
- *           title:
+ *           text:
  *             type: string
- *           position:
- *             type: integer
- *           description:
+ *           isEdited:
+ *             type: boolean
+ *           replyCommentId:
  *             type: string
- *           status:
- *             type: integer
- *             enum: [0, 1, 2]
- *           color:
- *             type: integer
- *             enum: [0, 1, 2, 3, 4, 5, 6]
- *           isArchived:
- *             type: boolean
- *           isNotificationsEnabled:
- *             type: boolean
  *       message:
  *         type: string
- * /v1/todo/:todoId
+ * /v1/comment/:commentId
  *   get:
  *     tags:
- *       - Todo
- *     description: Get todo info by id
+ *       - Comment
+ *     description: Get comment info by id
  *     produces:
  *       - application/json
  *     parameters:
@@ -133,53 +111,53 @@ router.post(
  *         type: string
  *         required: true
  *       - in: path
- *         name: todoId
+ *         name: commentId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Todo information successfully received"
+ *         description: "Comment information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetTodoResponse'
+ *          $ref: '#/definitions/GetCommentResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.get(
-  '/:todoId',
+  '/:commentId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getTodo'),
+  SchemaValidator.validate(RequestPart.params, 'getComment'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  TodoAdapter.get,
+  CommentAdapter.get,
 );
 
 /**
  * @swagger
  * definitions:
- *   GetAllTodosRequest:
+ *   GetAllCommentsRequest:
  *    type: object
  *    properties:
  *      boardId:
  *        type: integer
- *      columnId:
+ *      todoId:
  *        type: integer
- *   GetAllTodosResponse:
+ *   GetAllCommentsResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           todoId:
+ *           commentId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/todo
+ * /v1/comment
  *   get:
  *     tags:
- *       - Todo
- *     description: Get all todos to which you have access
+ *       - Comment
+ *     description: Get all comments to which you have access
  *     produces:
  *       - application/json
  *     parameters:
@@ -191,12 +169,12 @@ router.get(
  *         in: query
  *         required: false
  *         schema:
- *          $ref: '#/definitions/GetAllTodosRequest'
+ *          $ref: '#/definitions/GetAllCommentsRequest'
  *     responses:
  *       200:
- *         description: "Todos information successfully received"
+ *         description: "Comments information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetAllTodosResponse'
+ *          $ref: '#/definitions/GetAllCommentsResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -205,19 +183,19 @@ router.get(
 router.get(
   '/',
   FormatterMiddleware.castToInteger(RequestPart.query),
-  SchemaValidator.validate(RequestPart.query, 'getTodosQuery'),
+  SchemaValidator.validate(RequestPart.query, 'getCommentsQuery'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  TodoAdapter.getAll,
+  CommentAdapter.getAll,
 );
 
 /**
  * @swagger
  * definitions:
- *   UpdateTodoRequest:
+ *   UpdateCommentRequest:
  *    type: object
  *    properties:
- *      columnId:
+ *      todoId:
  *        type: integer
  *      title:
  *        type: string
@@ -235,16 +213,16 @@ router.get(
  *        type: boolean
  *      isNotificationsEnabled:
  *        type: boolean
- *   UpdateTodoResponse:
+ *   UpdateCommentResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/todo/:todoId
+ * /v1/comment/:commentId
  *   patch:
  *     tags:
- *       - Todo
- *     description: Update todo
+ *       - Comment
+ *     description: Update comment
  *     produces:
  *       - application/json
  *     parameters:
@@ -256,48 +234,48 @@ router.get(
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/UpdateTodoRequest'
+ *          $ref: '#/definitions/UpdateCommentRequest'
  *       - in: path
- *         name: todoId
+ *         name: commentId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Todo successfully updated"
+ *         description: "Comment successfully updated"
  *         schema:
- *          $ref: '#/definitions/UpdateTodoResponse'
+ *          $ref: '#/definitions/UpdateCommentResponse'
  *       403:
- *         description: "This account is not allowed to edit this todo"
+ *         description: "This account is not allowed to edit this comment"
  *         schema:
- *          $ref: '#/definitions/UpdateTodoResponse'
+ *          $ref: '#/definitions/UpdateCommentResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.patch(
-  '/:todoId',
+  '/:commentId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchTodoBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchTodoParams'),
+  SchemaValidator.validate(RequestPart.body, 'patchCommentBody'),
+  SchemaValidator.validate(RequestPart.params, 'patchCommentParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  TodoAdapter.update,
+  CommentAdapter.update,
 );
 
 /**
  * @swagger
  * definitions:
- *   DeleteTodoResponse:
+ *   DeleteCommentResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/todo/:todoId:
+ * /v1/comment/:commentId:
  *   delete:
  *     tags:
- *       - Todo
- *     description: Delete todo
+ *       - Comment
+ *     description: Delete comment
  *     produces:
  *       - application/json
  *     parameters:
@@ -306,32 +284,32 @@ router.patch(
  *        type: string
  *        required: true
  *      - in: path
- *        name: todoId
+ *        name: commentId
  *        type: integer
  *        required: true
  *     responses:
  *       200:
- *         description: "Todo successfully deleted"
+ *         description: "Comment successfully deleted"
  *         schema:
- *          $ref: '#/definitions/DeleteTodoResponse'
+ *          $ref: '#/definitions/DeleteCommentResponse'
  *       403:
- *         description: "This account is not allowed to delete this todo"
+ *         description: "This account is not allowed to delete this comment"
  *         schema:
- *          $ref: '#/definitions/DeleteTodoResponse'
+ *          $ref: '#/definitions/DeleteCommentResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
 router.delete(
-  '/:todoId',
+  '/:commentId',
   FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteTodoParams'),
+  SchemaValidator.validate(RequestPart.params, 'deleteCommentParams'),
   CheckMiddleware.isAuthenticated,
   FetchMiddleware.getUserId,
-  TodoAdapter.remove,
+  CommentAdapter.remove,
 );
 
 module.exports = {
-  todoRouter: router,
+  commentRouter: router,
 };

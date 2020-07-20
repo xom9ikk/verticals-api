@@ -24,6 +24,10 @@ class Database {
   get todos() {
     return knex(tables.todos);
   }
+
+  get comments() {
+    return knex(tables.comments);
+  }
 }
 
 module.exports = {

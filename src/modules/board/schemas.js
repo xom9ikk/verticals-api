@@ -32,6 +32,7 @@ class BoardSchema {
     properties: {
       boardId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['boardId'],
@@ -75,6 +76,7 @@ class BoardSchema {
     properties: {
       boardId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['boardId'],
@@ -84,6 +86,7 @@ class BoardSchema {
     properties: {
       boardId: {
         type: 'integer',
+        minimum: 1,
       },
     },
     required: ['boardId'],

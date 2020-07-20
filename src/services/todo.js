@@ -9,7 +9,7 @@ class TodoService extends Database {
   }
 
   async getBoardIdByTodoId(id) {
-    const subquery = this.todos
+    const getColumnId = this.todos
       .select([
         'columnId',
       ])
@@ -23,7 +23,7 @@ class TodoService extends Database {
       ])
       .whereIn(
         'id',
-        subquery,
+        getColumnId,
       )
       .first();
 

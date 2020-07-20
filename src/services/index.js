@@ -4,6 +4,7 @@ const { BoardService } = require('./board');
 const { BoardAccessService } = require('./board-access');
 const { ColumnService } = require('./column');
 const { TodoService } = require('./todo');
+const { CommentService } = require('./comment');
 
 module.exports = {
   UserService,
@@ -12,4 +13,5 @@ module.exports = {
   BoardAccessService,
   ColumnService,
   TodoService,
+  CommentService,
 };
