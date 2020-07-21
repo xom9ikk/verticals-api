@@ -16,11 +16,15 @@ class Knex {
         ...dbConfig.pool,
       },
       postProcessResponse: (result) => Formatter.deepConvertToCamelCase(result),
-      wrapIdentifier: (value, origImpl) => (value === '*' ? value : origImpl(Formatter.convertToSnakeCase(value))),
+      wrapIdentifier: (value, origImpl) => (
+        value === '*'
+          ? value
+          : origImpl(Formatter.convertToSnakeCase(value))),
     });
+    // console.log('migrate:latest');
     this.knex.migrate.latest();
     if (cluster.isMaster || NODE_APP_INSTANCE === '0') {
-      console.log('migrate:latest');
+      // console.log('seed:run');
       // Drop tables
       // this.knex.seed.run();
     }

@@ -30,7 +30,7 @@ class SchemaValidator {
       },
       message,
     } = firstError;
-    console.log(firstError);
+    // console.log(firstError);
     if (keyword === 'required') {
       throw new BackendError.BadRequest(`The required parameter '${missingProperty}' is missing`);
     }

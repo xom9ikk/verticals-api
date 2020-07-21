@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'verticals',
-    script: './src/server.js',
+    script: './src/index.js',
     watch: ['./src'],
     args: [
       '--color',
@@ -28,7 +28,7 @@ module.exports = {
       SWAGGER_DESCRIPTION: 'Backend part for verticals project',
       SWAGGER_HOST: '0.0.0.0:3000',
       SWAGGER_BASE_PATH: '/api',
-      LOG_FILE_NAME: `app_${new Date().getTime()}.log`,
+      LOG_FILE_NAME: 'app',
     },
     env_production: {
       NODE_ENV: 'production',

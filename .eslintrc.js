@@ -5,6 +5,9 @@ module.exports = {
   extends: [
     'airbnb-base',
   ],
+  plugins: [
+    'jest',
+  ],
   rules: {
     radix: 0,
     'class-methods-use-this': 0,
@@ -15,5 +18,6 @@ module.exports = {
   },
   env: {
     node: true,
+    'jest/globals': true,
   },
 };

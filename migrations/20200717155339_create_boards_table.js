@@ -1,13 +1,8 @@
-exports.up = (knex) => knex.schema.createTable('columns', (table) => {
+/* eslint-disable no-return-await */
+exports.up = async (knex) => await knex.schema.createTable('boards', (table) => {
   table
     .increments('id')
     .primary();
-  table
-    .integer('board_id')
-    .unsigned()
-    .notNullable()
-    .references('id')
-    .inTable('boards');
   table
     .string('title')
     .notNullable();
@@ -15,12 +10,12 @@ exports.up = (knex) => knex.schema.createTable('columns', (table) => {
     .integer('position')
     .notNullable();
   table
+    .integer('card_type')
+    .defaultTo(0);
+  table
     .string('description', 4096);
   table
     .integer('color');
-  table
-    .boolean('is_collapsed')
-    .defaultTo(false);
   table
     .timestamp('created_at')
     .defaultTo(knex.fn.now());
@@ -29,4 +24,4 @@ exports.up = (knex) => knex.schema.createTable('columns', (table) => {
     .defaultTo(knex.fn.now());
 });
 
-exports.down = (knex) => knex.schema.dropTable('columns');
+exports.down = async (knex) => await knex.schema.dropTable('boards');

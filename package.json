@@ -4,11 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node ./src/server.js",
+    "start": "node ./src/index.js",
     "dev": "pm2 start --no-daemon",
     "dev:nodemon": "cross-env NODE_ENV=development nodemon --inspect=127.0.0.1:3340 ./src/server.js --watch ./src",
     "lint": "eslint --ext .js ./src",
-    "lint:fix": "eslint --ext .js ./src --fix"
+    "lint:fix": "eslint --ext .js ./src --fix",
+    "test": "jest --config ./jest.config.js",
+    "test:silent": "jest --silent --config ./jest.config.js",
+    "test:watch": "jest --config ./jest.config.js --watch"
   },
   "author": "xom9ik <xom9ik.code@gmail.com>",
   "license": "MIT",
@@ -17,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chalk": "^4.1.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
@@ -42,8 +46,11 @@
     "eslint": "^7.4.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.18.0",
+    "faker": "^4.1.0",
     "jest": "^26.1.0",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "supertest": "^4.0.2"
   },
   "config": {
     "commitizen": {

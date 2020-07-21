@@ -6,6 +6,7 @@ class AuthSchema {
         type: 'string',
         lowercase: true,
         format: 'email',
+        maxLength: 64,
       },
       password: {
         type: 'string',
@@ -15,20 +16,20 @@ class AuthSchema {
       name: {
         type: 'string',
         minLength: 2,
-        maxLength: 16,
+        maxLength: 32,
         pattern: '^[A-Za-z0-9_]+$',
       },
       surname: {
         type: 'string',
         minLength: 2,
-        maxLength: 16,
+        maxLength: 32,
         pattern: '^[A-Za-z0-9_]+$',
       },
       username: {
         type: 'string',
         minLength: 2,
-        maxLength: 16,
-        pattern: '^[A-Za-z0-9_]+$',
+        maxLength: 32,
+        pattern: '^[A-Za-z0-9_.]+$',
       },
     },
     required: ['email', 'password', 'name', 'surname', 'username'],
@@ -45,13 +46,8 @@ class AuthSchema {
       username: {
         type: 'string',
         minLength: 2,
-        maxLength: 16,
-        pattern: '^[A-Za-z0-9_]+$',
-      },
-      field: {
-        type: 'string',
-        minLength: 2,
-        maxLength: 100,
+        maxLength: 32,
+        pattern: '^[A-Za-z0-9_.]+$',
       },
       password: {
         type: 'string',

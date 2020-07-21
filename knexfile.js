@@ -1,3 +1,9 @@
+const {
+  DB_HOST,
+  DB_PORT,
+  DB_NAME,
+} = process.env;
+
 module.exports = {
   development: {
     client: 'pg',
@@ -12,10 +18,22 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: `${__dirname}/src/knex/migrations`,
     },
-    seeds: {
-      directory: `${__dirname}/src/knex/seeds`,
+  },
+
+  test: {
+    client: 'pg',
+    connection: {
+      host: DB_HOST,
+      database: DB_NAME,
+      port: DB_PORT,
+    },
+    pool: {
+      min: 2,
+      max: 10000,
+    },
+    migrations: {
+      tableName: 'knex_migrations',
     },
   },
 
@@ -34,10 +52,6 @@ module.exports = {
     },
     migrations: {
       tableName: 'knex_migrations',
-      directory: `${__dirname}/src/knex/migrations`,
-    },
-    seeds: {
-      directory: `${__dirname}/src/knex/seeds`,
     },
   },
 };

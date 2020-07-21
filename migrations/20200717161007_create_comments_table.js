@@ -1,4 +1,5 @@
-exports.up = (knex) => knex.schema.createTable('comments', (table) => {
+/* eslint-disable no-return-await */
+exports.up = async (knex) => await knex.schema.createTable('comments', (table) => {
   table
     .increments('id')
     .primary();
@@ -25,4 +26,4 @@ exports.up = (knex) => knex.schema.createTable('comments', (table) => {
     .defaultTo(knex.fn.now());
 });
 
-exports.down = (knex) => knex.schema.dropTable('comments');
+exports.down = async (knex) => await knex.schema.dropTable('comments');

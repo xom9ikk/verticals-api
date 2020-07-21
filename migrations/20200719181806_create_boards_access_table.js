@@ -1,4 +1,5 @@
-exports.up = (knex) => knex.schema.createTable('boards_access', (table) => {
+/* eslint-disable no-return-await */
+exports.up = async (knex) => await knex.schema.createTable('boards_access', (table) => {
   table
     .increments('id')
     .primary();
@@ -22,4 +23,4 @@ exports.up = (knex) => knex.schema.createTable('boards_access', (table) => {
     .defaultTo(knex.fn.now());
 });
 
-exports.down = (knex) => knex.schema.dropTable('boards_access');
+exports.down = async (knex) => await knex.schema.dropTable('boards_access');

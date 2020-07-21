@@ -31,17 +31,17 @@ class CheckMiddleware {
     try {
       const token = CheckMiddleware.extractToken(req);
       if (!token) {
-        throw new BackendError.Forbidden('Token does not contain Bearer');
+        throw new BackendError.BadRequest('Token does not contain Bearer');
       }
 
       const isValidTokenSignature = CheckMiddleware.isValidTokenSignature(token);
       if (!isValidTokenSignature) {
-        throw new BackendError.Forbidden('Invalid token signature');
+        throw new BackendError.Unauthorized('Invalid token signature');
       }
 
       const isActiveToken = await ValidatorComponent.isActiveToken(token);
       if (!isActiveToken) {
-        throw new BackendError.Forbidden('Invalid token');
+        throw new BackendError.Unauthorized('Invalid token');
       }
 
       res.locals.parsedBearerToken = token;

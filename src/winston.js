@@ -2,7 +2,7 @@ const winston = require('winston');
 
 const { LOG_FILE_NAME } = process.env;
 
-const filename = `${__dirname}/../logs/${LOG_FILE_NAME}`;
+const filename = `${__dirname}/../logs/${LOG_FILE_NAME}_${new Date().getTime()}.log`;
 
 const timezone = () => new Date().toLocaleString('en-US', {
   timeZone: 'UTC',
