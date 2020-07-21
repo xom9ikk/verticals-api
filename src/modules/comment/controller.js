@@ -13,7 +13,7 @@ class CommentController {
       throw new BackendError.Forbidden('This account is not allowed to create comment for this todo');
     }
 
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to create comment for this todo');
@@ -33,7 +33,7 @@ class CommentController {
       throw new BackendError.Forbidden('This account is not allowed to receive this comment');
     }
 
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to receive this comment');
@@ -47,7 +47,7 @@ class CommentController {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.get(userId, boardId);
+      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
       if (!isAccess) {
         throw new BackendError.Forbidden('This account is not allowed to receive comments for this board');
       }
@@ -76,42 +76,30 @@ class CommentController {
     return comments;
   }
 
-  async update({ userId, todoId, patch }) {
-    const boardId = await CommentService.getBoardIdByCommentId(todoId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this todo');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+  async update({ userId, commentId, patch }) {
+    const isAccess = await BoardAccessService.getByCommentId(userId, commentId);
 
     if (!isAccess) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this todo');
+      throw new BackendError.Forbidden('This account is not allowed to edit this comment');
     }
 
-    const updatedComment = await CommentService.update(todoId, patch);
+    const updatedComment = await CommentService.update(commentId, patch);
 
     if (updatedComment === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this todo');
+      throw new BackendError.Forbidden('This account is not allowed to edit this comment');
     }
 
     return true;
   }
 
-  async remove({ userId, todoId }) {
-    const boardId = await CommentService.getBoardIdByCommentId(todoId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to remove this todo');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+  async remove({ userId, commentId }) {
+    const isAccess = await BoardAccessService.getByCommentId(userId, commentId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to remove this todo');
     }
 
-    await CommentService.removeById(todoId);
+    await CommentService.removeById(commentId);
     return true;
   }
 }

@@ -37,11 +37,11 @@ class CommentAdapter {
   async update(req, res, next) {
     try {
       const { userId } = res.locals;
-      const { todoId } = req.params;
+      const { commentId } = req.params;
 
       await CommentController.update({
         userId,
-        todoId,
+        commentId,
         patch: req.body,
       });
 

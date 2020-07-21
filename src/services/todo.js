@@ -21,10 +21,9 @@ class TodoService extends Database {
       .select([
         'boardId',
       ])
-      .whereIn(
-        'id',
-        getColumnId,
-      )
+      .where({
+        id: getColumnId,
+      })
       .first();
 
     return response ? response.boardId : undefined;
@@ -68,7 +67,7 @@ class TodoService extends Database {
   }
 
   getByBoardIds(boardIds) {
-    const subquery = this.columns
+    const getColumnIds = this.columns
       .select([
         'id',
       ])
@@ -90,7 +89,7 @@ class TodoService extends Database {
       ])
       .whereIn(
         'columnId',
-        subquery,
+        getColumnIds,
       );
   }
 
@@ -110,6 +109,17 @@ class TodoService extends Database {
         id,
       })
       .del();
+  }
+
+  getColumnId(id) {
+    return this.todos
+      .select([
+        'columnId',
+      ])
+      .where({
+        id,
+      })
+      .first();
   }
 }
 

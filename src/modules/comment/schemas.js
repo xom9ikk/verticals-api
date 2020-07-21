@@ -48,49 +48,13 @@ class CommentSchema {
   patchCommentBody = {
     type: 'object',
     properties: {
-      columnId: {
-        type: 'integer',
-        minimum: 1,
-      },
-      title: {
-        type: 'string',
-        minLength: 1,
-        maxLength: 255,
-      },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
-      description: {
+      text: {
         type: 'string',
         minLength: 1,
         maxLength: 4096,
       },
-      status: {
-        type: 'number',
-        enum: [0, 1, 2],
-      },
-      color: {
-        type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
-      },
-      isArchived: {
-        type: 'boolean',
-      },
-      isNotificationsEnabled: {
-        type: 'boolean',
-      },
     },
-    anyOf: [
-      { required: ["columnId"] },
-      { required: ["title"] },
-      { required: ["position"] },
-      { required: ["description"] },
-      { required: ["status"] },
-      { required: ["color"] },
-      { required: ["isArchived"] },
-      { required: ["isNotificationsEnabled"] },
-    ],
+    required: ['text'],
   }
   patchCommentParams = {
     type: 'object',

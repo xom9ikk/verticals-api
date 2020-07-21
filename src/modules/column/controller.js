@@ -4,7 +4,7 @@ const { BackendError } = require('../../components');
 class ColumnController {
   async create(userId, column) {
     const { boardId } = column;
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to create column for this board');
@@ -15,13 +15,7 @@ class ColumnController {
   }
 
   async get(userId, columnId) {
-    const boardId = await ColumnService.getBoardIdByColumnId(columnId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to receive this column');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to receive this column');
@@ -35,7 +29,7 @@ class ColumnController {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.get(userId, boardId);
+      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
       if (!isAccess) {
         throw new BackendError.Forbidden('This account is not allowed to receive columns for this board');
       }
@@ -58,16 +52,18 @@ class ColumnController {
   }
 
   async update({ userId, columnId, patch }) {
-    const boardId = await ColumnService.getBoardIdByColumnId(columnId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this column');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to edit this column');
+    }
+
+    const { boardId: newBoardId } = patch;
+    if (newBoardId) {
+      const isAccessToNewBoard = await BoardAccessService.getByBoardId(userId, newBoardId);
+      if (!isAccessToNewBoard) {
+        throw new BackendError.Forbidden('This account is not allowed to set this boardId for this column');
+      }
     }
 
     const updatedColumn = await ColumnService.update(columnId, patch);
@@ -80,18 +76,13 @@ class ColumnController {
   }
 
   async remove({ userId, columnId }) {
-    const boardId = await ColumnService.getBoardIdByColumnId(columnId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to remove this column');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to remove this column');
     }
 
+    // TODO cascade
     await ColumnService.removeById(columnId);
     return true;
   }

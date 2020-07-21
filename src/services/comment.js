@@ -21,19 +21,17 @@ class CommentService extends Database {
       .select([
         'columnId',
       ])
-      .whereIn(
-        'id',
-        getTodoId,
-      )
+      .where({
+        id: getTodoId,
+      })
       .first();
     const response = await this.columns
       .select([
         'boardId',
       ])
-      .whereIn(
-        'id',
-        getColumnId,
-      )
+      .where({
+        id: getColumnId,
+      })
       .first();
 
     return response ? response.boardId : undefined;
@@ -142,6 +140,17 @@ class CommentService extends Database {
         id,
       })
       .del();
+  }
+
+  getTodoId(id) {
+    return this.comments
+      .select([
+        'columnId',
+      ])
+      .where({
+        id,
+      })
+      .first();
   }
 }
 

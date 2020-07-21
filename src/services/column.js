@@ -88,6 +88,17 @@ class ColumnService extends Database {
       })
       .del();
   }
+
+  getBoardId(id) {
+    return this.columns
+      .select([
+        'boardId',
+      ])
+      .where({
+        id,
+      })
+      .first();
+  }
 }
 
 module.exports = {

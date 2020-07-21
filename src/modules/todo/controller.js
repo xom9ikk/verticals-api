@@ -4,13 +4,7 @@ const { BackendError } = require('../../components');
 class TodoController {
   async create(userId, todo) {
     const { columnId } = todo;
-    const boardId = await ColumnService.getBoardIdByColumnId(columnId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to create todo for this column');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to create todo for this column');
@@ -21,13 +15,7 @@ class TodoController {
   }
 
   async get(userId, todoId) {
-    const boardId = await TodoService.getBoardIdByTodoId(todoId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to receive this todo');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to receive this todo');
@@ -41,7 +29,7 @@ class TodoController {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.get(userId, boardId);
+      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
       if (!isAccess) {
         throw new BackendError.Forbidden('This account is not allowed to receive todos for this board');
       }
@@ -69,16 +57,19 @@ class TodoController {
   }
 
   async update({ userId, todoId, patch }) {
-    const boardId = await TodoService.getBoardIdByTodoId(todoId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this todo');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to edit this todo');
+    }
+
+    const { columnId: newColumnId } = patch;
+
+    if (newColumnId) {
+      const isAccessToNewColumn = await BoardAccessService.getByColumnId(userId, newColumnId);
+      if (!isAccessToNewColumn) {
+        throw new BackendError.Forbidden('This account is not allowed to set this columnId for this todo');
+      }
     }
 
     const updatedTodo = await TodoService.update(todoId, patch);
@@ -91,18 +82,13 @@ class TodoController {
   }
 
   async remove({ userId, todoId }) {
-    const boardId = await TodoService.getBoardIdByTodoId(todoId);
-
-    if (boardId === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to remove this todo');
-    }
-
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to remove this todo');
     }
 
+    // TODO cascade
     await TodoService.removeById(todoId);
     return true;
   }

@@ -9,7 +9,7 @@ class BoardController {
   }
 
   async get(userId, boardId) {
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to receive this board');
@@ -31,7 +31,7 @@ class BoardController {
   }
 
   async update({ userId, boardId, patch }) {
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to edit this board');
@@ -42,12 +42,13 @@ class BoardController {
   }
 
   async remove({ userId, boardId }) {
-    const isAccess = await BoardAccessService.get(userId, boardId);
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to remove this board');
     }
 
+    // TODO cascade
     await BoardAccessService.removeByBoardId(boardId);
     await BoardService.removeById(boardId);
     return true;
