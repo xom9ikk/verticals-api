@@ -1,34 +1,20 @@
-const jwt = require('jsonwebtoken');
-const { v4: uuidV4 } = require('uuid');
-const { TokenService } = require('../../src/services');
-
-const { JWT_SECRET } = process.env;
+const { TokenComponent } = require('../../src/components');
 
 class AuthMock {
-  static async issueTokenPair({ userId, ip }, expiresIn) {
-    const refreshToken = uuidV4();
-    const token = jwt.sign(
-      {
-        userId,
-        timestamp: new Date().getMilliseconds(),
-      },
-      JWT_SECRET,
-      { expiresIn },
-    );
-    await TokenService.add({
-      refreshToken,
-      token,
-      userId,
-      ip,
-    });
-    return {
-      token,
-      refreshToken,
-    };
+  static getExpiredTokenPair(data) {
+    return TokenComponent.issueTokenPair(data, '1ms');
+  }
+
+  static getTokenPairWithInvalidSignature(data) {
+    return TokenComponent.issueTokenPair(data, '1Y', 'INVALID_SECRET');
   }
 
   static getInvalidRefreshToken() {
     return 'INVALID_REFRESH_TOKEN';
+  }
+
+  static getInvalidToken() {
+    return 'INVALID_TOKEN';
   }
 }
 

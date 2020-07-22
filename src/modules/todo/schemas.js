@@ -1,3 +1,5 @@
+const { Color, TodoStatus } = require('../../enums');
+
 class TodoSchema {
   createTodo = {
     type: 'object',
@@ -22,11 +24,11 @@ class TodoSchema {
       },
       status: {
         type: 'number',
-        enum: [0, 1, 2],
+        enum: Object.values(TodoStatus),
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
       isArchived: {
         type: 'boolean',
@@ -83,11 +85,11 @@ class TodoSchema {
       },
       status: {
         type: 'number',
-        enum: [0, 1, 2],
+        enum: Object.values(TodoStatus),
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
       isArchived: {
         type: 'boolean',

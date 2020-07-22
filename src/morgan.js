@@ -6,7 +6,6 @@ const winston = require('./winston');
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
-// const isTest = NODE_ENV === 'test';
 let formattedLog;
 if (isProd) {
   formattedLog = (tokens, req, res) => {
@@ -51,7 +50,7 @@ if (isProd) {
 }
 
 const morganMiddleware = morgan(formattedLog, {
-  stream: isProd ? winston.stream : null,
+  stream: winston.stream,
 });
 
 const morganLogger = (app) => {

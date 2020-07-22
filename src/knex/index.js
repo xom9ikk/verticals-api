@@ -22,7 +22,7 @@ class Knex {
           : origImpl(Formatter.convertToSnakeCase(value))),
     });
     // console.log('migrate:latest');
-    this.knex.migrate.latest();
+    // this.knex.migrate.latest();
     if (cluster.isMaster || NODE_APP_INSTANCE === '0') {
       // console.log('seed:run');
       // Drop tables

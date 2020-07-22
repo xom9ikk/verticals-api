@@ -1,19 +1,12 @@
 const supertest = require('supertest');
-const { migrateRollbackAll, migrateLatest } = require('../../../tests/database');
 const { UserMock, AuthMock } = require('../../../tests/data');
 const app = require('../../server');
 
 const request = supertest(app);
 const baseRoute = '/api/v1/auth';
 
-beforeAll(async (done) => {
-  await migrateRollbackAll();
-  await migrateLatest();
-  done();
-});
-
 afterAll(async (done) => {
-  await migrateRollbackAll();
+  await knex.destroy();
   done();
 });
 
@@ -454,6 +447,7 @@ describe('refresh token', () => {
       .send({
         refreshToken,
       });
+
     const res = await request
       .post(`${baseRoute}/refresh`)
       .send({
@@ -468,7 +462,7 @@ describe('refresh token', () => {
 
     done();
   });
-  it('user can`t login with invalid refresh token', async (done) => {
+  it('user can`t refresh tokens with invalid refresh token', async (done) => {
     const res = await request
       .post(`${baseRoute}/refresh`)
       .send({
@@ -483,7 +477,7 @@ describe('refresh token', () => {
 
     done();
   });
-  it('user can`t login without refresh token', async (done) => {
+  it('user can`t refresh tokens without refresh token', async (done) => {
     const res = await request
       .post(`${baseRoute}/refresh`)
       .send();
@@ -529,7 +523,7 @@ describe('logout ', () => {
       .post(`${baseRoute}/logout`)
       .send();
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.any(Object),
@@ -554,7 +548,7 @@ describe('logout ', () => {
       .set('authorization', token)
       .send();
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.any(Object),
@@ -588,13 +582,13 @@ describe('logout ', () => {
     done();
   });
   it('user can`t logout with expired authorization headers', async (done) => {
-    const pairTokens = await AuthMock.issueTokenPair({
+    const { token } = await AuthMock.getExpiredTokenPair({
       userId: 1,
       ip: 'test.test.test.test',
-    }, '1ms');
+    });
     const res = await request
       .post(`${baseRoute}/logout`)
-      .set('authorization', `Bearer ${pairTokens.token}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -628,6 +622,115 @@ describe('logout ', () => {
       });
 
     expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('me', () => {
+  it('user can get information about himself after register', async (done) => {
+    const user = UserMock.getUnique();
+    const resRegister = await request
+      .post(`${baseRoute}/register`)
+      .send(user);
+    const { token } = resRegister.body.data;
+    const res = await request
+      .get(`${baseRoute}/me`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.objectContaining({
+        email: expect.any(String),
+        name: expect.any(String),
+        surname: expect.any(String),
+        username: expect.any(String),
+      }),
+    }));
+
+    done();
+  });
+  it('user can get information about himself after login', async (done) => {
+    const user = UserMock.getUnique();
+    await request
+      .post(`${baseRoute}/register`)
+      .send(user);
+    const resLogin = await request
+      .post(`${baseRoute}/login`)
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+    const { token } = resLogin.body.data;
+    const res = await request
+      .get(`${baseRoute}/me`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+    expect(res.body.data).toEqual({
+      email: user.email,
+      name: user.name,
+      surname: user.surname,
+      username: user.username,
+    });
+
+    done();
+  });
+  it('user can`t get information about himself with invalid token', async (done) => {
+    const token = AuthMock.getInvalidToken();
+    const res = await request
+      .get(`${baseRoute}/me`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can`t get information about himself with invalid signature token', async (done) => {
+    const { token } = await AuthMock.getTokenPairWithInvalidSignature({
+      userId: 1,
+      ip: 'test.test.test.test',
+    });
+    const res = await request
+      .get(`${baseRoute}/me`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can`t get information about himself with expired token', async (done) => {
+    const { token } = await AuthMock.getExpiredTokenPair({
+      userId: 1,
+      ip: 'test.test.test.test',
+    });
+    const res = await request
+      .get(`${baseRoute}/me`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.any(Object),

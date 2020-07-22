@@ -1,9 +1,3 @@
-const {
-  DB_HOST,
-  DB_PORT,
-  DB_NAME,
-} = process.env;
-
 module.exports = {
   development: {
     client: 'pg',
@@ -21,12 +15,20 @@ module.exports = {
     },
   },
 
+  // test: {
+  //   client: 'sqlite3',
+  //   connection: ':memory:',
+  //   migrations: {
+  //     tableName: 'knex_migrations',
+  //   },
+  // },
+
   test: {
     client: 'pg',
     connection: {
-      host: DB_HOST,
-      database: DB_NAME,
-      port: DB_PORT,
+      host: '0.0.0.0',
+      database: 'verticals_test',
+      port: 5432,
     },
     pool: {
       min: 2,

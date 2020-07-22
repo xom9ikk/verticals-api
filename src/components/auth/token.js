@@ -5,13 +5,11 @@ const { TokenService } = require('../../services');
 const { JWT_EXPIRE, JWT_SECRET } = process.env;
 
 class TokenComponent {
-  constructor() {
-    this.expiresIn = JWT_EXPIRE;
-    this.secret = JWT_SECRET;
-  }
-
-  async issueTokenPair({ userId, ip }) {
-    const { expiresIn, secret } = this;
+  async issueTokenPair(
+    { userId, ip },
+    expiresIn = JWT_EXPIRE,
+    secret = JWT_SECRET,
+  ) {
     const refreshToken = uuidV4();
     const token = jwt.sign(
       {
@@ -33,8 +31,8 @@ class TokenComponent {
     };
   }
 
-  verifyToken(token) {
-    return jwt.verify(token, this.secret);
+  verifyToken(token, secret = JWT_SECRET) {
+    return jwt.verify(token, secret);
   }
 }
 

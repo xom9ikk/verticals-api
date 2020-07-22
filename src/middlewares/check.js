@@ -31,7 +31,7 @@ class CheckMiddleware {
     try {
       const token = CheckMiddleware.extractToken(req);
       if (!token) {
-        throw new BackendError.BadRequest('Token does not contain Bearer');
+        throw new BackendError.Unauthorized('Token does not contain Bearer');
       }
 
       const isValidTokenSignature = CheckMiddleware.isValidTokenSignature(token);

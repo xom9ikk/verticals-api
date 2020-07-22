@@ -1,3 +1,5 @@
+const { Color } = require("../../enums");
+
 class ColumnSchema {
   createColumn = {
     type: 'object',
@@ -22,7 +24,7 @@ class ColumnSchema {
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
       isCollapsed: {
         type: 'boolean',
@@ -72,7 +74,7 @@ class ColumnSchema {
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
       isCollapsed: {
         type: 'boolean',

@@ -1,3 +1,5 @@
+const { CardType, Color } = require("../../enums");
+
 class BoardSchema {
   createBoard = {
     type: 'object',
@@ -13,7 +15,7 @@ class BoardSchema {
       },
       cardType: {
         type: 'integer',
-        enum: [0, 1, 2, 3, 4],
+        enum: Object.values(CardType),
       },
       description: {
         type: 'string',
@@ -22,7 +24,7 @@ class BoardSchema {
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
     },
     required: ['title', 'position', 'cardType'],
@@ -51,7 +53,7 @@ class BoardSchema {
       },
       cardType: {
         type: 'integer',
-        enum: [0, 1, 2, 3, 4],
+        enum: Object.values(CardType),
       },
       description: {
         type: 'string',
@@ -60,7 +62,7 @@ class BoardSchema {
       },
       color: {
         type: 'number',
-        enum: [0, 1, 2, 3, 4, 5, 6],
+        enum: Object.values(Color),
       },
     },
     anyOf: [
