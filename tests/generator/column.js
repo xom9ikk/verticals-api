@@ -1,24 +1,26 @@
 const faker = require('faker');
-const { CardType, Color } = require('../../src/enums');
+const { Color } = require('../../src/enums');
 
-class BoardMock {
-  static get() {
+class ColumnDataGenerator {
+  static get(boardId) {
     return {
-      title: 'test board title',
+      boardId,
+      title: 'test column title',
       position: 0,
-      cardType: CardType.checkboxes,
-      description: 'test board description',
+      description: 'test column description',
       color: Color.red,
+      isCollapsed: true,
     };
   }
 
-  static getUnique() {
+  static getUnique(boardId) {
     return {
+      boardId,
       title: faker.lorem.words(),
       position: faker.random.number({ min: 0 }),
-      cardType: faker.random.number({ max: 4 }),
       description: faker.lorem.sentences(),
       color: faker.random.number({ max: 5 }),
+      isCollapsed: faker.random.boolean(),
     };
   }
 
@@ -34,18 +36,6 @@ class BoardMock {
     return faker.random.number({ min: 0 }).toString();
   }
 
-  static getNegativeCardType() {
-    return faker.random.number({ max: -100 });
-  }
-
-  static getStringCardType() {
-    return faker.random.number({ min: 0 }).toString();
-  }
-
-  static getInvalidCardType() {
-    return faker.random.number({ min: 5, max: 10 }).toString();
-  }
-
   static getNegativeColor() {
     return faker.random.number({ max: -100 });
   }
@@ -57,8 +47,12 @@ class BoardMock {
   static getInvalidColor() {
     return faker.random.number({ min: 6, max: 10 }).toString();
   }
+
+  static getNegativeBoardId() {
+    return faker.random.number({ max: -100 });
+  }
 }
 
 module.exports = {
-  BoardMock,
+  ColumnDataGenerator,
 };

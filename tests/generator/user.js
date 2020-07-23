@@ -1,6 +1,6 @@
 const faker = require('faker');
 
-class UserMock {
+class UserDataGenerator {
   static get() {
     return {
       email: 'test@test.test',
@@ -51,5 +51,5 @@ class UserMock {
 }
 
 module.exports = {
-  UserMock,
+  UserDataGenerator,
 };

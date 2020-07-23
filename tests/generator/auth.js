@@ -1,6 +1,6 @@
 const { TokenComponent } = require('../../src/components');
 
-class AuthMock {
+class AuthDataGenerator {
   static getExpiredTokenPair(data) {
     return TokenComponent.issueTokenPair(data, '1ms');
   }
@@ -19,5 +19,5 @@ class AuthMock {
 }
 
 module.exports = {
-  AuthMock,
+  AuthDataGenerator,
 };

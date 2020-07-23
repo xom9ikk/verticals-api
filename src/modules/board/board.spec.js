@@ -1,30 +1,11 @@
 const supertest = require('supertest');
-const { UserMock, BoardMock } = require('../../../tests/data');
 const app = require('../../server');
+const { Generator } = require('../../../tests/generator');
+const { Helper } = require('../../../tests/helper');
+const { routes } = require('../../../tests/routes');
 
 const request = supertest(app);
-const baseAuthRoute = '/api/v1/auth';
-const baseBoardRoute = '/api/v1/board';
-
-const users = [];
-
-const registerUser = async () => {
-  const user = UserMock.getUnique();
-  const resRegister = await request
-    .post(`${baseAuthRoute}/register`)
-    .send(user);
-  users.push({
-    pseudoId: users.length,
-    token: resRegister.body.data.token,
-  });
-  return users[users.length - 1];
-};
-
-beforeAll(async (done) => {
-  await registerUser();
-  await registerUser();
-  done();
-});
+const helper = new Helper(request);
 
 afterAll(async (done) => {
   await knex.destroy();
@@ -33,10 +14,12 @@ afterAll(async (done) => {
 
 describe('create', () => {
   it('user can successfully create board with all fields', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(201);
@@ -50,11 +33,13 @@ describe('create', () => {
     done();
   });
   it('user can successfully create board without description', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.description;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(201);
@@ -68,11 +53,13 @@ describe('create', () => {
     done();
   });
   it('user can successfully create board without color', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.color;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(201);
@@ -86,12 +73,14 @@ describe('create', () => {
     done();
   });
   it('user can successfully create board without description and color', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.description;
     delete board.color;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(201);
@@ -105,9 +94,9 @@ describe('create', () => {
     done();
   });
   it('user can`t create board without authorization', async (done) => {
-    const board = BoardMock.getUnique();
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
+      .post(`${routes.board}/`)
       .send(board);
 
     expect(res.statusCode).toEqual(401);
@@ -119,11 +108,13 @@ describe('create', () => {
     done();
   });
   it('user can`t create board without title', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.title;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(400);
@@ -135,11 +126,13 @@ describe('create', () => {
     done();
   });
   it('user can`t create board without position', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.position;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(400);
@@ -151,11 +144,13 @@ describe('create', () => {
     done();
   });
   it('user can`t create board without card type', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     delete board.cardType;
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
 
     expect(res.statusCode).toEqual(400);
@@ -167,10 +162,12 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with empty title', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
         title: '',
@@ -185,13 +182,15 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with long title', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        title: BoardMock.getLongTitle(),
+        title: Generator.Board.getLongTitle(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -203,14 +202,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with negative position', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        position: BoardMock.getNegativePosition(),
+        position: Generator.Board.getNegativePosition(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -220,14 +222,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with string position', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        position: BoardMock.getStringPosition(),
+        position: Generator.Board.getStringPosition(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -237,14 +242,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with negative card type', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        cardType: BoardMock.getNegativeCardType(),
+        cardType: Generator.Board.getNegativeCardType(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -254,14 +262,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with string card type', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        cardType: BoardMock.getNegativeCardType(),
+        cardType: Generator.Board.getNegativeCardType(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -271,14 +282,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with card type which is not included in the enum', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        cardType: BoardMock.getInvalidCardType(),
+        cardType: Generator.Board.getInvalidCardType(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -288,14 +302,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with negative color', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        color: BoardMock.getNegativeColor(),
+        color: Generator.Board.getNegativeColor(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -305,14 +322,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with string color', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        color: BoardMock.getNegativeColor(),
+        color: Generator.Board.getNegativeColor(),
       });
+
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
@@ -322,13 +342,15 @@ describe('create', () => {
     done();
   });
   it('user can`t create board with color which is not included in the enum', async (done) => {
-    const board = BoardMock.getUnique();
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
     const res = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...board,
-        color: BoardMock.getInvalidColor(),
+        color: Generator.Board.getInvalidColor(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -343,15 +365,17 @@ describe('create', () => {
 
 describe('get board by id', () => {
   it('user can successfully get board by id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .get(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -367,14 +391,16 @@ describe('get board by id', () => {
     done();
   });
   it('user can`t get board without authorization header', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseBoardRoute}/${boardId}`)
+      .get(`${routes.board}/${boardId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -386,16 +412,18 @@ describe('get board by id', () => {
     done();
   });
   it('user can`t access to the board if he does not have access to it', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token: tokenFirst } = await helper.createUser();
+    const { token: tokenSecond } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
 
     const res = await request
-      .get(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${users[1].token}`)
+      .get(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -407,14 +435,16 @@ describe('get board by id', () => {
     done();
   });
   it('user can`t access to the board by string id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseBoardRoute}/string_${boardId}`)
+      .get(`${routes.board}/string_${boardId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -429,38 +459,30 @@ describe('get board by id', () => {
 
 describe('get all boards', () => {
   it('user can successfully get all boards to which he has access', async (done) => {
-    const userOne = UserMock.getUnique();
-    const resRegisterOne = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userOne);
-    const { token: tokenOne } = resRegisterOne.body.data;
-    const boardOne = BoardMock.getUnique();
+    const { token: tokenFirst } = await helper.createUser();
+    const { token: tokenSecond } = await helper.createUser();
+
+    const boardOne = Generator.Board.getUnique();
     await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenOne}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenFirst}`)
       .send(boardOne);
 
-    const userTwo = UserMock.getUnique();
-    const resRegisterTwo = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userTwo);
-    const { token: tokenTwo } = resRegisterTwo.body.data;
-    const boardTwo = BoardMock.getUnique();
-    const resCreateTwo = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+    const boardTwo = Generator.Board.getUnique();
+    const { body: { data: { boardId: boardIdTwo } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send(boardTwo);
-    const boardThree = BoardMock.getUnique();
-    const resCreateThree = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+
+    const boardThree = Generator.Board.getUnique();
+    const { body: { data: { boardId: boardIdThree } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send(boardThree);
-    const { boardId: boardIdTwo } = resCreateTwo.body.data;
-    const { boardId: boardIdThree } = resCreateThree.body.data;
 
     const res = await request
-      .get(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -470,6 +492,7 @@ describe('get all boards', () => {
     }));
 
     const { boards } = res.body.data;
+
     expect(boards).toEqual([
       {
         id: boardIdTwo,
@@ -483,26 +506,18 @@ describe('get all boards', () => {
     done();
   });
   it('user can`t get boards if he has no boards', async (done) => {
-    const userOne = UserMock.getUnique();
-    const resRegisterOne = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userOne);
-    const { token: tokenOne } = resRegisterOne.body.data;
-    const boardOne = BoardMock.getUnique();
+    const { token: tokenFirst } = await helper.createUser();
+    const { token: tokenSecond } = await helper.createUser();
+
+    const boardOne = Generator.Board.getUnique();
     await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenOne}`)
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenFirst}`)
       .send(boardOne);
 
-    const userTwo = UserMock.getUnique();
-    const resRegisterTwo = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userTwo);
-    const { token: tokenTwo } = resRegisterTwo.body.data;
-
     const res = await request
-      .get(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -513,14 +528,16 @@ describe('get all boards', () => {
     done();
   });
   it('user can`t get all boards without authorization header', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseBoardRoute}/${boardId}`)
+      .get(`${routes.board}/${boardId}`)
       .send(board);
 
     expect(res.statusCode).toEqual(401);
@@ -535,15 +552,17 @@ describe('get all boards', () => {
 
 describe('remove board', () => {
   it('user can successfully remove board by id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .delete(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -555,14 +574,16 @@ describe('remove board', () => {
     done();
   });
   it('user can`t remove board without authorization header', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseBoardRoute}/${boardId}`)
+      .delete(`${routes.board}/${boardId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -574,28 +595,18 @@ describe('remove board', () => {
     done();
   });
   it('user can`t remove board if he does not have access to it', async (done) => {
-    const userOne = UserMock.getUnique();
-    const resRegisterOne = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userOne);
-    const { token: tokenOne } = resRegisterOne.body.data;
+    const { token: tokenFirst } = await helper.createUser();
+    const { token: tokenSecond } = await helper.createUser();
 
-    const userTwo = UserMock.getUnique();
-    const resRegisterTwo = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userTwo);
-    const { token: tokenTwo } = resRegisterTwo.body.data;
-
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenOne}`)
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
 
     const res = await request
-      .delete(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+      .delete(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -607,14 +618,16 @@ describe('remove board', () => {
     done();
   });
   it('user can`t remove board by string id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseBoardRoute}/string_${boardId}`)
+      .delete(`${routes.board}/string_${boardId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -629,21 +642,23 @@ describe('remove board', () => {
 
 describe('update board', () => {
   it('user can successfully update board by id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
-    const newBoard = BoardMock.getUnique();
+
+    const newBoard = Generator.Board.getUnique();
     const resUpdate = await request
-      .patch(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .patch(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${token}`)
       .send(newBoard);
 
     const res = await request
-      .get(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .get(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(resUpdate.statusCode).toEqual(200);
@@ -661,15 +676,17 @@ describe('update board', () => {
     done();
   });
   it('user can`t update board without authorization header', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const { token } = await helper.createUser();
+
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
-    const newBoard = BoardMock.getUnique();
+
+    const newBoard = Generator.Board.getUnique();
     const res = await request
-      .patch(`${baseBoardRoute}/${boardId}`)
+      .patch(`${routes.board}/${boardId}`)
       .send(newBoard);
 
     expect(res.statusCode).toEqual(401);
@@ -681,29 +698,19 @@ describe('update board', () => {
     done();
   });
   it('user can`t update board if he does not have access to it', async (done) => {
-    const userOne = UserMock.getUnique();
-    const resRegisterOne = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userOne);
-    const { token: tokenOne } = resRegisterOne.body.data;
+    const { token: tokenFirst } = await helper.createUser();
+    const { token: tokenSecond } = await helper.createUser();
 
-    const userTwo = UserMock.getUnique();
-    const resRegisterTwo = await request
-      .post(`${baseAuthRoute}/register`)
-      .send(userTwo);
-    const { token: tokenTwo } = resRegisterTwo.body.data;
-
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${tokenOne}`)
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
-    const { boardId } = resCreate.body.data;
 
-    const newBoard = BoardMock.getUnique();
+    const newBoard = Generator.Board.getUnique();
     const res = await request
-      .patch(`${baseBoardRoute}/${boardId}`)
-      .set('authorization', `Bearer ${tokenTwo}`)
+      .patch(`${routes.board}/${boardId}`)
+      .set('authorization', `Bearer ${tokenSecond}`)
       .send(newBoard);
 
     expect(res.statusCode).toEqual(403);
@@ -715,16 +722,17 @@ describe('update board', () => {
     done();
   });
   it('user can`t update board by string id', async (done) => {
-    const board = BoardMock.getUnique();
-    const resCreate = await request
-      .post(`${baseBoardRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
-      .send(board);
-    const { boardId } = resCreate.body.data;
+    const { token } = await helper.createUser();
 
-    const newBoard = BoardMock.getUnique();
+    const board = Generator.Board.getUnique();
+    const { body: { data: { boardId } } } = await request
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(board);
+
+    const newBoard = Generator.Board.getUnique();
     const res = await request
-      .patch(`${baseBoardRoute}/string_${boardId}`)
+      .patch(`${routes.board}/string_${boardId}`)
       .send(newBoard);
 
     expect(res.statusCode).toEqual(400);

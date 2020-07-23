@@ -1,9 +1,9 @@
 const supertest = require('supertest');
-const { UserMock, AuthMock } = require('../../../tests/data');
 const app = require('../../server');
+const { Generator } = require('../../../tests/generator');
+const { routes } = require('../../../tests/routes');
 
 const request = supertest(app);
-const baseRoute = '/api/v1/auth';
 
 afterAll(async (done) => {
   await knex.destroy();
@@ -12,9 +12,9 @@ afterAll(async (done) => {
 
 describe('registration', () => {
   it('user can successfully register', async (done) => {
-    const user = UserMock.get();
+    const user = Generator.User.get();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
 
     expect(res.statusCode).toEqual(201);
@@ -29,10 +29,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with a non-unique username', async (done) => {
-    const uniqueUser = UserMock.getUnique();
-    const user = UserMock.get();
+    const uniqueUser = Generator.User.getUnique();
+    const user = Generator.User.get();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
         username: user.username,
@@ -47,10 +47,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with a non-unique email', async (done) => {
-    const uniqueUser = UserMock.getUnique();
-    const user = UserMock.get();
+    const uniqueUser = Generator.User.getUnique();
+    const user = Generator.User.get();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
         email: user.email,
@@ -65,10 +65,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without email', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.email;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -82,10 +82,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without password', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.password;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -99,10 +99,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without name', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.name;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -116,10 +116,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without surname', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.surname;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -133,10 +133,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without username', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.username;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -150,10 +150,10 @@ describe('registration', () => {
     done();
   });
   it('user can`t register without username', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.username;
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
       });
@@ -167,12 +167,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with invalid email', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        email: UserMock.getInvalidEmail(),
+        email: Generator.User.getInvalidEmail(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -184,12 +184,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with long email', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        email: UserMock.getLongEmail(),
+        email: Generator.User.getLongEmail(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -201,12 +201,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with long username', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        username: UserMock.getLongUsername(),
+        username: Generator.User.getLongUsername(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -218,12 +218,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with short username', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        username: UserMock.getShortUsername(),
+        username: Generator.User.getShortUsername(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -235,12 +235,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with long name', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        name: UserMock.getLongName(),
+        name: Generator.User.getLongName(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -252,12 +252,12 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with short name', async (done) => {
-    const uniqueUser = UserMock.getUnique();
+    const uniqueUser = Generator.User.getUnique();
     const res = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         ...uniqueUser,
-        name: UserMock.getShortName(),
+        name: Generator.User.getShortName(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -272,12 +272,12 @@ describe('registration', () => {
 
 describe('login', () => {
   it('user can successfully login with email and password', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
@@ -295,12 +295,12 @@ describe('login', () => {
     done();
   });
   it('user can successfully login with username and password', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         username: user.username,
         password: user.password,
@@ -318,14 +318,14 @@ describe('login', () => {
     done();
   });
   it('user can`t login without username and email', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send({
         password: user.password,
       });
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         password: user.password,
       });
@@ -339,12 +339,12 @@ describe('login', () => {
     done();
   });
   it('user can`t login only with email without password', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
       });
@@ -358,12 +358,12 @@ describe('login', () => {
     done();
   });
   it('user can`t login only with username without password', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         username: user.username,
       });
@@ -377,15 +377,15 @@ describe('login', () => {
     done();
   });
   it('user can`t login only with invalid password', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const res = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         username: user.username,
-        password: UserMock.getInvalidPassword(),
+        password: Generator.User.getInvalidPassword(),
       });
 
     expect(res.statusCode).toEqual(403);
@@ -400,12 +400,12 @@ describe('login', () => {
 
 describe('refresh token', () => {
   it('user can successfully refresh token', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
@@ -413,7 +413,7 @@ describe('refresh token', () => {
     const { refreshToken } = resLogin.body.data;
 
     const res = await request
-      .post(`${baseRoute}/refresh`)
+      .post(`${routes.auth}/refresh`)
       .send({
         refreshToken,
       });
@@ -430,26 +430,26 @@ describe('refresh token', () => {
     done();
   });
   it('user can refresh token only once', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { refreshToken } = resLogin.body.data;
 
-    const resFirst = await request
-      .post(`${baseRoute}/refresh`)
+    await request
+      .post(`${routes.auth}/refresh`)
       .send({
         refreshToken,
       });
 
     const res = await request
-      .post(`${baseRoute}/refresh`)
+      .post(`${routes.auth}/refresh`)
       .send({
         refreshToken,
       });
@@ -464,9 +464,9 @@ describe('refresh token', () => {
   });
   it('user can`t refresh tokens with invalid refresh token', async (done) => {
     const res = await request
-      .post(`${baseRoute}/refresh`)
+      .post(`${routes.auth}/refresh`)
       .send({
-        refreshToken: AuthMock.getInvalidRefreshToken(),
+        refreshToken: Generator.Auth.getInvalidRefreshToken(),
       });
 
     expect(res.statusCode).toEqual(403);
@@ -479,7 +479,7 @@ describe('refresh token', () => {
   });
   it('user can`t refresh tokens without refresh token', async (done) => {
     const res = await request
-      .post(`${baseRoute}/refresh`)
+      .post(`${routes.auth}/refresh`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -494,19 +494,19 @@ describe('refresh token', () => {
 
 describe('logout ', () => {
   it('user can successfully logout after login', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { token } = resLogin.body.data;
     const res = await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -520,7 +520,7 @@ describe('logout ', () => {
   });
   it('user can`t logout with empty authorization headers', async (done) => {
     const res = await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -532,19 +532,19 @@ describe('logout ', () => {
     done();
   });
   it('user can`t logout with authorization headers without Bearer', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { token } = resLogin.body.data;
     const res = await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .set('authorization', token)
       .send();
 
@@ -557,19 +557,19 @@ describe('logout ', () => {
     done();
   });
   it('user can`t logout with invalid authorization headers', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { token } = resLogin.body.data;
     const res = await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .set('authorization', `Bearer ${token}_invalid`)
       .send();
 
@@ -582,12 +582,12 @@ describe('logout ', () => {
     done();
   });
   it('user can`t logout with expired authorization headers', async (done) => {
-    const { token } = await AuthMock.getExpiredTokenPair({
+    const { token } = await Generator.Auth.getExpiredTokenPair({
       userId: 1,
       ip: 'test.test.test.test',
     });
     const res = await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -600,23 +600,23 @@ describe('logout ', () => {
     done();
   });
   it('user can`t refresh token after logout', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { token, refreshToken } = resLogin.body.data;
     await request
-      .post(`${baseRoute}/logout`)
+      .post(`${routes.auth}/logout`)
       .set('authorization', `Bearer ${token}`)
       .send();
     const res = await request
-      .post(`${baseRoute}/refresh`)
+      .post(`${routes.auth}/refresh`)
       .send({
         refreshToken,
       });
@@ -633,13 +633,13 @@ describe('logout ', () => {
 
 describe('me', () => {
   it('user can get information about himself after register', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     const resRegister = await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const { token } = resRegister.body.data;
     const res = await request
-      .get(`${baseRoute}/me`)
+      .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -657,19 +657,19 @@ describe('me', () => {
     done();
   });
   it('user can get information about himself after login', async (done) => {
-    const user = UserMock.getUnique();
+    const user = Generator.User.getUnique();
     await request
-      .post(`${baseRoute}/register`)
+      .post(`${routes.auth}/register`)
       .send(user);
     const resLogin = await request
-      .post(`${baseRoute}/login`)
+      .post(`${routes.auth}/login`)
       .send({
         email: user.email,
         password: user.password,
       });
     const { token } = resLogin.body.data;
     const res = await request
-      .get(`${baseRoute}/me`)
+      .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -688,9 +688,9 @@ describe('me', () => {
     done();
   });
   it('user can`t get information about himself with invalid token', async (done) => {
-    const token = AuthMock.getInvalidToken();
+    const token = Generator.Auth.getInvalidToken();
     const res = await request
-      .get(`${baseRoute}/me`)
+      .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -703,12 +703,12 @@ describe('me', () => {
     done();
   });
   it('user can`t get information about himself with invalid signature token', async (done) => {
-    const { token } = await AuthMock.getTokenPairWithInvalidSignature({
+    const { token } = await Generator.Auth.getTokenPairWithInvalidSignature({
       userId: 1,
       ip: 'test.test.test.test',
     });
     const res = await request
-      .get(`${baseRoute}/me`)
+      .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -721,12 +721,12 @@ describe('me', () => {
     done();
   });
   it('user can`t get information about himself with expired token', async (done) => {
-    const { token } = await AuthMock.getExpiredTokenPair({
+    const { token } = await Generator.Auth.getExpiredTokenPair({
       userId: 1,
       ip: 'test.test.test.test',
     });
     const res = await request
-      .get(`${baseRoute}/me`)
+      .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 

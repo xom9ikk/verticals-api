@@ -1,51 +1,23 @@
 const supertest = require('supertest');
-const { UserMock, BoardMock, ColumnMock } = require('../../../tests/data');
 const app = require('../../server');
+const { Generator } = require('../../../tests/generator');
+const { Helper } = require('../../../tests/helper');
+const { routes } = require('../../../tests/routes');
 
 const request = supertest(app);
-const baseAuthRoute = '/api/v1/auth';
-const baseBoardRoute = '/api/v1/board';
-const baseColumnRoute = '/api/v1/column';
+const helper = new Helper(request);
 
-const users = [];
-
-const registerUser = async () => {
-  const user = UserMock.getUnique();
-  const resRegister = await request
-    .post(`${baseAuthRoute}/register`)
-    .send(user);
-  users.push({
-    pseudoId: users.length,
-    token: resRegister.body.data.token,
-  });
-  return users[users.length - 1];
+const defaultUser = {
+  boards: [{
+    title: 'default-board-1',
+  }, {
+    title: 'default-board-2',
+  }, {
+    title: 'default-board-3',
+  }, {
+    title: 'default-board-4',
+  }],
 };
-
-const createBoard = async (userId) => {
-  const board = BoardMock.getUnique();
-  const resRegister = await request
-    .post(`${baseBoardRoute}/`)
-    .set('authorization', `Bearer ${users[userId].token}`)
-    .send(board);
-  const { boardIds = [] } = users[userId];
-  boardIds.push(resRegister.body.data.boardId);
-  users[userId] = {
-    ...users[userId],
-    boardIds,
-  };
-  return {
-    ...board,
-    id: resRegister.body.data.boardId,
-  };
-};
-
-beforeAll(async (done) => {
-  const { pseudoId: firstUserId } = await registerUser();
-  const { pseudoId: secondUserId } = await registerUser();
-  await createBoard(firstUserId);
-  await createBoard(secondUserId);
-  done();
-});
 
 afterAll(async (done) => {
   await knex.destroy();
@@ -54,10 +26,14 @@ afterAll(async (done) => {
 
 describe('create', () => {
   it('user can successfully create column with all fields', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(201);
@@ -71,11 +47,15 @@ describe('create', () => {
     done();
   });
   it('user can successfully create column without description', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.description;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(201);
@@ -89,11 +69,15 @@ describe('create', () => {
     done();
   });
   it('user can successfully create column without color', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.color;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(201);
@@ -107,11 +91,15 @@ describe('create', () => {
     done();
   });
   it('user can successfully create column without is collapsed', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.isCollapsed;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(201);
@@ -125,13 +113,17 @@ describe('create', () => {
     done();
   });
   it('user can successfully create column without description, color and is collapsed', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.description;
     delete column.color;
     delete column.isCollapsed;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(201);
@@ -145,9 +137,12 @@ describe('create', () => {
     done();
   });
   it('user can`t create column without authorization', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
+      .post(`${routes.column}/`)
       .send(column);
 
     expect(res.statusCode).toEqual(401);
@@ -159,11 +154,15 @@ describe('create', () => {
     done();
   });
   it('user can`t create column without title', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.title;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(400);
@@ -175,11 +174,15 @@ describe('create', () => {
     done();
   });
   it('user can`t create column without position', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     delete column.position;
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(400);
@@ -191,10 +194,14 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with empty title', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
         title: '',
@@ -209,13 +216,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with long title', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        title: BoardMock.getLongTitle(),
+        title: Generator.Board.getLongTitle(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -227,13 +238,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with negative position', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        position: BoardMock.getNegativePosition(),
+        position: Generator.Board.getNegativePosition(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -244,13 +259,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with string position', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        position: BoardMock.getStringPosition(),
+        position: Generator.Board.getStringPosition(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -261,13 +280,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with negative color', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: BoardMock.getNegativeColor(),
+        color: Generator.Board.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -278,13 +301,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with string color', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: BoardMock.getNegativeColor(),
+        color: Generator.Board.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -295,13 +322,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with color which is not included in the enum', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: BoardMock.getInvalidColor(),
+        color: Generator.Board.getInvalidColor(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -313,13 +344,17 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with negative board id', async (done) => {
-    const column = ColumnMock.getUnique(users[1].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        boardId: ColumnMock.getNegativeBoardId(),
+        boardId: Generator.Column.getNegativeBoardId(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -331,11 +366,16 @@ describe('create', () => {
     done();
   });
   it('user can`t create column with board id without having access to it', async (done) => {
-    const boardIdWithoutAccess = users[1].boardIds[0];
-    const column = ColumnMock.getUnique(boardIdWithoutAccess);
+    const firstUser = await helper.createUser(defaultUser);
+    const { token } = firstUser;
+
+    const secondUser = await helper.createUser(defaultUser);
+    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardIdWithoutAccess);
     const res = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
 
     expect(res.statusCode).toEqual(403);
@@ -350,15 +390,19 @@ describe('create', () => {
 
 describe('get column by id', () => {
   it('user can successfully get column by id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .get(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -374,14 +418,18 @@ describe('get column by id', () => {
     done();
   });
   it('user can`t get column without authorization header', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseColumnRoute}/${columnId}`)
+      .get(`${routes.column}/${columnId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -393,17 +441,20 @@ describe('get column by id', () => {
     done();
   });
   it('user can`t access to the column if he does not have access to it', async (done) => {
-    const boardIdSecondUser = users[1].boardIds[0];
-    const column = ColumnMock.getUnique(boardIdSecondUser);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[1].token}`)
+    const firstUser = await helper.createUser(defaultUser);
+    const firstUserBoardId = firstUser.getRandomBoardId();
+
+    const secondUser = await helper.createUser(defaultUser);
+
+    const column = Generator.Column.getUnique(firstUserBoardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
 
     const res = await request
-      .get(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .get(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -415,14 +466,18 @@ describe('get column by id', () => {
     done();
   });
   it('user can`t access to the column by string id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .get(`${baseColumnRoute}/string_${columnId}`)
+      .get(`${routes.column}/string_${columnId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -437,26 +492,29 @@ describe('get column by id', () => {
 
 describe('get all columns', () => {
   it('user can successfully gets all columns to which he has access', async (done) => {
-    const { pseudoId: firstUserId } = await registerUser();
-    const { pseudoId: secondUserId } = await registerUser();
-    await createBoard(firstUserId);
-    const boardOne = await createBoard(secondUserId);
-    const boardTwo = await createBoard(secondUserId);
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoard, secondBoard] = await helper.createBoards({
+      token,
+      boards: defaultUser.boards,
+    });
+    await helper.createUser(defaultUser);
 
-    const columnOne = ColumnMock.getUnique(boardOne.id);
+    const columnOne = Generator.Column.getUnique(firstBoard.id);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(columnOne);
-    const columnTwo = ColumnMock.getUnique(boardTwo.id);
+
+    const columnTwo = Generator.Column.getUnique(secondBoard.id);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(columnTwo);
 
     const res = await request
-      .get(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .get(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -479,26 +537,28 @@ describe('get all columns', () => {
     done();
   });
   it('user can`t get columns if he has no columns', async (done) => {
-    const { pseudoId: firstUserId } = await registerUser();
-    const { pseudoId: secondUserId } = await registerUser();
-    await createBoard(firstUserId);
-    const boardOne = await createBoard(secondUserId);
-    const boardTwo = await createBoard(secondUserId);
+    const firstUser = await helper.createUser();
+    const [firstBoard, secondBoard] = await helper.createBoards({
+      token: firstUser.getToken(),
+      boards: defaultUser.boards,
+    });
+    const secondUser = await helper.createUser();
 
-    const columnOne = ColumnMock.getUnique(boardOne.id);
+    const columnOne = Generator.Column.getUnique(firstBoard.id);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnOne);
-    const columnTwo = ColumnMock.getUnique(boardTwo.id);
+
+    const columnTwo = Generator.Column.getUnique(secondBoard.id);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnTwo);
 
     const res = await request
-      .get(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+      .get(`${routes.column}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -509,13 +569,18 @@ describe('get all columns', () => {
     done();
   });
   it('user can`t get all columns without authorization header', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
+
     const res = await request
-      .get(`${baseColumnRoute}/`)
+      .get(`${routes.column}/`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -530,15 +595,19 @@ describe('get all columns', () => {
 
 describe('remove column', () => {
   it('user can successfully remove column by id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .delete(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(res.statusCode).toEqual(200);
@@ -550,14 +619,18 @@ describe('remove column', () => {
     done();
   });
   it('user can`t remove column without authorization header', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseColumnRoute}/${columnId}`)
+      .delete(`${routes.column}/${columnId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -569,27 +642,28 @@ describe('remove column', () => {
     done();
   });
   it('user can`t remove column if he does not have access to it', async (done) => {
-    const { pseudoId: firstUserId } = await registerUser();
-    const { pseudoId: secondUserId } = await registerUser();
-    const boardOne = await createBoard(firstUserId);
-    const boardTwo = await createBoard(firstUserId);
+    const firstUser = await helper.createUser();
+    const [firstBoard, secondBoard] = await helper.createBoards({
+      token: firstUser.getToken(),
+      boards: defaultUser.boards,
+    });
+    const secondUser = await helper.createUser();
 
-    const columnOne = ColumnMock.getUnique(boardOne.id);
+    const columnOne = Generator.Column.getUnique(firstBoard.id);
     await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnOne);
-    const columnTwo = ColumnMock.getUnique(boardTwo.id);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+
+    const columnTwo = Generator.Column.getUnique(secondBoard.id);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnTwo);
 
-    const { columnId } = resCreate.body.data;
-
     const res = await request
-      .delete(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .delete(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
     expect(res.statusCode).toEqual(403);
@@ -601,14 +675,18 @@ describe('remove column', () => {
     done();
   });
   it('user can`t remove column by string id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
+
     const res = await request
-      .delete(`${baseColumnRoute}/string_${columnId}`)
+      .delete(`${routes.column}/string_${columnId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -623,21 +701,25 @@ describe('remove column', () => {
 
 describe('update column', () => {
   it('user can successfully update column by id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
-    const newColumn = ColumnMock.getUnique(users[0].boardIds[0]);
+
+    const newColumn = Generator.Column.getUnique(boardId);
     const resUpdate = await request
-      .patch(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .patch(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${token}`)
       .send(newColumn);
 
     const res = await request
-      .get(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[0].token}`)
+      .get(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${token}`)
       .send();
 
     expect(resUpdate.statusCode).toEqual(200);
@@ -655,15 +737,19 @@ describe('update column', () => {
     done();
   });
   it('user can`t update column without authorization header', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
-    const newColumn = ColumnMock.getUnique(users[0].boardIds[0]);
+
+    const newColumn = Generator.Column.getUnique(boardId);
     const res = await request
-      .patch(`${baseColumnRoute}/${columnId}`)
+      .patch(`${routes.column}/${columnId}`)
       .send(newColumn);
 
     expect(res.statusCode).toEqual(401);
@@ -675,21 +761,21 @@ describe('update column', () => {
     done();
   });
   it('user can`t update column if he does not have access to it', async (done) => {
-    const { pseudoId: firstUserId } = await registerUser();
-    const { pseudoId: secondUserId } = await registerUser();
-    const boardOne = await createBoard(firstUserId);
+    const firstUser = await helper.createUser(defaultUser);
+    const boardId = firstUser.getRandomBoardId();
 
-    const column = ColumnMock.getUnique(boardOne.id);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+    const secondUser = await helper.createUser(defaultUser);
+
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
 
-    const newColumn = ColumnMock.getUnique();
+    const newColumn = Generator.Column.getUnique();
     const res = await request
-      .patch(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[secondUserId].token}`)
+      .patch(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(newColumn);
 
     expect(res.statusCode).toEqual(403);
@@ -701,16 +787,19 @@ describe('update column', () => {
     done();
   });
   it('user can`t update column by string id', async (done) => {
-    const column = ColumnMock.getUnique(users[0].boardIds[0]);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[0].token}`)
-      .send(column);
-    const { columnId } = resCreate.body.data;
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
 
-    const newColumn = ColumnMock.getUnique(users[0].boardIds[0]);
+    const column = Generator.Column.getUnique(boardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(column);
+
+    const newColumn = Generator.Column.getUnique(boardId);
     const res = await request
-      .patch(`${baseColumnRoute}/string_${columnId}`)
+      .patch(`${routes.column}/string_${columnId}`)
       .send(newColumn);
 
     expect(res.statusCode).toEqual(400);
@@ -722,22 +811,22 @@ describe('update column', () => {
     done();
   });
   it('user can`t update column if he does not have access to new board id', async (done) => {
-    const { pseudoId: firstUserId } = await registerUser();
-    const { pseudoId: secondUserId } = await registerUser();
-    const boardOne = await createBoard(firstUserId);
-    const boardWithoutAccess = await createBoard(secondUserId);
+    const firstUser = await helper.createUser(defaultUser);
+    const firstUserBoardId = firstUser.getRandomBoardId();
 
-    const column = ColumnMock.getUnique(boardOne.id);
-    const resCreate = await request
-      .post(`${baseColumnRoute}/`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+    const secondUser = await helper.createUser(defaultUser);
+    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(firstUserBoardId);
+    const { body: { data: { columnId } } } = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
-    const { columnId } = resCreate.body.data;
 
-    const newColumn = ColumnMock.getUnique(boardWithoutAccess.id);
+    const newColumn = Generator.Column.getUnique(boardIdWithoutAccess);
     const res = await request
-      .patch(`${baseColumnRoute}/${columnId}`)
-      .set('authorization', `Bearer ${users[firstUserId].token}`)
+      .patch(`${routes.column}/${columnId}`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(newColumn);
 
     expect(res.statusCode).toEqual(403);
