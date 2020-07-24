@@ -12,21 +12,27 @@ const defaultUser = {
     title: 'default-board-1',
     columns: [{
       title: 'default-column-1',
+    }, {
+      title: 'default-column-2',
     }],
   }, {
     title: 'default-board-2',
     columns: [{
-      title: 'default-column-2',
+      title: 'default-column-3',
+    }, {
+      title: 'default-column-4',
+    }, {
+      title: 'default-column-5',
     }],
   }, {
     title: 'default-board-3',
     columns: [{
-      title: 'default-column-3',
+      title: 'default-column-6',
     }],
   }, {
     title: 'default-board-4',
     columns: [{
-      title: 'default-column-4',
+      title: 'default-column-7',
     }],
   }],
 };
@@ -615,6 +621,164 @@ describe('get all todos', () => {
       id: todoIdTwo,
       ...todoTwo,
     }]);
+
+    done();
+  });
+  it('user can successfully gets all todos to which he has access by board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
+
+    await helper.createUser(defaultUser);
+
+    const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoOne);
+
+    const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoTwo);
+
+    const res = await request
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ boardId: firstBoardId })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { todos } = res.body.data;
+    const [{ id: todoIdOne }] = todos;
+
+    expect(todos).toEqual([{
+      id: todoIdOne,
+      ...todoOne,
+    }]);
+
+    done();
+  });
+  it('user can successfully gets all todos to which he has access by column id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
+
+    await helper.createUser(defaultUser);
+
+    const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoOne);
+
+    const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoTwo);
+
+    const res = await request
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: columnIdFromFirstBoard })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { todos } = res.body.data;
+    const [{ id: todoIdOne }] = todos;
+
+    expect(todos).toEqual([{
+      id: todoIdOne,
+      ...todoOne,
+    }]);
+
+    done();
+  });
+  it('user can`t get all todos if he does not have access to board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
+
+    const secondUser = await helper.createUser(defaultUser);
+    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+
+    const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoOne);
+
+    const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoTwo);
+
+    const res = await request
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ boardId: boardIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can`t get all todos if he does not have access to column id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
+
+    const secondUser = await helper.createUser(defaultUser);
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+
+    const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoOne);
+
+    const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
+    await request
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todoTwo);
+
+    const res = await request
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: columnIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
 
     done();
   });

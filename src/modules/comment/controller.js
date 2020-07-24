@@ -2,7 +2,7 @@ const { CommentService, BoardAccessService } = require('../../services');
 const { BackendError } = require('../../components');
 
 class CommentController {
-  async create(userId, comment) {
+  async create({ userId, comment }) {
     const { todoId } = comment;
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -14,7 +14,7 @@ class CommentController {
     return commentId;
   }
 
-  async get(userId, commentId) {
+  async get({ userId, commentId }) {
     const isAccess = await BoardAccessService.getByCommentId(userId, commentId);
 
     if (!isAccess) {
@@ -25,13 +25,15 @@ class CommentController {
     return comment;
   }
 
-  async getAll(userId, boardId, todoId) {
+  async getAll({
+    userId, boardId, columnId, todoId,
+  }) {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
-      if (!isAccess) {
-        throw new BackendError.Forbidden('This account is not allowed to receive comments for this board');
+      const isAccessToBoard = await BoardAccessService.getByBoardId(userId, boardId);
+      if (!isAccessToBoard) {
+        throw new BackendError.Forbidden('1This account is not allowed to receive comments for this board');
       }
       boardIdsWithAccess = [boardId];
     } else {
@@ -39,18 +41,24 @@ class CommentController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any comments');
+      throw new BackendError.Forbidden('2This account does not have access to any boards');
     }
 
     let comments;
     if (todoId) {
+      const isAccessToTodo = await BoardAccessService.getByTodoId(userId, todoId);
+      if (!isAccessToTodo) {
+        throw new BackendError.Forbidden('This account is not allowed to receive comments for this todo');
+      }
       comments = await CommentService.getByTodoId(todoId);
+    } else if (columnId) {
+      const isAccessToColumn = await BoardAccessService.getByColumnId(userId, columnId);
+      if (!isAccessToColumn) {
+        throw new BackendError.Forbidden('This account is not allowed to receive comments for this column');
+      }
+      comments = await CommentService.getByColumnId(columnId);
     } else {
       comments = await CommentService.getByBoardIds(boardIdsWithAccess);
-    }
-
-    if (!comments.length) {
-      throw new BackendError.Forbidden('This account does not have access to any comments');
     }
 
     return comments;

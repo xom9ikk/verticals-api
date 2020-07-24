@@ -11,6 +11,10 @@ class Column {
     const randomIndex = faker.random.number({ max: this.todos.length - 1 });
     return this.todos[randomIndex];
   }
+
+  getRandomTodoId() {
+    return this.getRandomTodo().id;
+  }
 }
 
 module.exports = {

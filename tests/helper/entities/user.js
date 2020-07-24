@@ -15,6 +15,10 @@ class User {
     return this.token;
   }
 
+  getBoardById(boardId) {
+    return this.boards.find((board) => board.id === boardId);
+  }
+
   getRandomBoard() {
     const randomIndex = faker.random.number({ max: this.boards.length - 1 });
     return this.boards[randomIndex];
@@ -33,7 +37,12 @@ class User {
   }
 
   getRandomColumnId() {
-    return this.getRandomBoard().getRandomColumn().id;
+    return this.getRandomBoard().getRandomColumnId();
+  }
+
+  // -
+  getRandomColumnIdFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().id;
   }
 
   getColumnIds() {
@@ -52,6 +61,11 @@ class User {
 
   getRandomTodoId() {
     return this.getRandomBoard().getRandomColumn().getRandomTodo().id;
+  }
+
+  // -
+  getRandomTodoIdFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().getRandomTodo().id;
   }
 
   getTodoIds() {

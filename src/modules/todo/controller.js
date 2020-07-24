@@ -29,8 +29,8 @@ class TodoController {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
-      if (!isAccess) {
+      const isAccessToBoard = await BoardAccessService.getByBoardId(userId, boardId);
+      if (!isAccessToBoard) {
         throw new BackendError.Forbidden('This account is not allowed to receive todos for this board');
       }
       boardIdsWithAccess = [boardId];
@@ -39,11 +39,15 @@ class TodoController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any todos');
+      throw new BackendError.Forbidden('This account does not have access to any boards');
     }
 
     let todos;
     if (columnId) {
+      const isAccessToColumn = await BoardAccessService.getByColumnId(userId, columnId);
+      if (!isAccessToColumn) {
+        throw new BackendError.Forbidden('This account is not allowed to receive todos for this column');
+      }
       todos = await TodoService.getByColumnId(columnId);
     } else {
       todos = await TodoService.getByBoardIds(boardIdsWithAccess);

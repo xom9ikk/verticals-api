@@ -5,7 +5,7 @@ class CommentAdapter {
   async create(req, res, next) {
     try {
       const { userId } = res.locals;
-      const commentId = await CommentController.create(userId, req.body);
+      const commentId = await CommentController.create({ userId, comment: req.body });
       return BackendResponse.Created(res, 'Comment successfully created', { commentId });
     } catch (e) {
       next(e);
@@ -16,7 +16,7 @@ class CommentAdapter {
     try {
       const { userId } = res.locals;
       const { commentId } = req.params;
-      const comment = await CommentController.get(userId, commentId);
+      const comment = await CommentController.get({ userId, commentId });
       return BackendResponse.Success(res, 'Comment information successfully received', comment);
     } catch (e) {
       next(e);
@@ -27,7 +27,9 @@ class CommentAdapter {
     try {
       const { userId } = res.locals;
       const { boardId, columnId, todoId } = req.query;
-      const comments = await CommentController.getAll(userId, boardId, columnId, todoId);
+      const comments = await CommentController.getAll({
+        userId, boardId, columnId, todoId,
+      });
       return BackendResponse.Success(res, 'Comments information successfully received', { comments });
     } catch (e) {
       next(e);

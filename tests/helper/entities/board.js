@@ -10,6 +10,14 @@ class Board {
     const randomIndex = faker.random.number({ max: this.columns.length - 1 });
     return this.columns[randomIndex];
   }
+
+  getRandomColumnId() {
+    return this.getRandomColumn().id;
+  }
+
+  getColumns() {
+    return this.columns;
+  }
 }
 
 module.exports = {

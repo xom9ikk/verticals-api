@@ -29,8 +29,8 @@ class ColumnController {
     let boardIdsWithAccess;
 
     if (boardId) {
-      const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
-      if (!isAccess) {
+      const isAccessToBoard = await BoardAccessService.getByBoardId(userId, boardId);
+      if (!isAccessToBoard) {
         throw new BackendError.Forbidden('This account is not allowed to receive columns for this board');
       }
       boardIdsWithAccess = [boardId];
@@ -39,7 +39,7 @@ class ColumnController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any columns');
+      throw new BackendError.Forbidden('This account does not have access to any baords');
     }
 
     const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);

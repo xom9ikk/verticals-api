@@ -16,44 +16,78 @@ const defaultUser = {
         title: 'default-todo-1',
       }, {
         title: 'default-todo-2',
-      }, {
+      }],
+    }, {
+      title: 'default-column-2',
+      todos: [{
         title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
       }],
     }],
   }, {
     title: 'default-board-2',
     columns: [{
-      title: 'default-column-2',
+      title: 'default-column-3',
       todos: [{
-        title: 'default-todo-4',
-      }, {
-        title: 'default-todo-5',
-      }, {
         title: 'default-todo-6',
+      }, {
+        title: 'default-todo-7',
+      }, {
+        title: 'default-todo-8',
+      }],
+    }, {
+      title: 'default-column-4',
+      todos: [{
+        title: 'default-todo-9',
+      }, {
+        title: 'default-todo-10',
+      }, {
+        title: 'default-todo-11',
       }],
     }],
   }, {
     title: 'default-board-3',
     columns: [{
-      title: 'default-column-3',
+      title: 'default-column-5',
       todos: [{
-        title: 'default-todo-7',
+        title: 'default-todo-12',
       }, {
-        title: 'default-todo-8',
+        title: 'default-todo-13',
       }, {
-        title: 'default-todo-9',
+        title: 'default-todo-14',
+      }],
+    }, {
+      title: 'default-column-6',
+      todos: [{
+        title: 'default-todo-15',
+      }, {
+        title: 'default-todo-16',
+      }, {
+        title: 'default-todo-17',
       }],
     }],
   }, {
     title: 'default-board-4',
     columns: [{
-      title: 'default-column-4',
+      title: 'default-column-7',
       todos: [{
-        title: 'default-todo-10',
+        title: 'default-todo-18',
       }, {
-        title: 'default-todo-11',
+        title: 'default-todo-19',
       }, {
-        title: 'default-todo-12',
+        title: 'default-todo-20',
+      }],
+    }, {
+      title: 'default-column-8',
+      todos: [{
+        title: 'default-todo-21',
+      }, {
+        title: 'default-todo-22',
+      }, {
+        title: 'default-todo-23',
       }],
     }],
   }],
@@ -438,6 +472,245 @@ describe('get all comments', () => {
       replyCommentId: null,
       isEdited: false,
     }]);
+
+    done();
+  });
+  it('user can successfully gets all comments to which he has access by board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const todoIdFromFirstBoard = firstUser.getRandomTodoIdFromBoard(firstBoardId);
+    const todoIdFromSecondBoard = firstUser.getRandomTodoIdFromBoard(secondBoardId);
+
+    await helper.createUser(defaultUser);
+
+    const commentOne = Generator.Comment.getUnique(todoIdFromFirstBoard);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondBoard);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ boardId: firstBoardId })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { comments } = res.body.data;
+    const [{ id: commentIdOne }] = comments;
+
+    expect(comments).toEqual([{
+      id: commentIdOne,
+      ...commentOne,
+      replyCommentId: null,
+      isEdited: false,
+    }]);
+
+    done();
+  });
+  it('user can successfully gets all comments to which he has access by column id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const board = firstUser.getRandomBoard();
+    const [firstColumn, secondColumn] = board.getColumns();
+    const todoIdFromFirstColumn = firstColumn.getRandomTodoId();
+    const todoIdFromSecondColumn = secondColumn.getRandomTodoId();
+
+    await helper.createUser(defaultUser);
+
+    const commentOne = Generator.Comment.getUnique(todoIdFromFirstColumn);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondColumn);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: firstColumn.id })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { comments } = res.body.data;
+    const [{ id: commentIdOne }] = comments;
+
+    expect(comments).toEqual([{
+      id: commentIdOne,
+      ...commentOne,
+      replyCommentId: null,
+      isEdited: false,
+    }]);
+
+    done();
+  });
+  it('user can successfully gets all comments to which he has access by todo id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const board = firstUser.getRandomBoard();
+    const [firstColumn, secondColumn] = board.getColumns();
+    const todoIdFromFirstColumn = firstColumn.getRandomTodoId();
+    const todoIdFromSecondColumn = secondColumn.getRandomTodoId();
+
+    await helper.createUser(defaultUser);
+
+    const commentOne = Generator.Comment.getUnique(todoIdFromFirstColumn);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondColumn);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ todoId: todoIdFromFirstColumn })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { comments } = res.body.data;
+    const [{ id: commentIdOne }] = comments;
+
+    expect(comments).toEqual([{
+      id: commentIdOne,
+      ...commentOne,
+      replyCommentId: null,
+      isEdited: false,
+    }]);
+
+    done();
+  });
+  it('user can`t get all comments if he does not have access to board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const todoIdFirstUser = firstUser.getRandomTodoId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const todoIdSecondUser = secondUser.getRandomTodoId();
+    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+
+    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .query({ boardId: boardIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can`t get all comments if he does not have access to column id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const todoIdFirstUser = firstUser.getRandomTodoId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const todoIdSecondUser = secondUser.getRandomTodoId();
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+
+    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .query({ columnId: columnIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can`t get all comments if he does not have access to todo id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const todoIdFirstUser = firstUser.getRandomTodoId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const todoIdSecondUser = secondUser.getRandomTodoId();
+    const todoIdWithoutAccess = secondUser.getRandomTodoId();
+
+    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    await request
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .send(commentTwo);
+
+    const res = await request
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .query({ todoId: todoIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
 
     done();
   });

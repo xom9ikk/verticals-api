@@ -556,6 +556,81 @@ describe('get all columns', () => {
 
     done();
   });
+  it('user can successfully gets all columns to which he has access by board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+
+    await helper.createUser(defaultUser);
+
+    const columnOne = Generator.Column.getUnique(firstBoardId);
+    await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(columnOne);
+
+    const columnTwo = Generator.Column.getUnique(secondBoardId);
+    await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(columnTwo);
+
+    const res = await request
+      .get(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ boardId: firstBoardId })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { columns } = res.body.data;
+    const [{ id: columnIdOne }] = columns;
+
+    expect(columns).toEqual([{
+      id: columnIdOne,
+      ...columnOne,
+    }]);
+
+    done();
+  });
+  it('user can`t get all columns if he does not have access to board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const [boardIdWithoutAccess] = secondUser.getBoardIds();
+
+    const columnOne = Generator.Column.getUnique(firstBoardId);
+    await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(columnOne);
+
+    const columnTwo = Generator.Column.getUnique(secondBoardId);
+    await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(columnTwo);
+
+    const res = await request
+      .get(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ boardId: boardIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
   it('user can`t get columns if he has no columns', async (done) => {
     const firstUser = await helper.createUser();
     const [firstBoard, secondBoard] = await helper.createBoards({
