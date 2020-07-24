@@ -1,14 +1,6 @@
 const faker = require('faker');
 
 class CommentDataGenerator {
-  static get(todoId) {
-    return {
-      todoId,
-      text: 'test column description',
-      isEdited: true,
-    };
-  }
-
   static getUnique(todoId, replyCommentId) {
     return {
       todoId,

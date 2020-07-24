@@ -16,6 +16,9 @@ class Helper {
     const res = await this._post(`${routes.auth}/register`, userData);
 
     const { token, refreshToken } = res.body.data;
+    if (res.statusCode !== 201) {
+      return this.createUser(config);
+    }
 
     let boards = [];
     if (config.boards) {

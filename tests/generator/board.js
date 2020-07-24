@@ -1,17 +1,6 @@
 const faker = require('faker');
-const { CardType, Color } = require('../../src/enums');
 
 class BoardDataGenerator {
-  static get() {
-    return {
-      title: 'test board title',
-      position: 0,
-      cardType: CardType.checkboxes,
-      description: 'test board description',
-      color: Color.red,
-    };
-  }
-
   static getUnique() {
     return {
       title: faker.lorem.words(),

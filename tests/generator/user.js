@@ -1,16 +1,6 @@
 const faker = require('faker');
 
 class UserDataGenerator {
-  static get() {
-    return {
-      email: 'test@test.test',
-      password: '123456',
-      name: 'testname',
-      surname: 'testsurname',
-      username: 'test',
-    };
-  }
-
   static getUnique() {
     return {
       email: faker.internet.email(),

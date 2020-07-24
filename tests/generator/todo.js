@@ -2,19 +2,6 @@ const faker = require('faker');
 const { Color, TodoStatus } = require('../../src/enums');
 
 class TodoDataGenerator {
-  static get(columnId) {
-    return {
-      columnId,
-      title: 'test column title',
-      position: 0,
-      description: 'test column description',
-      status: TodoStatus.todo,
-      color: Color.red,
-      isArchived: true,
-      isNotificationsEnabled: true,
-    };
-  }
-
   static getUnique(columnId) {
     return {
       columnId,

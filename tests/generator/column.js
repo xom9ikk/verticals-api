@@ -2,17 +2,6 @@ const faker = require('faker');
 const { Color } = require('../../src/enums');
 
 class ColumnDataGenerator {
-  static get(boardId) {
-    return {
-      boardId,
-      title: 'test column title',
-      position: 0,
-      description: 'test column description',
-      color: Color.red,
-      isCollapsed: true,
-    };
-  }
-
   static getUnique(boardId) {
     return {
       boardId,

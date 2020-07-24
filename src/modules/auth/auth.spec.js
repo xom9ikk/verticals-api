@@ -12,7 +12,7 @@ afterAll(async (done) => {
 
 describe('registration', () => {
   it('user can successfully register', async (done) => {
-    const user = Generator.User.get();
+    const user = Generator.User.getUnique();
     const res = await request
       .post(`${routes.auth}/register`)
       .send(user);
@@ -29,13 +29,16 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with a non-unique username', async (done) => {
-    const uniqueUser = Generator.User.getUnique();
-    const user = Generator.User.get();
+    const firstUser = Generator.User.getUnique();
+    const secondUser = Generator.User.getUnique();
+    await request
+      .post(`${routes.auth}/register`)
+      .send(firstUser);
     const res = await request
       .post(`${routes.auth}/register`)
       .send({
-        ...uniqueUser,
-        username: user.username,
+        ...secondUser,
+        username: firstUser.username,
       });
 
     expect(res.statusCode).toEqual(409);
@@ -47,13 +50,16 @@ describe('registration', () => {
     done();
   });
   it('user can`t register with a non-unique email', async (done) => {
-    const uniqueUser = Generator.User.getUnique();
-    const user = Generator.User.get();
+    const firstUser = Generator.User.getUnique();
+    const secondUser = Generator.User.getUnique();
+    await request
+      .post(`${routes.auth}/register`)
+      .send(firstUser);
     const res = await request
       .post(`${routes.auth}/register`)
       .send({
-        ...uniqueUser,
-        email: user.email,
+        ...secondUser,
+        email: firstUser.email,
       });
 
     expect(res.statusCode).toEqual(409);
