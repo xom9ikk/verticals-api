@@ -14,6 +14,7 @@ class TodoDataGenerator {
       isNotificationsEnabled: faker.random.boolean(),
     };
   }
+
   //
   // static getLongTitle() {
   //   return ''.padStart(256, 'longtitle');
@@ -39,9 +40,9 @@ class TodoDataGenerator {
   //   return faker.random.number({ min: 6, max: 10 }).toString();
   // }
   //
-  // static getNegativeBoardId() {
-  //   return faker.random.number({ max: -100 });
-  // }
+  static getNegativeColumnId() {
+    return faker.random.number({ max: -100 });
+  }
 }
 
 module.exports = {

@@ -32,6 +32,10 @@ class User {
     return this.getRandomBoard().getRandomColumn();
   }
 
+  getRandomColumnId() {
+    return this.getRandomBoard().getRandomColumn().id;
+  }
+
   getRandomTodo() {
     return this.getRandomBoard().getRandomColumn().getRandomTodo();
   }

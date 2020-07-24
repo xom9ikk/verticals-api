@@ -72,7 +72,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can successfully create board without description and color', async (done) => {
+  it('user can successfully create board without all non-required fields', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
