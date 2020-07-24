@@ -6,50 +6,62 @@ const winston = require('./winston');
 
 const { NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
-let formattedLog;
-if (isProd) {
-  formattedLog = (tokens, req, res) => {
-    const isError = parseInt(tokens.status(req, res)) >= 400;
-    const id = uuidV4();
-    return [
-      'Req:',
-      id,
-      tokens.method(req, res),
-      tokens.url(req, res),
-      tokens.reqBody(req, res),
-      '\nRes:',
-      id,
-      tokens.resBody(req, res),
-      isError
-        ? `Err: ${tokens.status(req, res)}`
-        : tokens.status(req, res),
-      `${tokens['total-time'](req, res)} ms`,
-    ].join(' ');
-  };
-} else {
-  formattedLog = (tokens, req, res) => {
-    const isError = parseInt(tokens.status(req, res)) >= 400;
-    const id = uuidV4();
-    return [
-      c.blue.bold('Req:'),
-      c.white(id),
-      c.cyan(tokens.method(req, res)),
-      c.green(tokens.url(req, res)),
-      c.magenta(tokens.reqBody(req, res)),
-      c.yellow.bold('\nRes:'),
-      c.white(id),
-      ' '.repeat(tokens.method(req, res).length),
-      ' '.repeat(tokens.url(req, res).length),
-      c.magenta(tokens.resBody(req, res)),
-      isError
-        ? `Err: ${c.red(tokens.status(req, res))}`
-        : c.green(tokens.status(req, res)),
-      c.yellow(`${tokens['total-time'](req, res)} ms`),
-    ].join(' ');
-  };
-}
 
-const morganMiddleware = morgan(formattedLog, {
+const colorize = (data, chalkColors) => chalkColors.map((color, i) => color(data[i]));
+
+const formattedLogRequest = (tokens, req, res) => {
+  const id = uuidV4();
+  res.locals.morganId = id;
+  const chalkColors = [
+    c.blue.bold,
+    c.white,
+    c.cyan,
+    c.green,
+    c.magenta,
+  ];
+  const data = [
+    'Req:',
+    id,
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.reqBody(req, res),
+  ];
+  if (!isProd) {
+    return colorize(data, chalkColors).join(' ');
+  }
+  return data.join(' ');
+};
+
+const formattedLogResponse = (tokens, req, res) => {
+  const isError = parseInt(tokens.status(req, res)) >= 400;
+  const data = [
+    'Res:',
+    res.locals.morganId,
+    tokens.resBody(req, res),
+    isError
+      ? `Err: ${tokens.status(req, res)}`
+      : tokens.status(req, res),
+    `${tokens['total-time'](req, res)} ms`,
+  ];
+  const chalkColors = [
+    c.yellow.bold,
+    c.white,
+    c.magenta,
+    isError ? c.red : c.green,
+    c.yellow,
+  ];
+  if (!isProd) {
+    return colorize(data, chalkColors).join(' ');
+  }
+  return data.join(' ');
+};
+
+const morganRequest = morgan(formattedLogRequest, {
+  immediate: true,
+  stream: winston.stream,
+});
+
+const morganResponse = morgan(formattedLogResponse, {
   stream: winston.stream,
 });
 
@@ -62,7 +74,8 @@ const morganLogger = (app) => {
   morgan.token('reqBody', (req) => JSON.stringify(req.body));
   morgan.token('resBody', (req, res) => res.body);
   morgan.token('requestId', (req) => req.requestId);
-  app.use(morganMiddleware);
+  app.use(morganRequest);
+  app.use(morganResponse);
 };
 
 module.exports = {

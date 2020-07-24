@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js ./src",
     "lint:fix": "eslint --ext .js ./src --fix",
     "test": "jest --config ./jest.config.js",
-    "test:silent": "jest --silent --config ./jest.config.js",
+    "test:silent": "jest --bail --silent --config ./jest.config.js",
     "test:watch": "jest --config ./jest.config.js --watch"
   },
   "author": "xom9ik <xom9ik.code@gmail.com>",

@@ -18,8 +18,8 @@ app.use(parseErrorHandler);
 morganLogger(app);
 app.use(routes);
 
-process.on('uncaughtException', (reason, p) => {
-  console.error('>>>uncaughtException', reason, p);
+process.on('uncaughtException', (error) => {
+  logger.error('uncaughtException', error);
   process.exit(1);
 });
 

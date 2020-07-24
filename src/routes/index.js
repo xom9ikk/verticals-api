@@ -3,7 +3,8 @@ const router = require('express').Router();
 const { swagger } = require('../swagger');
 const {
   allowHeadersHandler,
-  errorHandler,
+  clientErrorHandler,
+  uncaughtErrorHandler,
   notFoundHandler,
 } = require('./common');
 const { authRouter } = require('../modules/auth/route');
@@ -23,7 +24,8 @@ router.use('/api/v1/column', columnRouter);
 router.use('/api/v1/todo', todoRouter);
 router.use('/api/v1/comment', commentRouter);
 router.use(...swagger);
-router.use(errorHandler);
+router.use(clientErrorHandler);
+router.use(uncaughtErrorHandler);
 router.use(notFoundHandler);
 
 module.exports = router;

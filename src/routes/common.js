@@ -21,15 +21,19 @@ class RoutesHandler {
     return new BackendResponse(res, 400, 'Invalid JSON. Change the body and try again');
   }
 
-  errorHandler(error, req, res, _) {
+  clientErrorHandler(error, req, res, next) {
     const isCustomError = error instanceof GeneralError;
-    const { status = 500, msg } = error;
-    if (!isCustomError) {
-      console.error('errorHandler', error);
-      return new BackendResponse(res, status, 'Internal');
-      // && process.exit(1);
+    if (isCustomError) {
+      const { status, msg } = error;
+      return new BackendResponse(res, status, msg);
     }
-    return new BackendResponse(res, status, msg);
+    return next(error);
+  }
+
+  uncaughtErrorHandler(error, req, res, _) {
+    logger.error(error);
+    return new BackendResponse(res, 500, 'Internal')
+      && process.exit(1);
   }
 
   notFoundHandler(req, res) {

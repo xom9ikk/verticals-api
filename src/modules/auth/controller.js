@@ -12,6 +12,10 @@ class AuthController {
       password: hashPassword, email, name, surname, username,
     });
 
+    if (!registeredUserId) {
+      throw new BackendError.Conflict('User with this email or username already registered');
+    }
+
     const tokens = await TokenComponent.issueTokenPair({
       userId: registeredUserId,
       ip,

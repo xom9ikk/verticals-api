@@ -15,6 +15,7 @@ module.exports = {
   },
   globals: {
     knex: true,
+    logger: true,
   },
   env: {
     node: true,
