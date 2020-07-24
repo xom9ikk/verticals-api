@@ -30,8 +30,6 @@ const { RequestPart } = require('../../enums');
  *        type: integer
  *      text:
  *        type: string
- *      isEdited:
- *        type: boolean
  *      replyCommentId:
  *        type: string
  *   CreateCommentResponse:
@@ -92,8 +90,6 @@ router.post(
  *             type: integer
  *           text:
  *             type: string
- *           isEdited:
- *             type: boolean
  *           replyCommentId:
  *             type: string
  *       message:
@@ -197,22 +193,10 @@ router.get(
  *    properties:
  *      todoId:
  *        type: integer
- *      title:
+ *      text:
  *        type: string
- *      position:
+ *      replyCommentId:
  *        type: integer
- *      description:
- *        type: string
- *      status:
- *        type: integer
- *        enum: [0, 1, 2]
- *      color:
- *        type: integer
- *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isArchived:
- *        type: boolean
- *      isNotificationsEnabled:
- *        type: boolean
  *   UpdateCommentResponse:
  *     type: object
  *     properties:

@@ -90,8 +90,6 @@ class CommentService extends Database {
   }
 
   getByBoardIds(boardIds) {
-    console.log('get all comments by boardIds', boardIds);
-
     const getColumnIds = this.columns
       .select([
         'id',
@@ -145,7 +143,7 @@ class CommentService extends Database {
   getTodoId(id) {
     return this.comments
       .select([
-        'columnId',
+        'todoId',
       ])
       .where({
         id,

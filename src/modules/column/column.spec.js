@@ -153,6 +153,26 @@ describe('create', () => {
 
     done();
   });
+  it('user can`t create column without board id', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const boardId = user.getRandomBoardId();
+
+    const column = Generator.Column.getUnique(boardId);
+    delete column.boardId;
+    const res = await request
+      .post(`${routes.column}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(column);
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
   it('user can`t create column without title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
@@ -226,7 +246,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        title: Generator.Board.getLongTitle(),
+        title: Generator.Column.getLongTitle(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -248,7 +268,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        position: Generator.Board.getNegativePosition(),
+        position: Generator.Column.getNegativePosition(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -269,7 +289,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        position: Generator.Board.getStringPosition(),
+        position: Generator.Column.getStringPosition(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -290,7 +310,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: Generator.Board.getNegativeColor(),
+        color: Generator.Column.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -311,7 +331,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: Generator.Board.getNegativeColor(),
+        color: Generator.Column.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -332,7 +352,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${token}`)
       .send({
         ...column,
-        color: Generator.Board.getInvalidColor(),
+        color: Generator.Column.getInvalidColor(),
       });
 
     expect(res.statusCode).toEqual(400);

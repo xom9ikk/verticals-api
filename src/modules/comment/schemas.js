@@ -11,9 +11,6 @@ class CommentSchema {
         minLength: 1,
         maxLength: 4096,
       },
-      isEdited: {
-        type: 'boolean',
-      },
       replyCommentId: {
         type: 'integer',
         minimum: 1,

@@ -54,11 +54,11 @@ class CommentAdapter {
   async remove(req, res, next) {
     try {
       const { userId } = res.locals;
-      const { todoId } = req.params;
+      const { commentId } = req.params;
 
       await CommentController.remove({
         userId,
-        todoId,
+        commentId,
       });
 
       return BackendResponse.Success(res, 'Comment successfully removed');
