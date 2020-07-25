@@ -294,6 +294,53 @@ router.delete(
   CommentAdapter.remove,
 );
 
+/**
+ * @swagger
+ * definitions:
+ *   DeleteAttachCommentResponse:
+ *     type: object
+ *     properties:
+ *       message:
+ *         type: string
+ * /v1/comment/attachment/:attachmentId:
+ *   delete:
+ *     tags:
+ *       - Comment
+ *     description: Delete attachment from comment
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *      - in: header
+ *        name: Authorization
+ *        type: string
+ *        required: true
+ *      - in: path
+ *        name: attachmentId
+ *        type: integer
+ *        required: true
+ *     responses:
+ *       200:
+ *         description: "Comment successfully deleted"
+ *         schema:
+ *          $ref: '#/definitions/DeleteAttachCommentResponse'
+ *       403:
+ *         description: "This account is not allowed to delete this comment"
+ *         schema:
+ *          $ref: '#/definitions/DeleteCommentResponse'
+ *       422:
+ *         description: "Field [field] in request do not match expected"
+ *         schema:
+ *          $ref: '#/definitions/ErrorResponse'
+ */
+router.delete(
+  '/attachment/:attachmentId',
+  FormatterMiddleware.castToInteger(RequestPart.params),
+  SchemaValidator.validate(RequestPart.params, 'deleteAttachmentParams'),
+  CheckMiddleware.isAuthenticated,
+  FetchMiddleware.getUserId,
+  CommentAdapter.removeFile,
+);
+
 module.exports = {
   commentRouter: router,
 };

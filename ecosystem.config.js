@@ -6,9 +6,9 @@ module.exports = {
     args: [
       '--color',
     ],
+    exec_mode: 'cluster',
     instances: 1,
     // instances: 'max',
-    exec_mode: 'cluster',
     env: {
       NODE_ENV: 'development',
       DEBUG_COLORS: true,
@@ -29,6 +29,7 @@ module.exports = {
       SWAGGER_HOST: '0.0.0.0:3000',
       SWAGGER_BASE_PATH: '/api',
       LOG_FILE_NAME: 'app',
+      CDN_LINK: 'cdn.verticals.xom9ik.com',
     },
     env_production: {
       NODE_ENV: 'production',

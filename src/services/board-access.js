@@ -1,6 +1,7 @@
 const { ColumnService } = require('./column');
 const { TodoService } = require('./todo');
 const { CommentService } = require('./comment');
+const { CommentFilesService } = require('./comment-files');
 const { Database } = require('../database');
 
 class BoardAccessService extends Database {
@@ -10,14 +11,13 @@ class BoardAccessService extends Database {
         userId,
         boardId,
       })
-      .returning('id');
+      .returning(['userId', 'boardId']);
     return response[0];
   }
 
   getByBoardId(userId, boardId) {
     return this.boardsAccess
       .select([
-        'id',
         'userId',
         'boardId',
       ])
@@ -32,7 +32,6 @@ class BoardAccessService extends Database {
     const boardId = ColumnService.getBoardId(columnId);
     return this.boardsAccess
       .select([
-        'id',
         'userId',
         'boardId',
       ])
@@ -48,7 +47,6 @@ class BoardAccessService extends Database {
     const boardId = ColumnService.getBoardId(columnId);
     return this.boardsAccess
       .select([
-        'id',
         'userId',
         'boardId',
       ])
@@ -65,7 +63,23 @@ class BoardAccessService extends Database {
     const boardId = ColumnService.getBoardId(columnId);
     return this.boardsAccess
       .select([
-        'id',
+        'userId',
+        'boardId',
+      ])
+      .where({
+        boardId,
+        userId,
+      })
+      .first();
+  }
+
+  getByAttachmentId(userId, attachmentId) {
+    const commentId = CommentFilesService.getCommentId(attachmentId);
+    const todoId = CommentService.getTodoId(commentId);
+    const columnId = TodoService.getColumnId(todoId);
+    const boardId = ColumnService.getBoardId(columnId);
+    return this.boardsAccess
+      .select([
         'userId',
         'boardId',
       ])

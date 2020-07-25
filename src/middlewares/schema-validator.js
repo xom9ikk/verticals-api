@@ -6,6 +6,7 @@ const { BoardSchema } = require('../modules/board/schemas');
 const { ColumnSchema } = require('../modules/column/schemas');
 const { TodoSchema } = require('../modules/todo/schemas');
 const { CommentSchema } = require('../modules/comment/schemas');
+const { UploadSchema } = require('../modules/upload/schemas');
 
 class SchemaValidator {
   constructor() {
@@ -18,6 +19,7 @@ class SchemaValidator {
     Object.keys(ColumnSchema).map((key) => this.ajv.addSchema(ColumnSchema[key], key));
     Object.keys(TodoSchema).map((key) => this.ajv.addSchema(TodoSchema[key], key));
     Object.keys(CommentSchema).map((key) => this.ajv.addSchema(CommentSchema[key], key));
+    Object.keys(UploadSchema).map((key) => this.ajv.addSchema(UploadSchema[key], key));
   }
 
   errorResponse(schemaErrors) {

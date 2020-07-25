@@ -7,5 +7,6 @@ module.exports = {
     columns: 'columns',
     todos: 'todos',
     comments: 'comments',
+    commentFiles: 'comment_files',
   },
 };

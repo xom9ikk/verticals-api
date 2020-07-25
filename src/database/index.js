@@ -28,6 +28,10 @@ class Database {
   get comments() {
     return knex(tables.comments);
   }
+
+  get commentFiles() {
+    return knex(tables.commentFiles);
+  }
 }
 
 module.exports = {

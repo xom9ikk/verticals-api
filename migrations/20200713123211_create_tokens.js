@@ -14,7 +14,8 @@ exports.up = async (knex) => await knex.schema.createTable('tokens', (table) => 
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('users');
+    .inTable('users')
+    .onDelete('CASCADE');
   table
     .string('ip')
     .notNullable();

@@ -8,7 +8,8 @@ exports.up = async (knex) => await knex.schema.createTable('todos', (table) => {
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('columns');
+    .inTable('columns')
+    .onDelete('CASCADE');
   table
     .string('title')
     .notNullable();

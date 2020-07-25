@@ -1,14 +1,13 @@
 /* eslint-disable no-return-await */
 exports.up = async (knex) => await knex.schema.createTable('boards_access', (table) => {
-  table
-    .increments('id')
-    .primary();
+  table.primary(['board_id', 'user_id']);
   table
     .integer('user_id')
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('users');
+    .inTable('users')
+    .onDelete('CASCADE');
   table
     .integer('board_id')
     .unsigned()

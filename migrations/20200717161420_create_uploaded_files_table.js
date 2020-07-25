@@ -1,5 +1,5 @@
 /* eslint-disable no-return-await */
-exports.up = async (knex) => await knex.schema.createTable('files', (table) => {
+exports.up = async (knex) => await knex.schema.createTable('comment_files', (table) => {
   table
     .increments('id')
     .primary();
@@ -8,19 +8,26 @@ exports.up = async (knex) => await knex.schema.createTable('files', (table) => {
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('comments');
+    .inTable('comments')
+    .onDelete('CASCADE');
   table
-    .string('link')
-    .notNullable();
-  table
-    .string('type')
-    .notNullable();
-  table
-    .string('size')
+    .string('path')
     .notNullable();
   table
     .string('name')
     .notNullable();
+  table
+    .string('extension')
+    .notNullable();
+  table
+    .integer('size')
+    .notNullable();
+  table
+    .string('mime_type')
+    .nullable();
+  table
+    .string('encoding')
+    .nullable();
   table
     .timestamp('created_at')
     .defaultTo(knex.fn.now());
@@ -29,4 +36,4 @@ exports.up = async (knex) => await knex.schema.createTable('files', (table) => {
     .defaultTo(knex.fn.now());
 });
 
-exports.down = async (knex) => await knex.schema.dropTable('files');
+exports.down = async (knex) => await knex.schema.dropTable('comment_files');

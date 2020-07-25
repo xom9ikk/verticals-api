@@ -8,13 +8,15 @@ exports.up = async (knex) => await knex.schema.createTable('comments', (table) =
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('todos');
+    .inTable('todos')
+    .onDelete('CASCADE');
   table
     .string('text', 4096);
   table
     .integer('reply_comment_id')
     .references('id')
-    .inTable('comments');
+    .inTable('comments')
+    .onDelete('CASCADE');
   table
     .boolean('is_edited')
     .defaultTo(false);

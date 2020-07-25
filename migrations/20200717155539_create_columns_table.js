@@ -1,3 +1,4 @@
+/* eslint-disable no-return-await */
 exports.up = async (knex) => await knex.schema.createTable('columns', (table) => {
   table
     .increments('id')
@@ -7,7 +8,8 @@ exports.up = async (knex) => await knex.schema.createTable('columns', (table) =>
     .unsigned()
     .notNullable()
     .references('id')
-    .inTable('boards');
+    .inTable('boards')
+    .onDelete('CASCADE');
   table
     .string('title')
     .notNullable();

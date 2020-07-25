@@ -7,8 +7,7 @@ const isProd = NODE_ENV === 'production';
 const isTest = NODE_ENV === 'test';
 const isDev = NODE_ENV === 'development';
 
-// const filename = `${__dirname}/../logs/${LOG_FILE_NAME}_${new Date().getTime()}.log`;
-const filename = `${__dirname}/../logs/${LOG_FILE_NAME}_.log`;
+const filename = `${__dirname}/../logs/${LOG_FILE_NAME}_${new Date().getTime()}.log`;
 
 const options = {
   file: {
@@ -38,26 +37,6 @@ const getTransports = () => {
   ) transports.push(new winston.transports.Console(options.console));
   return transports;
 };
-
-const enumerateErrorFormat = winston.format((info) => {
-  if (info.message instanceof Error) {
-    info.message = {
-      message: info.message.message,
-      stack: info.message.stack,
-      ...info.message,
-    };
-  }
-
-  if (info instanceof Error) {
-    return {
-      message: info.message,
-      stack: info.stack,
-      ...info,
-    };
-  }
-
-  return info;
-});
 
 const logger = winston.createLogger({
   transports: getTransports(),

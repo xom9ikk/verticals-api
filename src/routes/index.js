@@ -12,6 +12,7 @@ const { boardRouter } = require('../modules/board/route');
 const { columnRouter } = require('../modules/column/route');
 const { todoRouter } = require('../modules/todo/route');
 const { commentRouter } = require('../modules/comment/route');
+const { uploadRouter } = require('../modules/upload/route');
 
 router.all('*', allowHeadersHandler);
 // router.options('*', (req, res) => {
@@ -23,6 +24,7 @@ router.use('/api/v1/board', boardRouter);
 router.use('/api/v1/column', columnRouter);
 router.use('/api/v1/todo', todoRouter);
 router.use('/api/v1/comment', commentRouter);
+router.use('/api/v1/upload', uploadRouter);
 router.use(...swagger);
 router.use(clientErrorHandler);
 router.use(uncaughtErrorHandler);

@@ -1,3 +1,4 @@
+const { tables } = require('../database/tables');
 const { Database } = require('../database');
 
 class CommentService extends Database {
@@ -38,17 +39,33 @@ class CommentService extends Database {
   }
 
   getById(id) {
-    return this.comments
-      .select([
-        'id',
-        'todoId',
-        'text',
-        'replyCommentId',
-        'isEdited',
-      ])
+    return knex('comments')
       .where({
+        'comments.id':
         id,
       })
+      .leftJoin(
+        'comment_files',
+        'comment_files.comment_id',
+        id,
+      )
+      .select(
+        'comments.id',
+        'comments.todoId',
+        'comments.text',
+        'comments.replyCommentId',
+        'comments.isEdited',
+        knex.raw(`COALESCE(json_agg(json_build_object(
+               'id', comment_files.id,
+               'path', comment_files.path,
+               'name', comment_files.name,
+               'extension', comment_files.extension,
+               'size', comment_files.size,
+               'mime_type', comment_files.mime_type,
+               'encoding', comment_files.encoding
+           )) FILTER (WHERE comment_files.comment_id IS NOT NULL), '[]') AS attached_files`),
+      )
+      .groupBy('comments.id')
       .first();
   }
 

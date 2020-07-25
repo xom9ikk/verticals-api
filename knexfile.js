@@ -15,14 +15,6 @@ module.exports = {
     },
   },
 
-  // test: {
-  //   client: 'sqlite3',
-  //   connection: ':memory:',
-  //   migrations: {
-  //     tableName: 'knex_migrations',
-  //   },
-  // },
-
   test: {
     client: 'pg',
     connection: {
@@ -32,7 +24,7 @@ module.exports = {
     },
     pool: {
       min: 2,
-      max: 100000,
+      max: 10000,
     },
     migrations: {
       tableName: 'knex_migrations',
@@ -50,7 +42,7 @@ module.exports = {
     },
     pool: {
       min: 2,
-      max: 10,
+      max: 10000,
     },
     migrations: {
       tableName: 'knex_migrations',

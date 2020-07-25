@@ -344,6 +344,7 @@ describe('get comment by id', () => {
       ...comment,
       replyCommentId: null,
       isEdited: false,
+      attachedFiles: [],
     });
 
     done();
@@ -901,6 +902,7 @@ describe('update comment', () => {
       ...newComment,
       replyCommentId: null,
       isEdited: true,
+      attachedFiles: [],
     });
 
     done();

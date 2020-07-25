@@ -68,6 +68,28 @@ class CommentAdapter {
       next(e);
     }
   }
+
+  async saveFile(req, res, next) {
+    try {
+      const { commentId } = req.params;
+      const { userId, file } = res.locals;
+      const savedFile = await CommentController.saveFile({ userId, commentId, file });
+      return BackendResponse.Created(res, 'Successfully uploaded attachment for comment', { file: savedFile });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async removeFile(req, res, next) {
+    try {
+      const { attachmentId } = req.params;
+      const { userId } = res.locals;
+      await CommentController.removeFile({ userId, attachmentId });
+      return BackendResponse.Success(res, 'Comment successfully removed', { attachmentId });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = {
