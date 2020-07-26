@@ -6,7 +6,7 @@ const { BoardSchema } = require('../modules/board/schemas');
 const { ColumnSchema } = require('../modules/column/schemas');
 const { TodoSchema } = require('../modules/todo/schemas');
 const { CommentSchema } = require('../modules/comment/schemas');
-const { UploadSchema } = require('../modules/upload/schemas');
+const { CommentAttachmentSchema } = require('../modules/comment-attachment/schemas');
 
 class SchemaValidator {
   constructor() {
@@ -19,7 +19,7 @@ class SchemaValidator {
     Object.keys(ColumnSchema).map((key) => this.ajv.addSchema(ColumnSchema[key], key));
     Object.keys(TodoSchema).map((key) => this.ajv.addSchema(TodoSchema[key], key));
     Object.keys(CommentSchema).map((key) => this.ajv.addSchema(CommentSchema[key], key));
-    Object.keys(UploadSchema).map((key) => this.ajv.addSchema(UploadSchema[key], key));
+    Object.keys(CommentAttachmentSchema).map((key) => this.ajv.addSchema(CommentAttachmentSchema[key], key));
   }
 
   errorResponse(schemaErrors) {
@@ -32,7 +32,6 @@ class SchemaValidator {
       },
       message,
     } = firstError;
-    // console.log(firstError);
     if (keyword === 'required') {
       throw new BackendError.BadRequest(`The required parameter '${missingProperty}' is missing`);
     }

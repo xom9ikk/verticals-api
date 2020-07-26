@@ -9,7 +9,7 @@ const {
 } = process.env;
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server has been started on ${HOST}:${PORT} in ${NODE_ENV} mode`);
+  logger.info(`Server has been started on ${HOST}:${PORT} in ${NODE_ENV} mode`);
 });
 
 if (METRICS_ENABLED) {

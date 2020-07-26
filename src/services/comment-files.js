@@ -25,7 +25,7 @@ class CommentFilesService extends Database {
         id,
       })
       .first();
-    return response.path;
+    return response ? response.path : undefined;
   }
 
   getCommentId(id) {

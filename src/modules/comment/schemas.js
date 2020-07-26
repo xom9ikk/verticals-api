@@ -73,16 +73,6 @@ class CommentSchema {
     },
     required: ['commentId'],
   }
-  deleteAttachmentParams = {
-    type: 'object',
-    properties: {
-      attachmentId: {
-        type: 'integer',
-        minimum: 1,
-      },
-    },
-    required: ['attachmentId'],
-  }
 }
 
 module.exports = {

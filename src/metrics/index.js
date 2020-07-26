@@ -36,7 +36,7 @@ class Metrics {
     app.set('trust proxy', true);
     app.get(METRICS_ROUTE, pm2Cluster);
     app.listen(METRICS_PORT, METRICS_HOST, () => {
-      console.log(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE} on worker ${NODE_APP_INSTANCE}`);
+      logger.info(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE} on worker ${NODE_APP_INSTANCE}`);
     });
   }
 }

@@ -1,11 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-const chalk = require('chalk');
-
-const COLORIZE = {
-  primary: chalk.cyan,
-  error: chalk.red,
-  success: chalk.gray,
-};
 
 class KnexLogger {
   constructor(knexInstance, options = {}) {
@@ -42,22 +35,24 @@ class KnexLogger {
 
   handleQueryError(_error, { __knexQueryUid: queryId }) {
     this.withQuery(queryId, ({ sql, bindings, duration }) => {
-      this.print({ sql, bindings, duration }, COLORIZE.error);
+      this.print({ sql, bindings, duration }, true);
     });
   }
 
   handleQueryResponse(_response, { __knexQueryUid: queryId }) {
     this.withQuery(queryId, ({ sql, bindings, duration }) => {
-      this.print({ sql, bindings, duration }, COLORIZE.success);
+      this.print({ sql, bindings, duration }, false);
     });
   }
 
   makeQueryPrinter(_knex, { logger, withBindings }) {
-    return ({ sql, bindings, duration }, colorize) => {
+    return ({ sql, bindings, duration }, isError) => {
       const sqlRequest = _knex.client._formatQuery(sql, withBindings ? bindings : null);
-      logger(
-        `${COLORIZE.primary(`SQL (${duration.toFixed(3)} ms)`)} ${colorize(sqlRequest)}`,
-      );
+      logger({
+        ms: duration.toFixed(3),
+        request: sqlRequest,
+        isError,
+      });
     };
   }
 }

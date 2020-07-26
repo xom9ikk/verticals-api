@@ -13,6 +13,7 @@ class FileComponent {
   }
 
   removeFile(relativePathToFile) {
+    if (!relativePathToFile) return;
     return new Promise((resolve, reject) => {
       const fullPath = path.resolve(relativePathToFile);
       fs.unlink(fullPath, (e) => {
