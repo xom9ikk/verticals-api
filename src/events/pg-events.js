@@ -85,7 +85,7 @@ class PgEvent {
   }
 
   async releaseConnection() {
-    await knex.client.releaseConnection(this._connection);
+    await knex.client.destroyRawConnection(this._connection);
     delete this._connection;
   }
 
