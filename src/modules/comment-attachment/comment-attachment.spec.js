@@ -6,7 +6,24 @@ const { routes } = require('../../../tests/routes');
 
 const request = () => supertest(app);
 const helper = new Helper(request);
+
+const { Knex } = require('../../knex');
+const { Subscriber } = require('../../events/subscriber');
+
+beforeAll(async (done) => {
+  global.knex = new Knex();
+  await Subscriber.subscribeOnPg();
+  done();
+});
+
+afterAll(async (done) => {
+  await Subscriber.unsubscribe();
+  await global.knex.destroy();
+  done();
+});
+
 const pathToAttachment = path.resolve('tests', 'files', 'node.jpg');
+
 const defaultUser = {
   boards: [{
     title: 'default-board-1',
@@ -207,15 +224,6 @@ const defaultUser = {
     }],
   }],
 };
-
-afterAll(async (done) => {
-  await knex.destroy();
-  done();
-});
-
-beforeEach(async () => {
-  jest.setTimeout(10000);
-});
 
 describe('upload attachment', () => {
   it('user can successfully attach file to comment', async (done) => {

@@ -2,11 +2,20 @@ const supertest = require('supertest');
 const app = require('../../server');
 const { Generator } = require('../../../tests/generator');
 const { routes } = require('../../../tests/routes');
+const { Knex } = require('../../knex');
+const { Subscriber } = require('../../events/subscriber');
 
 const request = () => supertest(app);
 
+beforeAll(async (done) => {
+  global.knex = new Knex();
+  await Subscriber.subscribeOnPg();
+  done();
+});
+
 afterAll(async (done) => {
-  await knex.destroy();
+  await Subscriber.unsubscribe();
+  await global.knex.destroy();
   done();
 });
 

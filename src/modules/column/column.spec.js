@@ -7,6 +7,21 @@ const { routes } = require('../../../tests/routes');
 const request = () => supertest(app);
 const helper = new Helper(request);
 
+const { Knex } = require('../../knex');
+const { Subscriber } = require('../../events/subscriber');
+
+beforeAll(async (done) => {
+  global.knex = new Knex();
+  await Subscriber.subscribeOnPg();
+  done();
+});
+
+afterAll(async (done) => {
+  await Subscriber.unsubscribe();
+  await global.knex.destroy();
+  done();
+});
+
 const defaultUser = {
   boards: [{
     title: 'default-board-1',
@@ -18,11 +33,6 @@ const defaultUser = {
     title: 'default-board-4',
   }],
 };
-
-afterAll(async (done) => {
-  await knex.destroy();
-  done();
-});
 
 describe('create', () => {
   it('user can successfully create column with all fields', async (done) => {

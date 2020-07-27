@@ -32,8 +32,7 @@ class RoutesHandler {
 
   uncaughtErrorHandler(error, req, res, _) {
     logger.error(error);
-    return new BackendResponse(res, 500, 'Internal');
-    // && process.exit(1);
+    return new BackendResponse(res, 500, 'Internal') && process.exit(1);
   }
 
   notFoundHandler(req, res) {

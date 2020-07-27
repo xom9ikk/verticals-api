@@ -7,8 +7,18 @@ const { routes } = require('../../../tests/routes');
 const request = () => supertest(app);
 const helper = new Helper(request);
 
+const { Knex } = require('../../knex');
+const { Subscriber } = require('../../events/subscriber');
+
+beforeAll(async (done) => {
+  global.knex = new Knex();
+  await Subscriber.subscribeOnPg();
+  done();
+});
+
 afterAll(async (done) => {
-  await knex.destroy();
+  await Subscriber.unsubscribe();
+  await global.knex.destroy();
   done();
 });
 
