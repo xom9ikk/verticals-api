@@ -4,7 +4,7 @@ const { Generator } = require('../../../tests/generator');
 const { Helper } = require('../../../tests/helper');
 const { routes } = require('../../../tests/routes');
 
-const request = supertest(app);
+const request = () => supertest(app);
 const helper = new Helper(request);
 
 afterAll(async (done) => {
@@ -17,7 +17,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -37,7 +37,7 @@ describe('create', () => {
 
     const board = Generator.Board.getUnique();
     delete board.description;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -57,7 +57,7 @@ describe('create', () => {
 
     const board = Generator.Board.getUnique();
     delete board.color;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -78,7 +78,7 @@ describe('create', () => {
     const board = Generator.Board.getUnique();
     delete board.description;
     delete board.color;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -95,7 +95,7 @@ describe('create', () => {
   });
   it('user can`t create board without authorization', async (done) => {
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .send(board);
 
@@ -112,7 +112,7 @@ describe('create', () => {
 
     const board = Generator.Board.getUnique();
     delete board.title;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -130,7 +130,7 @@ describe('create', () => {
 
     const board = Generator.Board.getUnique();
     delete board.position;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -148,7 +148,7 @@ describe('create', () => {
 
     const board = Generator.Board.getUnique();
     delete board.cardType;
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
@@ -165,7 +165,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -185,7 +185,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -205,7 +205,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -225,7 +225,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -245,7 +245,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -265,7 +265,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -285,7 +285,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -305,7 +305,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -325,7 +325,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -345,7 +345,7 @@ describe('create', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -368,12 +368,12 @@ describe('get board by id', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -394,12 +394,12 @@ describe('get board by id', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/${boardId}`)
       .send();
 
@@ -416,12 +416,12 @@ describe('get board by id', () => {
     const { token: tokenSecond } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send();
@@ -438,12 +438,12 @@ describe('get board by id', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/string_${boardId}`)
       .send();
 
@@ -463,24 +463,24 @@ describe('get all boards', () => {
     const { token: tokenSecond } = await helper.createUser();
 
     const boardOne = Generator.Board.getUnique();
-    await request
+    await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenFirst}`)
       .send(boardOne);
 
     const boardTwo = Generator.Board.getUnique();
-    const { body: { data: { boardId: boardIdTwo } } } = await request
+    const { body: { data: { boardId: boardIdTwo } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send(boardTwo);
 
     const boardThree = Generator.Board.getUnique();
-    const { body: { data: { boardId: boardIdThree } } } = await request
+    const { body: { data: { boardId: boardIdThree } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send(boardThree);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send();
@@ -510,12 +510,12 @@ describe('get all boards', () => {
     const { token: tokenSecond } = await helper.createUser();
 
     const boardOne = Generator.Board.getUnique();
-    await request
+    await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenFirst}`)
       .send(boardOne);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send();
@@ -531,12 +531,12 @@ describe('get all boards', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/${boardId}`)
       .send(board);
 
@@ -555,12 +555,12 @@ describe('remove board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -577,12 +577,12 @@ describe('remove board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.board}/${boardId}`)
       .send();
 
@@ -599,12 +599,12 @@ describe('remove board', () => {
     const { token: tokenSecond } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send();
@@ -621,12 +621,12 @@ describe('remove board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.board}/string_${boardId}`)
       .send();
 
@@ -645,18 +645,18 @@ describe('update board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
     const newBoard = Generator.Board.getUnique();
-    const resUpdate = await request
+    const resUpdate = await request()
       .patch(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${token}`)
       .send(newBoard);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -679,13 +679,13 @@ describe('update board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
     const newBoard = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .patch(`${routes.board}/${boardId}`)
       .send(newBoard);
 
@@ -702,13 +702,13 @@ describe('update board', () => {
     const { token: tokenSecond } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${tokenFirst}`)
       .send(board);
 
     const newBoard = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .patch(`${routes.board}/${boardId}`)
       .set('authorization', `Bearer ${tokenSecond}`)
       .send(newBoard);
@@ -725,13 +725,13 @@ describe('update board', () => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request
+    const { body: { data: { boardId } } } = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
       .send(board);
 
     const newBoard = Generator.Board.getUnique();
-    const res = await request
+    const res = await request()
       .patch(`${routes.board}/string_${boardId}`)
       .send(newBoard);
 

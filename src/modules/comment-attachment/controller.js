@@ -1,5 +1,5 @@
 const { FileComponent } = require('../../components/file');
-const { CommentService, BoardAccessService, CommentFilesService } = require('../../services');
+const { BoardAccessService, CommentFilesService } = require('../../services');
 const { BackendError } = require('../../components');
 
 class CommentController {
@@ -12,12 +12,15 @@ class CommentController {
 
     const savedFile = await FileComponent.saveCommentAttachment(file);
 
-    await CommentFilesService.create({
+    const attachmentId = await CommentFilesService.create({
       ...savedFile,
       commentId,
     });
 
-    return savedFile;
+    return {
+      ...savedFile,
+      id: attachmentId,
+    };
   }
 
   async removeAttachment({ userId, attachmentId }) {

@@ -1,4 +1,5 @@
 const Busboy = require('busboy');
+const { BackendError } = require('../components');
 
 const config = {
   defCharset: 'utf8',
@@ -17,7 +18,7 @@ class BusboyMiddleware {
         await BusboyMiddleware.generateFileInfo(req, res, folderName);
         next();
       } catch (e) {
-        next(e);
+        next(new BackendError.UnprocessableEntity('The request was made incorrectly'));
       }
     };
   }
@@ -42,8 +43,6 @@ class BusboyMiddleware {
       });
 
       busboy.on('error', (e) => {
-        // TODO: handle
-        console.error('busboy err', e);
         reject(e);
       });
 

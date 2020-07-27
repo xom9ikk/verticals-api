@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
-const winston = require('winston');
+const { createLogger, format, transports } = require('winston');
+
+const { combine } = format;
+
 const c = require('chalk');
 
 const { NODE_ENV, LOG_FILE_NAME } = process.env;
@@ -16,50 +19,47 @@ const options = {
     level: 'verbose',
     filename: combinedFile,
     handleExceptions: true,
-    json: true,
     maxsize: 5242880, // 5MB
     maxFiles: 1,
-    colorize: false,
-    format: winston.format.printf((data) => JSON.stringify(data, null, 4)),
+    format: combine(
+      format.timestamp(),
+      format.printf((data) => JSON.stringify(data, null, 2)),
+    ),
   },
   errorLog: {
     level: 'error',
     filename: errorFile,
     handleExceptions: true,
-    json: true,
     maxsize: 5242880, // 5MB
     maxFiles: 1,
-    colorize: false,
-    format: winston.format.printf((data) => JSON.stringify(data, null, 4)),
+    format: format.printf((data) => JSON.stringify(data, null, 2)),
   },
   console: {
-    level: 'debug',
+    level: 'error',
     handleExceptions: true,
-    colorize: true,
-    format:
-      winston.format.combine(
-        winston.format.timestamp({
-          format: 'DD/MM/YYYY - HH:mm:ss.SSS',
-        }),
-        winston.format.printf((info) => {
-          if (!info.stack) {
-            if (info.level === 'http') {
-              return `[${info.timestamp}] ${Logger.generateHttpLog(info.message)}`;
-            }
-            if (info.level === 'database') {
-              return `[${info.timestamp}] ${Logger.generateDatabaseLog(info.message)}`;
-            }
-            return `[${info.timestamp}] ${info.message}`;
-          }
-          return `[${info.timestamp}] (${info.level}) ${info.message} Stacktrace: ${info.stack}`;
-        }),
-      ),
+    format: format.combine(
+      format.timestamp({
+        format: 'DD/MM/YYYY - HH:mm:ss.SSS',
+      }),
+      format.printf((info) => {
+        if (info.level === 'http') {
+          return `[${info.timestamp}] ${Logger.generateHttpLog(info.message)}`;
+        }
+        if (info.level === 'database') {
+          return `[${info.timestamp}] ${Logger.generateDatabaseLog(info.message)}`;
+        }
+        if (info.level === 'error') {
+          return `[${info.timestamp}] ${c.red(`ERROR: ${info.message})`)}`;
+        }
+        return `[${info.timestamp}] ${info.message}`;
+      }),
+    ),
   },
 };
 
 class Logger {
   constructor() {
-    this.logger = winston.createLogger({
+    this.logger = createLogger({
       levels: {
         error: 0,
         warn: 1,
@@ -72,24 +72,28 @@ class Logger {
       },
       transports: Logger.getTransports(),
     });
-    this.logger.stream = {
-      write(message) {
-        logger.info(message);
-      },
+    this.logger.error = (err) => {
+      if (err instanceof Error) {
+        this.logger.log({ level: 'error', message: `${err.stack || err}` });
+      } else {
+        this.logger.log({ level: 'error', message: err });
+      }
     };
     return this.logger;
   }
 
   static getTransports() {
-    const transports = [];
+    const availableTransports = [];
     if (isProd || isTest || isDev) {
-      transports.push(new winston.transports.File(options.errorLog));
-      transports.push(new winston.transports.File(options.combinedLog));
+      availableTransports.push(new transports.File(options.errorLog)); // 186 257
+      availableTransports.push(new transports.File(options.combinedLog)); // 205 215 286
     }
-    if (isDev || isTest) {
-      transports.push(new winston.transports.Console(options.console));
+    if (isDev
+    || isTest
+    ) {
+      availableTransports.push(new transports.Console(options.console));
     }
-    return transports;
+    return availableTransports;
   }
 
   static colorize(data, chalkColors) {

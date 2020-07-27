@@ -8,10 +8,16 @@ class Subscriber {
       const { path } = data.payload;
       try {
         await FileComponent.removeFile(path);
-      } catch (e) {
-        logger.error(e);
+      } catch (error) {
+        logger.error(error);
       }
     });
+  }
+
+  unsubscribe() {
+    if (!this.pgEvent) return;
+    this.pgEvent.clear();
+    this.pgEvent.releaseConnection();
   }
 }
 

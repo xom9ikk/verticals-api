@@ -37,7 +37,7 @@ class User {
   }
 
   getRandomColumnId() {
-    return this.getRandomBoard().getRandomColumnId();
+    return this.getRandomColumn().id;
   }
 
   // -
@@ -60,7 +60,7 @@ class User {
   }
 
   getRandomTodoId() {
-    return this.getRandomBoard().getRandomColumn().getRandomTodo().id;
+    return this.getRandomTodo().id;
   }
 
   // -
@@ -82,6 +82,24 @@ class User {
 
   getRandomComment() {
     return this.getRandomBoard().getRandomColumn().getRandomTodo().getRandomComment();
+  }
+
+  getRandomCommentId() {
+    return this.getRandomComment().id;
+  }
+
+  getCommentIds() {
+    const commentIds = [];
+    this.boards.forEach((board) => {
+      board.columns.forEach((column) => {
+        column.todos.forEach((todo) => {
+          todo.comments.forEach((comment) => {
+            commentIds.push(comment.id);
+          });
+        });
+      });
+    });
+    return commentIds;
   }
 }
 

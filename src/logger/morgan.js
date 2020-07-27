@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const { v4: uuidV4 } = require('uuid');
 
 class MorganLogger {
-  constructor(app, logger) {
+  constructor(app) {
     const originalSend = app.response.send;
     app.response.send = function sendOverWrite(body) {
       originalSend.call(this, body);
@@ -14,11 +14,8 @@ class MorganLogger {
     morgan.token('requestId', (req) => req.requestId);
     app.use(morgan(MorganLogger.logRequest, {
       immediate: true,
-      stream: logger.stream,
     }));
-    app.use(morgan(MorganLogger.logResponse, {
-      stream: logger.stream,
-    }));
+    app.use(morgan(MorganLogger.logResponse));
   }
 
   static colorize(data, chalkColors) {

@@ -20,9 +20,11 @@ class Knex {
           ? value
           : origImpl(Formatter.convertToSnakeCase(value))),
     });
-    this.logger = new KnexLogger(this.knex, {
-      logger: logger.database,
-    });
+    if (global.logger) {
+      this.logger = new KnexLogger(this.knex, {
+        logger: logger.database,
+      });
+    }
     return this.knex;
   }
 }

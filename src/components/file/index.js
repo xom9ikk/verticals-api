@@ -48,7 +48,7 @@ class FileComponent {
         name: fileName,
         mimeType,
         encoding,
-        size,
+        size: parseInt(size),
       }));
 
       stream.on('error', (e) => reject(e));

@@ -12,7 +12,7 @@ class Helper {
   }
 
   _logError(name, res) {
-    console.log(`helper.${name}`, res.statusCode, res.body);
+    // console.log(`helper.${name}`, res.statusCode, res.body);
   }
 
   async createUser(config = {}) {
@@ -43,12 +43,6 @@ class Helper {
       const boardData = Generator.Board.getUnique();
       const mergedData = this._mergeObject(boardData, board);
       const res = await this._post(`${routes.board}/`, mergedData, token);
-      // if (res.statusCode !== 201) {
-      //   this._logError('createBoards', res);
-      //   return this.createBoards({
-      //     token, boards,
-      //   });
-      // }
       const { boardId } = res.body.data;
       let columns = [];
       if (board.columns) {
@@ -166,12 +160,12 @@ class Helper {
 
   _post(route, data, token) {
     if (token) {
-      return this.request
+      return this.request()
         .post(route)
         .set('authorization', `Bearer ${token}`)
         .send(data);
     }
-    return this.request
+    return this.request()
       .post(route)
       .send(data);
   }
