@@ -263,6 +263,55 @@ router.get(
   AuthAdapter.me,
 );
 
+// module.exports = {
+//   authRouter: router,
+// };
+
 module.exports = {
-  authRouter: router,
+  authRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/register',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'register'),
+          CheckMiddleware.isUserExist,
+        ],
+      },
+      AuthAdapter.register,
+    );
+    fastify.post(
+      '/login',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'login'),
+        ],
+      }, AuthAdapter.login,
+    );
+    fastify.post(
+      '/refresh',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'refresh'),
+        ],
+      }, AuthAdapter.refresh,
+    );
+    fastify.post(
+      '/logout',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+        ],
+      }, AuthAdapter.logout,
+    );
+    fastify.get(
+      '/me',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      }, AuthAdapter.me,
+    );
+    done();
+  },
 };

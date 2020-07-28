@@ -166,12 +166,12 @@ class Helper {
 
   _post(route, data, token) {
     if (token) {
-      return this.request
+      return this.request()
         .post(route)
         .set('authorization', `Bearer ${token}`)
         .send(data);
     }
-    return this.request
+    return this.request()
       .post(route)
       .send(data);
   }

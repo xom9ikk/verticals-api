@@ -315,6 +315,72 @@ router.delete(
   ColumnAdapter.remove,
 );
 
+// module.exports = {
+//   columnRouter: router,
+// };
+
 module.exports = {
-  columnRouter: router,
+  columnRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createColumn'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.create,
+    );
+    fastify.get(
+      '/:columnId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getColumn'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getColumnsQuery'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.getAll,
+    );
+    fastify.patch(
+      '/:columnId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchColumnBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchColumnParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.update,
+    );
+    fastify.delete(
+      '/:columnId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteColumnParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.remove,
+    );
+    done();
+  },
 };

@@ -1,11 +1,27 @@
-const supertest = require('supertest');
-const app = require('../../server');
+const { build } = require('../../server');
+const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
 const { Helper } = require('../../../tests/helper');
 const { routes } = require('../../../tests/routes');
+const { Request } = require('../../../tests/request');
 
-const request = supertest(app);
+let knex;
+let app;
+
+const request = () => new Request(app);
+
 const helper = new Helper(request);
+
+beforeAll(async (done) => {
+  knex = new Knex();
+  app = build(knex);
+  done();
+});
+
+afterAll(async (done) => {
+  await knex.closeConnection();
+  done();
+});
 
 const defaultUser = {
   boards: [{
@@ -37,11 +53,6 @@ const defaultUser = {
   }],
 };
 
-afterAll(async (done) => {
-  await knex.destroy();
-  done();
-});
-
 describe('create', () => {
   it('user can successfully create todo with all fields', async (done) => {
     const user = await helper.createUser(defaultUser);
@@ -49,7 +60,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -71,7 +82,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.description;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -93,7 +104,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.status;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -115,7 +126,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.color;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -137,7 +148,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.isArchived;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -159,7 +170,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.isNotificationsEnabled;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -185,7 +196,7 @@ describe('create', () => {
     delete todo.color;
     delete todo.isArchived;
     delete todo.isNotificationsEnabled;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -205,7 +216,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .send(todo);
 
@@ -224,7 +235,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.title;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -244,7 +255,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.position;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -264,7 +275,7 @@ describe('create', () => {
 
     const todo = Generator.Todo.getUnique(columnId);
     delete todo.columnId;
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -283,7 +294,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -305,7 +316,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -327,7 +338,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -348,7 +359,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -369,7 +380,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -390,7 +401,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -411,7 +422,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -433,7 +444,7 @@ describe('create', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -457,7 +468,7 @@ describe('create', () => {
     const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnIdWithoutAccess);
-    const res = await request
+    const res = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
@@ -479,12 +490,12 @@ describe('get todo by id', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -507,12 +518,12 @@ describe('get todo by id', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/${todoId}`)
       .send();
 
@@ -531,12 +542,12 @@ describe('get todo by id', () => {
     const secondUser = await helper.createUser(defaultUser);
 
     const todo = Generator.Todo.getUnique(firstUserColumnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -555,12 +566,12 @@ describe('get todo by id', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/string_${todoId}`)
       .send();
 
@@ -583,24 +594,24 @@ describe('get all todos', () => {
     const secondUserColumnId = secondUser.getRandomColumnId();
 
     const secondUserTodo = Generator.Todo.getUnique(secondUserColumnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(secondUserTodo);
 
     const todoOne = Generator.Todo.getUnique(firstColumnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(secondColumnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -634,18 +645,18 @@ describe('get all todos', () => {
     await helper.createUser(defaultUser);
 
     const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: firstBoardId })
@@ -677,18 +688,18 @@ describe('get all todos', () => {
     await helper.createUser(defaultUser);
 
     const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ columnId: columnIdFromFirstBoard })
@@ -721,18 +732,18 @@ describe('get all todos', () => {
     const boardIdWithoutAccess = secondUser.getRandomBoardId();
 
     const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: boardIdWithoutAccess })
@@ -757,18 +768,18 @@ describe('get all todos', () => {
     const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
     const todoOne = Generator.Todo.getUnique(columnIdFromFirstBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(columnIdFromSecondBoard);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ columnId: columnIdWithoutAccess })
@@ -788,18 +799,18 @@ describe('get all todos', () => {
     const secondUser = await helper.createUser();
 
     const todoOne = Generator.Todo.getUnique(firstColumnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todoOne);
 
     const todoTwo = Generator.Todo.getUnique(secondColumnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todoTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -817,12 +828,12 @@ describe('get all todos', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    await request
+    await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/`)
       .send();
 
@@ -843,12 +854,12 @@ describe('remove todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -867,12 +878,12 @@ describe('remove todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.todo}/${todoId}`)
       .send();
 
@@ -891,12 +902,12 @@ describe('remove todo', () => {
     const secondUser = await helper.createUser();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -915,12 +926,12 @@ describe('remove todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.todo}/string_${todoId}`)
       .send();
 
@@ -941,18 +952,18 @@ describe('update todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique(columnId);
-    const resUpdate = await request
+    const resUpdate = await request()
       .patch(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${token}`)
       .send(newTodo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -977,13 +988,13 @@ describe('update todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .patch(`${routes.todo}/${todoId}`)
       .send(newTodo);
 
@@ -1002,13 +1013,13 @@ describe('update todo', () => {
     const secondUser = await helper.createUser(defaultUser);
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique();
-    const res = await request
+    const res = await request()
       .patch(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(newTodo);
@@ -1027,13 +1038,13 @@ describe('update todo', () => {
     const columnId = user.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(columnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique(columnId);
-    const res = await request
+    const res = await request()
       .patch(`${routes.todo}/string_${todoId}`)
       .send(newTodo);
 
@@ -1053,13 +1064,13 @@ describe('update todo', () => {
     const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
     const todo = Generator.Todo.getUnique(firstUserColumnId);
-    const { body: { data: { todoId } } } = await request
+    const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique(columnIdWithoutAccess);
-    const res = await request
+    const res = await request()
       .patch(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(newTodo);

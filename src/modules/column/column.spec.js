@@ -1,11 +1,27 @@
-const supertest = require('supertest');
-const app = require('../../server');
+const { build } = require('../../server');
+const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
 const { Helper } = require('../../../tests/helper');
 const { routes } = require('../../../tests/routes');
+const { Request } = require('../../../tests/request');
 
-const request = supertest(app);
+let knex;
+let app;
+
+const request = () => new Request(app);
+
 const helper = new Helper(request);
+
+beforeAll(async (done) => {
+  knex = new Knex();
+  app = build(knex);
+  done();
+});
+
+afterAll(async (done) => {
+  await knex.closeConnection();
+  done();
+});
 
 const defaultUser = {
   boards: [{
@@ -19,11 +35,6 @@ const defaultUser = {
   }],
 };
 
-afterAll(async (done) => {
-  await knex.destroy();
-  done();
-});
-
 describe('create', () => {
   it('user can successfully create column with all fields', async (done) => {
     const user = await helper.createUser(defaultUser);
@@ -31,7 +42,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -53,7 +64,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.description;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -75,7 +86,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.color;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -97,7 +108,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.isCollapsed;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -121,7 +132,7 @@ describe('create', () => {
     delete column.description;
     delete column.color;
     delete column.isCollapsed;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -141,7 +152,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .send(column);
 
@@ -160,7 +171,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.boardId;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -180,7 +191,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.title;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -200,7 +211,7 @@ describe('create', () => {
 
     const column = Generator.Column.getUnique(boardId);
     delete column.position;
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -219,7 +230,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -241,7 +252,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -263,7 +274,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -284,7 +295,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -305,7 +316,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -326,7 +337,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -347,7 +358,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -369,7 +380,7 @@ describe('create', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
@@ -393,7 +404,7 @@ describe('create', () => {
     const boardIdWithoutAccess = secondUser.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardIdWithoutAccess);
-    const res = await request
+    const res = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
@@ -415,12 +426,12 @@ describe('get column by id', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -443,12 +454,12 @@ describe('get column by id', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/${columnId}`)
       .send();
 
@@ -467,12 +478,12 @@ describe('get column by id', () => {
     const secondUser = await helper.createUser(defaultUser);
 
     const column = Generator.Column.getUnique(firstUserBoardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -491,12 +502,12 @@ describe('get column by id', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/string_${columnId}`)
       .send();
 
@@ -521,18 +532,18 @@ describe('get all columns', () => {
     await helper.createUser(defaultUser);
 
     const columnOne = Generator.Column.getUnique(firstBoard.id);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnOne);
 
     const columnTwo = Generator.Column.getUnique(secondBoard.id);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -564,18 +575,18 @@ describe('get all columns', () => {
     await helper.createUser(defaultUser);
 
     const columnOne = Generator.Column.getUnique(firstBoardId);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnOne);
 
     const columnTwo = Generator.Column.getUnique(secondBoardId);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: firstBoardId })
@@ -606,18 +617,18 @@ describe('get all columns', () => {
     const [boardIdWithoutAccess] = secondUser.getBoardIds();
 
     const columnOne = Generator.Column.getUnique(firstBoardId);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnOne);
 
     const columnTwo = Generator.Column.getUnique(secondBoardId);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(columnTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: boardIdWithoutAccess })
@@ -640,18 +651,18 @@ describe('get all columns', () => {
     const secondUser = await helper.createUser();
 
     const columnOne = Generator.Column.getUnique(firstBoard.id);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnOne);
 
     const columnTwo = Generator.Column.getUnique(secondBoard.id);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnTwo);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -669,12 +680,12 @@ describe('get all columns', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/`)
       .send();
 
@@ -695,12 +706,12 @@ describe('remove column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -719,12 +730,12 @@ describe('remove column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.column}/${columnId}`)
       .send();
 
@@ -745,18 +756,18 @@ describe('remove column', () => {
     const secondUser = await helper.createUser();
 
     const columnOne = Generator.Column.getUnique(firstBoard.id);
-    await request
+    await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnOne);
 
     const columnTwo = Generator.Column.getUnique(secondBoard.id);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(columnTwo);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
@@ -775,12 +786,12 @@ describe('remove column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
-    const res = await request
+    const res = await request()
       .delete(`${routes.column}/string_${columnId}`)
       .send();
 
@@ -801,18 +812,18 @@ describe('update column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
     const newColumn = Generator.Column.getUnique(boardId);
-    const resUpdate = await request
+    const resUpdate = await request()
       .patch(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${token}`)
       .send(newColumn);
 
-    const res = await request
+    const res = await request()
       .get(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
@@ -837,13 +848,13 @@ describe('update column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
     const newColumn = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .patch(`${routes.column}/${columnId}`)
       .send(newColumn);
 
@@ -862,13 +873,13 @@ describe('update column', () => {
     const secondUser = await helper.createUser(defaultUser);
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
 
     const newColumn = Generator.Column.getUnique();
-    const res = await request
+    const res = await request()
       .patch(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(newColumn);
@@ -887,13 +898,13 @@ describe('update column', () => {
     const boardId = user.getRandomBoardId();
 
     const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send(column);
 
     const newColumn = Generator.Column.getUnique(boardId);
-    const res = await request
+    const res = await request()
       .patch(`${routes.column}/string_${columnId}`)
       .send(newColumn);
 
@@ -913,13 +924,13 @@ describe('update column', () => {
     const boardIdWithoutAccess = secondUser.getRandomBoardId();
 
     const column = Generator.Column.getUnique(firstUserBoardId);
-    const { body: { data: { columnId } } } = await request
+    const { body: { data: { columnId } } } = await request()
       .post(`${routes.column}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(column);
 
     const newColumn = Generator.Column.getUnique(boardIdWithoutAccess);
-    const res = await request
+    const res = await request()
       .patch(`${routes.column}/${columnId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(newColumn);

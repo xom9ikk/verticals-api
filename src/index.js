@@ -1,5 +1,7 @@
 const { Metrics } = require('./metrics');
-const app = require('./server');
+const { build } = require('./server');
+const { Knex } = require('./knex');
+const { Subscriber } = require('./events/subscriber');
 
 const {
   PORT,
@@ -8,7 +10,10 @@ const {
   NODE_ENV,
 } = process.env;
 
-app.listen(PORT, HOST, () => {
+const knex = new Knex();
+
+build(knex).listen(PORT, HOST, async () => {
+  await Subscriber.subscribe();
   logger.info(`Server has been started on ${HOST}:${PORT} in ${NODE_ENV} mode`);
 });
 

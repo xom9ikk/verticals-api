@@ -1,94 +1,66 @@
 const { BackendResponse } = require('../../components');
-const { CommentController } = require('./controller');
+const { CommentAttachmentController } = require('./controller');
 
 class CommentAttachmentAdapter {
-  async create(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const commentId = await CommentController.create({ userId, comment: req.body });
-      return BackendResponse.Created(res, 'Comment successfully created', { commentId });
-    } catch (e) {
-      next(e);
-    }
+  async create(req, res) {
+    const { userId } = req;
+    const commentId = await CommentAttachmentController.create({ userId, comment: req.body });
+    return BackendResponse.Created(res, 'Comment successfully created', { commentId });
   }
 
-  async get(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const { commentId } = req.params;
-      const comment = await CommentController.get({ userId, commentId });
-      return BackendResponse.Success(res, 'Comment information successfully received', comment);
-    } catch (e) {
-      next(e);
-    }
+  async get(req, res) {
+    const { userId } = req;
+    const { commentId } = req.params;
+    const comment = await CommentAttachmentController.get({ userId, commentId });
+    return BackendResponse.Success(res, 'Comment information successfully received', comment);
   }
 
-  async getAll(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const { boardId, columnId, todoId } = req.query;
-      const comments = await CommentController.getAll({
-        userId, boardId, columnId, todoId,
-      });
-      return BackendResponse.Success(res, 'Comments information successfully received', { comments });
-    } catch (e) {
-      next(e);
-    }
+  async getAll(req, res) {
+    const { userId } = req;
+    const { boardId, columnId, todoId } = req.query;
+    const comments = await CommentAttachmentController.getAll({
+      userId, boardId, columnId, todoId,
+    });
+    return BackendResponse.Success(res, 'Comments information successfully received', { comments });
   }
 
-  async update(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const { commentId } = req.params;
+  async update(req, res) {
+    const { userId } = req;
+    const { commentId } = req.params;
 
-      await CommentController.update({
-        userId,
-        commentId,
-        patch: req.body,
-      });
+    await CommentAttachmentController.update({
+      userId,
+      commentId,
+      patch: req.body,
+    });
 
-      return BackendResponse.Success(res, 'Comment successfully updated');
-    } catch (e) {
-      next(e);
-    }
+    return BackendResponse.Success(res, 'Comment successfully updated');
   }
 
-  async remove(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const { commentId } = req.params;
+  async remove(req, res) {
+    const { userId } = req;
+    const { commentId } = req.params;
 
-      await CommentController.remove({
-        userId,
-        commentId,
-      });
+    await CommentAttachmentController.remove({
+      userId,
+      commentId,
+    });
 
-      return BackendResponse.Success(res, 'Comment successfully removed');
-    } catch (e) {
-      next(e);
-    }
+    return BackendResponse.Success(res, 'Comment successfully removed');
   }
 
-  async saveAttachment(req, res, next) {
-    try {
-      const { commentId } = req.params;
-      const { userId, file } = res.locals;
-      const savedFile = await CommentController.saveAttachment({ userId, commentId, file });
-      return BackendResponse.Created(res, 'Successfully uploaded attachment for comment', { file: savedFile });
-    } catch (e) {
-      next(e);
-    }
+  async saveAttachment(req, res) {
+    const { commentId } = req.params;
+    const { userId, file } = req;
+    const savedFile = await CommentAttachmentController.saveAttachment({ userId, commentId, file });
+    return BackendResponse.Created(res, 'Successfully uploaded attachment for comment', savedFile);
   }
 
-  async removeAttachment(req, res, next) {
-    try {
-      const { attachmentId } = req.params;
-      const { userId } = res.locals;
-      await CommentController.removeAttachment({ userId, attachmentId });
-      return BackendResponse.Success(res, 'Attachment successfully removed', { attachmentId });
-    } catch (e) {
-      next(e);
-    }
+  async removeAttachment(req, res) {
+    const { attachmentId } = req.params;
+    const { userId } = req;
+    await CommentAttachmentController.removeAttachment({ userId, attachmentId });
+    return BackendResponse.Success(res, 'Attachment successfully removed', { attachmentId });
   }
 }
 

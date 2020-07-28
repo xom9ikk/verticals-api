@@ -24,15 +24,17 @@ class BackendResponse {
   static send(res, _status, msg, data) {
     Metrics.counterRequests({
       status: _status,
-      method: res.req.method,
-      route: res.req.originalUrl,
+      method: res.method,
+      route: res.url,
     });
-    return res.status(_status).json({
-      data: {
-        ...data,
-      },
-      message: msg,
-    });
+    return res
+      .code(_status)
+      .send({
+        data: {
+          ...data,
+        },
+        message: msg,
+      });
   }
 
   static Success(res, msg = message.Success, data) {

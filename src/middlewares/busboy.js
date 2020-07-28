@@ -1,4 +1,4 @@
-const Busboy = require('busboy');
+const { BackendError } = require('../components/error');
 
 const config = {
   defCharset: 'utf8',
@@ -12,25 +12,18 @@ const config = {
 
 class BusboyMiddleware {
   generateFileInfo(folderName = 'uploads') {
-    return async (req, res, next) => {
-      try {
-        await BusboyMiddleware.generateFileInfo(req, res, folderName);
-        next();
-      } catch (e) {
-        next(e);
+    return async (req, res) => {
+      if (!req.isMultipart()) {
+        throw new BackendError.UnprocessableEntity('Invalid multipart. Change the body and try again');
       }
+      await BusboyMiddleware.generateFileInfo(req, res, folderName);
     };
   }
 
-  static generateFileInfo(req, res) {
-    return new Promise((resolve, reject) => {
-      const busboy = new Busboy({
-        headers: req.headers,
-        ...config,
-      });
-
-      busboy.on('file', (fieldName, file, fileName, encoding, mimeType) => {
-        res.locals.file = {
+  static generateFileInfo(req) {
+    return new Promise((resolve) => {
+      req.multipart((fieldName, file, fileName, encoding, mimeType) => {
+        req.file = {
           fieldName,
           file,
           fileName,
@@ -39,15 +32,7 @@ class BusboyMiddleware {
           size: req.headers['content-length'],
         };
         resolve();
-      });
-
-      busboy.on('error', (e) => {
-        // TODO: handle
-        console.error('busboy err', e);
-        reject(e);
-      });
-
-      req.pipe(busboy);
+      }, () => {});
     });
   }
 }
