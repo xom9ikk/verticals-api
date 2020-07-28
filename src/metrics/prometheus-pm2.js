@@ -73,8 +73,8 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error(err);
   } finally {
-    res.set('Content-Type', prom.register.contentType);
-    res.end(responseData);
+    res.header('Content-Type', prom.register.contentType);
+    res.send(responseData);
     pm2.disconnect();
   }
 };

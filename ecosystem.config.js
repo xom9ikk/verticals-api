@@ -7,8 +7,8 @@ module.exports = {
       '--color',
     ],
     exec_mode: 'cluster',
-    instances: 1,
-    // instances: 'max',
+    // instances: 1,
+    instances: 'max',
     env: {
       NODE_ENV: 'development',
       DEBUG_COLORS: true,
