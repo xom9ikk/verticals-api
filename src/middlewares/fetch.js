@@ -6,30 +6,19 @@ class FetchMiddleware {
     return TokenComponent.verifyToken(token);
   }
 
-  async getUserId(req, res, next) {
-    try {
-      const { parsedBearerToken } = res.locals;
-      const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
+  async getUserId(req) {
+    const { parsedBearerToken } = req;
+    const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
 
-      res.locals.userId = userId;
-      next();
-    } catch (e) {
-      next(e);
-    }
+    req.userId = userId;
   }
 
-  async getUser(req, res, next) {
-    try {
-      const { parsedBearerToken } = res.locals;
-      const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
+  async getUser(req) {
+    const { parsedBearerToken } = req;
+    const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
 
-      const user = await UserService.getById(userId);
-
-      res.locals.user = user;
-      next();
-    } catch (e) {
-      next(e);
-    }
+    const user = await UserService.getById(userId);
+    req.user = user;
   }
 }
 

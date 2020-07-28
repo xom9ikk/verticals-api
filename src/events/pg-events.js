@@ -85,12 +85,16 @@ class PgEvent {
   }
 
   async releaseConnection() {
-    await knex.client.destroyRawConnection(this._connection);
-    delete this._connection;
+    try {
+      await knex.client.releaseConnection(this._connection);
+      delete this._connection;
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   async _setupConnection() {
-    this._connection = await knex.client.acquireRawConnection();
+    this._connection = await knex.client.acquireConnection();
     this._connection.on('notification', (data) => {
       const { channel } = data;
       const event = this._events.get(channel);

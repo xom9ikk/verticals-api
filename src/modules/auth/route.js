@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { AuthAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -84,12 +83,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/register',
-  SchemaValidator.validate(RequestPart.body, 'register'),
-  CheckMiddleware.isUserExist,
-  AuthAdapter.register,
-);
 
 /**
  * @swagger
@@ -147,11 +140,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/login',
-  SchemaValidator.validate(RequestPart.body, 'login'),
-  AuthAdapter.login,
-);
 
 /**
  * @swagger
@@ -202,11 +190,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/refresh',
-  SchemaValidator.validate(RequestPart.body, 'refresh'),
-  AuthAdapter.refresh,
-);
 
 /**
  * @swagger
@@ -250,19 +233,52 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/logout',
-  CheckMiddleware.isAuthenticated,
-  AuthAdapter.logout,
-);
-
-router.get(
-  '/me',
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  AuthAdapter.me,
-);
 
 module.exports = {
-  authRouter: router,
+  authRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/register',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'register'),
+          CheckMiddleware.isUserExist,
+        ],
+      },
+      AuthAdapter.register,
+    );
+    fastify.post(
+      '/login',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'login'),
+        ],
+      }, AuthAdapter.login,
+    );
+    fastify.post(
+      '/refresh',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'refresh'),
+        ],
+      }, AuthAdapter.refresh,
+    );
+    fastify.post(
+      '/logout',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+        ],
+      }, AuthAdapter.logout,
+    );
+    fastify.get(
+      '/me',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      }, AuthAdapter.me,
+    );
+    done();
+  },
 };

@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle,no-console */
-const express = require('express');
 const cluster = require('cluster');
 const promClient = require('prom-client');
 const pm2Cluster = require('./prometheus-pm2');
@@ -31,9 +30,9 @@ class Metrics {
   }
 
   static start() {
-    const app = express();
+    const app = fastify();
     promClient.collectDefaultMetrics({ timeout: METRICS_TIMEOUT });
-    app.set('trust proxy', true);
+    // app.set('trust proxy', true);
     app.get(METRICS_ROUTE, pm2Cluster);
     app.listen(METRICS_PORT, METRICS_HOST, () => {
       logger.info(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE} on worker ${NODE_APP_INSTANCE}`);

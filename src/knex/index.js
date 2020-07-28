@@ -22,9 +22,16 @@ class Knex {
     });
     if (global.logger) {
       this.logger = new KnexLogger(this.knex, {
-        logger: logger.database,
+        logger: global.logger ? logger.database : null,
       });
     }
+    this.knex.closeConnection = () => new Promise((resolve) => {
+      this
+        .knex
+        .destroy()
+        .catch(global.logger ? global.error : console.error)
+        .finally(resolve);
+    });
     return this.knex;
   }
 }

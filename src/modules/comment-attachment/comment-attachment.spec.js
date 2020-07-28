@@ -1,24 +1,28 @@
 const path = require('path');
-const supertest = require('supertest');
-const app = require('../../server');
-const { Helper } = require('../../../tests/helper');
-const { routes } = require('../../../tests/routes');
-
-const request = () => supertest(app);
-const helper = new Helper(request);
-
+const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Subscriber } = require('../../events/subscriber');
+const { Helper } = require('../../../tests/helper');
+const { routes } = require('../../../tests/routes');
+const { Request } = require('../../../tests/request');
+
+let knex;
+let app;
+
+const request = () => new Request(app);
+
+const helper = new Helper(request);
 
 beforeAll(async (done) => {
-  global.knex = new Knex();
-  await Subscriber.subscribeOnPg();
+  knex = new Knex();
+  app = build(knex);
+  await Subscriber.subscribe();
   done();
 });
 
 afterAll(async (done) => {
   await Subscriber.unsubscribe();
-  await global.knex.destroy();
+  await knex.closeConnection();
   done();
 });
 
@@ -229,17 +233,17 @@ describe('upload attachment', () => {
   it('user can successfully attach file to comment', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const commentId = user.getRandomCommentId();
+    const comment = user.getRandomComment();
 
     const resAttach = await request()
-      .post(`${routes.commentAttachment}/${commentId}`)
+      .post(`${routes.commentAttachment}/${comment.id}`)
       .set('authorization', `Bearer ${token}`)
       .attach('name', pathToAttachment);
 
     expect(resAttach.statusCode).toEqual(201);
 
     const res = await request()
-      .get(`${routes.comment}/${commentId}`)
+      .get(`${routes.comment}/${comment.id}`)
       .set('authorization', `Bearer ${token}`)
       .send();
     expect(res.statusCode).toEqual(200);
@@ -248,8 +252,12 @@ describe('upload attachment', () => {
       message: expect.any(String),
       data: expect.objectContaining({
         id: expect.any(Number),
+        todoId: expect.any(Number),
+        text: expect.any(String),
+        replyCommentId: null,
+        isEdited: expect.any(Boolean),
         attachedFiles: expect.arrayContaining([{
-          ...resAttach.body.data.file,
+          ...resAttach.body.data,
         }]),
       }),
     }));
@@ -265,7 +273,7 @@ describe('upload attachment', () => {
       .set('authorization', `Bearer ${token}`)
       .attach('name', pathToAttachment);
 
-    expect(res.statusCode).toEqual(404);
+    expect(res.statusCode).toEqual(400);
 
     done();
   });
@@ -329,7 +337,7 @@ describe('remove attachment', () => {
 
     expect(resAttach.statusCode).toEqual(201);
 
-    const { id: attachmentId } = resAttach.body.data.file;
+    const { id: attachmentId } = resAttach.body.data;
 
     const res = await request()
       .delete(`${routes.commentAttachment}/${attachmentId}`)
@@ -370,7 +378,7 @@ describe('remove attachment', () => {
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .attach('name', pathToAttachment);
 
-    const { id: attachmentIdWithoutAccess } = resAttach.body.data.file;
+    const { id: attachmentIdWithoutAccess } = resAttach.body.data;
     const res = await request()
       .delete(`${routes.commentAttachment}/${attachmentIdWithoutAccess}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
@@ -390,7 +398,9 @@ describe('remove attachment', () => {
       .set('authorization', `Bearer ${token}`)
       .attach('name', pathToAttachment);
 
-    const { id: attachmentIdWithoutAccess } = resAttach.body.data.file;
+    // console.log(resAttach.body);
+
+    const { id: attachmentIdWithoutAccess } = resAttach.body.data;
     const res = await request()
       .delete(`${routes.commentAttachment}/${attachmentIdWithoutAccess}`)
       .send();

@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { BoardAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -77,13 +76,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/',
-  SchemaValidator.validate(RequestPart.body, 'createBoard'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BoardAdapter.create,
-);
 
 /**
  * @swagger
@@ -136,14 +128,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/:boardId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getBoard'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BoardAdapter.get,
-);
 
 /**
  * @swagger
@@ -180,12 +164,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/',
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BoardAdapter.getAll,
-);
 
 /**
  * @swagger
@@ -249,15 +227,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.patch(
-  '/:boardId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchBoardBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchBoardParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BoardAdapter.update,
-);
 
 /**
  * @swagger
@@ -297,15 +266,67 @@ router.patch(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.delete(
-  '/:boardId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteBoardParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BoardAdapter.remove,
-);
 
 module.exports = {
-  boardRouter: router,
+  boardRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createBoard'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.create,
+    );
+    fastify.get(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getBoard'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.getAll,
+    );
+    fastify.patch(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchBoardBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchBoardParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.update,
+    );
+    fastify.delete(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteBoardParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.remove,
+    );
+    done();
+  },
 };

@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { CommentAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -69,13 +68,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/',
-  SchemaValidator.validate(RequestPart.body, 'createComment'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.create,
-);
 
 /**
  * @swagger
@@ -120,14 +112,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getComment'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.get,
-);
 
 /**
  * @swagger
@@ -176,14 +160,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/',
-  FormatterMiddleware.castToInteger(RequestPart.query),
-  SchemaValidator.validate(RequestPart.query, 'getCommentsQuery'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.getAll,
-);
 
 /**
  * @swagger
@@ -237,15 +213,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.patch(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchCommentBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchCommentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.update,
-);
 
 /**
  * @swagger
@@ -285,15 +252,69 @@ router.patch(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.delete(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteCommentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.remove,
-);
 
 module.exports = {
-  commentRouter: router,
+  commentRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createComment'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.create,
+    );
+    fastify.get(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getComment'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.query),
+          SchemaValidator.validate(RequestPart.query, 'getCommentsQuery'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.getAll,
+    );
+    fastify.patch(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchCommentBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchCommentParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.update,
+    );
+    fastify.delete(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteCommentParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.remove,
+    );
+    done();
+  },
 };
