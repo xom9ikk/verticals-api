@@ -12,7 +12,7 @@ class Helper {
   }
 
   _logError(name, res) {
-    // console.log(`helper.${name}`, res.statusCode, res.body);
+    console.log(`helper.${name}`, res.statusCode, res.body);
   }
 
   async createUser(config = {}) {
@@ -44,6 +44,12 @@ class Helper {
       const mergedData = this._mergeObject(boardData, board);
       const res = await this._post(`${routes.board}/`, mergedData, token);
       const { boardId } = res.body.data;
+      if (res.statusCode !== 201) {
+        this._logError('createBoards', res);
+        return this.createColumns({
+          token, boards,
+        });
+      }
       let columns = [];
       if (board.columns) {
         columns = await this.createColumns({
@@ -68,12 +74,12 @@ class Helper {
       const columnData = Generator.Column.getUnique(boardId);
       const mergedData = this._mergeObject(columnData, column);
       const res = await this._post(`${routes.column}/`, mergedData, token);
-      // if (res.statusCode !== 201) {
-      //   this._logError('createColumns', res);
-      //   return this.createColumns({
-      //     token, columns, boardId,
-      //   });
-      // }
+      if (res.statusCode !== 201) {
+        this._logError('createColumns', res);
+        return this.createColumns({
+          token, columns, boardId,
+        });
+      }
       const { columnId } = res.body.data;
       let todos = [];
       if (column.todos) {
@@ -101,12 +107,12 @@ class Helper {
       const todoData = Generator.Todo.getUnique(columnId);
       const mergedData = this._mergeObject(todoData, todo);
       const res = await this._post(`${routes.todo}/`, mergedData, token);
-      // if (res.statusCode !== 201) {
-      //   this._logError('createTodos', res);
-      //   return this.createTodos({
-      //     token, todos, columnId,
-      //   });
-      // }
+      if (res.statusCode !== 201) {
+        this._logError('createTodos', res);
+        return this.createTodos({
+          token, todos, columnId,
+        });
+      }
       const { todoId } = res.body.data;
       let comments = [];
       if (todo.comments) {
@@ -133,12 +139,12 @@ class Helper {
       const commentData = Generator.Comment.getUnique(todoId);
       const mergedData = this._mergeObject(commentData, comment);
       const res = await this._post(`${routes.comment}/`, mergedData, token);
-      // if (res.statusCode !== 201) {
-      //   console.error('helper.createComments', res.statusCode, res.body);
-      //   return this.createComments({
-      //     token, comments, todoId,
-      //   });
-      // }
+      if (res.statusCode !== 201) {
+        console.error('helper.createComments', res.statusCode, res.body);
+        return this.createComments({
+          token, comments, todoId,
+        });
+      }
       const { commentId } = res.body.data;
       resComments.push({
         id: commentId,

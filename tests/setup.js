@@ -7,5 +7,5 @@ module.exports = async () => {
     CREATE SCHEMA public;
   `);
   await knexConnection.migrate.latest();
-  await knexConnection.destroy();
+  await knexConnection.closeConnection();
 };

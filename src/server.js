@@ -24,4 +24,11 @@ process.on('uncaughtException', async (error) => {
   process.exit(1);
 });
 
-module.exports = app;
+module.exports = {
+  app: {
+    build: (knex) => {
+      global.knex = knex;
+      return app;
+    },
+  },
+};

@@ -14,10 +14,14 @@ class Subscriber {
     });
   }
 
-  unsubscribe() {
-    if (!this.pgEvent) return;
-    this.pgEvent.clear();
-    this.pgEvent.releaseConnection();
+  async unsubscribe() {
+    try {
+      if (!this.pgEvent) return;
+      this.pgEvent.clear();
+      await this.pgEvent.releaseConnection();
+    } catch (e) {
+      logger.error(e);
+    }
   }
 }
 

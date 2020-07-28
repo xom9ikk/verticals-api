@@ -25,6 +25,15 @@ class Knex {
         logger: logger.database,
       });
     }
+
+    this.knex.closeConnection = () => new Promise((resolve) => {
+      resolve();
+      this
+        .knex
+        .destroy()
+        .catch(logger.error)
+        .finally(resolve);
+    });
     return this.knex;
   }
 }

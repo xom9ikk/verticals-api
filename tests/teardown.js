@@ -6,5 +6,5 @@ module.exports = async () => {
     DROP SCHEMA public CASCADE;
     CREATE SCHEMA public;
   `);
-  await knexConnection.destroy();
+  await knexConnection.closeConnection();
 };

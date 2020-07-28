@@ -1,24 +1,30 @@
 const path = require('path');
 const supertest = require('supertest');
-const app = require('../../server');
+const { app } = require('../../server');
 const { Helper } = require('../../../tests/helper');
 const { routes } = require('../../../tests/routes');
-
-const request = () => supertest(app);
-const helper = new Helper(request);
 
 const { Knex } = require('../../knex');
 const { Subscriber } = require('../../events/subscriber');
 
+const knex = new Knex();
+const appInstance = app.build(knex);
+const request = () => supertest(appInstance);
+const helper = new Helper(request);
+
+beforeEach(async (done) => {
+  jest.setTimeout(10000);
+  done();
+});
+
 beforeAll(async (done) => {
-  global.knex = new Knex();
   await Subscriber.subscribeOnPg();
   done();
 });
 
 afterAll(async (done) => {
   await Subscriber.unsubscribe();
-  await global.knex.destroy();
+  await knex.closeConnection();
   done();
 });
 

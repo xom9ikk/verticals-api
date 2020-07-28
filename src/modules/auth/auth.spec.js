@@ -1,21 +1,27 @@
 const supertest = require('supertest');
-const app = require('../../server');
+const { app } = require('../../server');
 const { Generator } = require('../../../tests/generator');
 const { routes } = require('../../../tests/routes');
 const { Knex } = require('../../knex');
 const { Subscriber } = require('../../events/subscriber');
 
-const request = () => supertest(app);
+const knex = new Knex();
+const appInstance = app.build(knex);
+const request = () => supertest(appInstance);
+
+beforeEach(async (done) => {
+  jest.setTimeout(10000);
+  done();
+});
 
 beforeAll(async (done) => {
-  global.knex = new Knex();
   await Subscriber.subscribeOnPg();
   done();
 });
 
 afterAll(async (done) => {
   await Subscriber.unsubscribe();
-  await global.knex.destroy();
+  await knex.closeConnection();
   done();
 });
 
