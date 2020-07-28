@@ -23,6 +23,9 @@ class SchemaValidator {
   }
 
   errorResponse(schemaErrors) {
+    if (!schemaErrors) {
+      throw new BackendError.BadRequest('Request field(s) do not match expected');
+    }
     const [firstError] = schemaErrors;
     const fieldWithError = firstError.dataPath.slice(1);
     const {
@@ -54,12 +57,10 @@ class SchemaValidator {
   }
 
   validate(type, schemaName) {
-    return (req, res, next) => {
-      const valid = this.ajv.validate(schemaName, req[type]);
+    return async (req) => {
+      const valid = this.ajv.validate(schemaName, req[type] || {});
       if (!valid) {
-        this.errorResponse(this.ajv.errors);
-      } else {
-        next();
+        return this.errorResponse(this.ajv.errors);
       }
     };
   }

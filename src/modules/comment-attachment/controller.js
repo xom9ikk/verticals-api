@@ -2,7 +2,7 @@ const { FileComponent } = require('../../components/file');
 const { BoardAccessService, CommentFilesService } = require('../../services');
 const { BackendError } = require('../../components');
 
-class CommentController {
+class CommentAttachmentController {
   async saveAttachment({ userId, commentId, file }) {
     const isAccess = await BoardAccessService.getByCommentId(userId, commentId);
 
@@ -37,5 +37,5 @@ class CommentController {
 }
 
 module.exports = {
-  CommentController: new CommentController(),
+  CommentAttachmentController: new CommentAttachmentController(),
 };

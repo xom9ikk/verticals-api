@@ -294,6 +294,72 @@ router.delete(
   CommentAdapter.remove,
 );
 
+// module.exports = {
+//   commentRouter: router,
+// };
+
 module.exports = {
-  commentRouter: router,
+  commentRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createComment'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.create,
+    );
+    fastify.get(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getComment'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.query),
+          SchemaValidator.validate(RequestPart.query, 'getCommentsQuery'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.getAll,
+    );
+    fastify.patch(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchCommentBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchCommentParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.update,
+    );
+    fastify.delete(
+      '/:commentId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteCommentParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAdapter.remove,
+    );
+    done();
+  },
 };

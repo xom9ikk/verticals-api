@@ -2,68 +2,48 @@ const { BackendResponse } = require('../../components');
 const { AuthController } = require('./controller');
 
 class AuthAdapter {
-  async register(req, res, next) {
-    try {
-      const tokens = await AuthController.register({
-        ...req.body,
-        ip: req.ip,
-      });
-      return BackendResponse.Created(res, 'User successfully registered', tokens);
-    } catch (e) {
-      next(e);
-    }
+  async register(req, res) {
+    const tokens = await AuthController.register({
+      ...req.body,
+      ip: req.ip,
+    });
+    return BackendResponse.Created(res, 'User successfully registered', tokens);
   }
 
-  async login(req, res, next) {
-    try {
-      const {
-        body:
+  async login(req, res) {
+    const {
+      body:
           { password: userInputPassword, email, username },
-        ip,
-      } = req;
-      const tokens = await AuthController.login({
-        userInputPassword, email, username, ip,
-      });
-      return BackendResponse.Success(res, 'Pair of tokens was generated', tokens);
-    } catch (e) {
-      next(e);
-    }
+      ip,
+    } = req;
+    const tokens = await AuthController.login({
+      userInputPassword, email, username, ip,
+    });
+    return BackendResponse.Success(res, 'Pair of tokens was generated', tokens);
   }
 
-  async refresh(req, res, next) {
-    try {
-      const {
-        body:
+  async refresh(req, res) {
+    const {
+      body:
           { refreshToken },
-        ip,
-      } = req;
-      const tokens = await AuthController.refresh({
-        refreshToken, ip,
-      });
-      return BackendResponse.Success(res, 'Pair of tokens was refreshed', tokens);
-    } catch (e) {
-      next(e);
-    }
+      ip,
+    } = req;
+    const tokens = await AuthController.refresh({
+      refreshToken, ip,
+    });
+    return BackendResponse.Success(res, 'Pair of tokens was refreshed', tokens);
   }
 
-  async logout(req, res, next) {
-    try {
-      const { parsedBearerToken } = res.locals;
-      await AuthController.logout({ token: parsedBearerToken });
-      return BackendResponse.Success(res, 'Success logout');
-    } catch (e) {
-      next(e);
-    }
+  async logout(req, res) {
+    const { parsedBearerToken } = req;
+    await AuthController.logout({ token: parsedBearerToken });
+    return BackendResponse.Success(res, 'Success logout');
   }
 
-  async me(req, res, next) {
-    try {
-      const { userId } = res.locals;
-      const user = await AuthController.me({ userId });
-      return BackendResponse.Success(res, 'User successfully received', user);
-    } catch (e) {
-      next(e);
-    }
+  async me(req, res) {
+    const { userId } = req;
+    const user = await AuthController.me({ userId });
+    return BackendResponse.Success(res, 'User successfully received', user);
   }
 }
 

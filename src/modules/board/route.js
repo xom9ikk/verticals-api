@@ -306,6 +306,70 @@ router.delete(
   BoardAdapter.remove,
 );
 
+// module.exports = {
+//   boardRouter: router,
+// };
+
 module.exports = {
-  boardRouter: router,
+  boardRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createBoard'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.create,
+    );
+    fastify.get(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getBoard'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.getAll,
+    );
+    fastify.patch(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchBoardBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchBoardParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.update,
+    );
+    fastify.delete(
+      '/:boardId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteBoardParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.remove,
+    );
+    done();
+  },
 };

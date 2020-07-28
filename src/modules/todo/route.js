@@ -332,6 +332,72 @@ router.delete(
   TodoAdapter.remove,
 );
 
+// module.exports = {
+//   todoRouter: router,
+// };
+
 module.exports = {
-  todoRouter: router,
+  todoRouter: (fastify, opts, done) => {
+    fastify.post(
+      '/',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'createTodo'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.create,
+    );
+    fastify.get(
+      '/:todoId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getTodo'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.get,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.query),
+          SchemaValidator.validate(RequestPart.query, 'getTodosQuery'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.getAll,
+    );
+    fastify.patch(
+      '/:todoId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.body, 'patchTodoBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchTodoParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.update,
+    );
+    fastify.delete(
+      '/:todoId',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'deleteTodoParams'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.remove,
+    );
+    done();
+  },
 };
