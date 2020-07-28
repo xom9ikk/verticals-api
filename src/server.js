@@ -1,23 +1,18 @@
 /* eslint-disable no-new */
 const Fastify = require('fastify');
 const middie = require('middie');
-const helmet = require('helmet');
-const bodyParser = require('body-parser');
 const fastifyMultipart = require('fastify-multipart');
 const { BackendError } = require('./components');
-const { MorganLogger } = require('./logger/morgan');
 const { Logger } = require('./logger/winston');
 const { router } = require('./routes');
-const { parseErrorHandler } = require('./routes/common');
 
 global.logger = new Logger();
 
-// Subscriber.subscribeOnPg();
-
 process.on('uncaughtException', (error) => {
-  console.error('uncaughtException', error);
-  // process.exit(1);
+  logger.error(error);
+  process.exit(1);
 });
+
 const build = (knex) => {
   global.knex = knex;
   const app = Fastify();
@@ -45,8 +40,6 @@ const build = (knex) => {
     });
     // app.use(helmet());
     // app.set('trust proxy', true);
-    // app.use(bodyParser.json({ limit: '50mb' }));
-    // app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     // fastify.use(parseErrorHandler);
     // new MorganLogger(app, logger);
     fastify.decorateRequest('file', '');

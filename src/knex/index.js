@@ -20,19 +20,16 @@ class Knex {
           ? value
           : origImpl(Formatter.convertToSnakeCase(value))),
     });
-    // if (global.logger) {
-    //   this.logger = new KnexLogger(this.knex, {
-    //     logger: logger.database,
-    //   });
-    // }
+    if (global.logger) {
+      this.logger = new KnexLogger(this.knex, {
+        logger: global.logger ? logger.database : null,
+      });
+    }
     this.knex.closeConnection = () => new Promise((resolve) => {
-      console.log('close connection');
       this
         .knex
         .destroy()
-        .catch(() => {
-          console.log('eerrr');
-        })
+        .catch(global.logger ? global.error : console.error)
         .finally(resolve);
     });
     return this.knex;

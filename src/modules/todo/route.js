@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { TodoAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -83,13 +82,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/',
-  SchemaValidator.validate(RequestPart.body, 'createTodo'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  TodoAdapter.create,
-);
 
 /**
  * @swagger
@@ -146,14 +138,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/:todoId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getTodo'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  TodoAdapter.get,
-);
 
 /**
  * @swagger
@@ -202,14 +186,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/',
-  FormatterMiddleware.castToInteger(RequestPart.query),
-  SchemaValidator.validate(RequestPart.query, 'getTodosQuery'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  TodoAdapter.getAll,
-);
 
 /**
  * @swagger
@@ -275,15 +251,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.patch(
-  '/:todoId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchTodoBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchTodoParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  TodoAdapter.update,
-);
 
 /**
  * @swagger
@@ -323,18 +290,6 @@ router.patch(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.delete(
-  '/:todoId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteTodoParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  TodoAdapter.remove,
-);
-
-// module.exports = {
-//   todoRouter: router,
-// };
 
 module.exports = {
   todoRouter: (fastify, opts, done) => {

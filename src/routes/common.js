@@ -16,7 +16,7 @@ class RoutesHandler {
     );
   }
 
-  parseErrorHandler(error, req, res, _) {
+  parseErrorHandler(error, req, res) {
     return new BackendResponse(res, 400, 'Invalid JSON. Change the body and try again');
   }
 
@@ -30,15 +30,8 @@ class RoutesHandler {
       return new BackendResponse(res, 415, 'Invalid Media Type');
     }
     logger.error(error);
-    return new BackendResponse(res, 500, 'Internal');
-    // && process.exit(1);
+    return new BackendResponse(res, 500, 'Internal') && process.exit(1);
   }
-
-  // uncaughtErrorHandler(error, req, res, _) {
-  //   logger.error(error);
-  //   return new BackendResponse(res, 500, 'Internal')
-  //     && process.exit(1);
-  // }
 
   notFoundHandler(req, res) {
     return new BackendResponse(res, 404, `Route not found ${req.get('host')}${req.originalUrl}`);

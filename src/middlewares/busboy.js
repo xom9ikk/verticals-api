@@ -1,15 +1,5 @@
 const { BackendError } = require('../components/error');
 
-const config = {
-  defCharset: 'utf8',
-  limits: {
-    fields: 1,
-    fileSize: 1048576, // 1 MB
-    file: 1,
-    parts: 1,
-  },
-};
-
 class BusboyMiddleware {
   generateFileInfo(folderName = 'uploads') {
     return async (req, res) => {

@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { CommentAttachmentAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -68,16 +67,6 @@ const { RequestPart } = require('../../enums');
  *          $ref: '#/definitions/ErrorResponse'
  */
 
-router.post(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'uploadAttachmentToCommentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  BusboyMiddleware.generateFileInfo('uploads'),
-  CommentAttachmentAdapter.saveAttachment,
-);
-
 /**
  * @swagger
  * definitions:
@@ -116,18 +105,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.delete(
-  '/:attachmentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteAttachmentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAttachmentAdapter.removeAttachment,
-);
-
-// module.exports = {
-//   commentAttachmentRouter: router,
-// };
 
 module.exports = {
   commentAttachmentRouter: (fastify, opts, done) => {

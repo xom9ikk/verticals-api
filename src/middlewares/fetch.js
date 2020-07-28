@@ -6,14 +6,14 @@ class FetchMiddleware {
     return TokenComponent.verifyToken(token);
   }
 
-  async getUserId(req, res) {
+  async getUserId(req) {
     const { parsedBearerToken } = req;
     const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
 
     req.userId = userId;
   }
 
-  async getUser(req, res, next) {
+  async getUser(req) {
     const { parsedBearerToken } = req;
     const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
 

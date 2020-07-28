@@ -1,5 +1,3 @@
-const router = require('express').Router();
-
 const { swagger } = require('../swagger');
 const {
   allowHeadersHandler,

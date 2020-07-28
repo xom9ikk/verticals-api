@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { CommentAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -69,13 +68,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/',
-  SchemaValidator.validate(RequestPart.body, 'createComment'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.create,
-);
 
 /**
  * @swagger
@@ -120,14 +112,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'getComment'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.get,
-);
 
 /**
  * @swagger
@@ -176,14 +160,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.get(
-  '/',
-  FormatterMiddleware.castToInteger(RequestPart.query),
-  SchemaValidator.validate(RequestPart.query, 'getCommentsQuery'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.getAll,
-);
 
 /**
  * @swagger
@@ -237,15 +213,6 @@ router.get(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.patch(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.body, 'patchCommentBody'),
-  SchemaValidator.validate(RequestPart.params, 'patchCommentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.update,
-);
 
 /**
  * @swagger
@@ -285,18 +252,6 @@ router.patch(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.delete(
-  '/:commentId',
-  FormatterMiddleware.castToInteger(RequestPart.params),
-  SchemaValidator.validate(RequestPart.params, 'deleteCommentParams'),
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  CommentAdapter.remove,
-);
-
-// module.exports = {
-//   commentRouter: router,
-// };
 
 module.exports = {
   commentRouter: (fastify, opts, done) => {

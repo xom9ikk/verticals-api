@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const { AuthAdapter } = require('./adapter');
 const {
   SchemaValidator,
@@ -84,12 +83,6 @@ const { RequestPart } = require('../../enums');
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/register',
-  SchemaValidator.validate(RequestPart.body, 'register'),
-  CheckMiddleware.isUserExist,
-  AuthAdapter.register,
-);
 
 /**
  * @swagger
@@ -147,11 +140,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/login',
-  SchemaValidator.validate(RequestPart.body, 'login'),
-  AuthAdapter.login,
-);
 
 /**
  * @swagger
@@ -202,11 +190,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/refresh',
-  SchemaValidator.validate(RequestPart.body, 'refresh'),
-  AuthAdapter.refresh,
-);
 
 /**
  * @swagger
@@ -250,22 +233,6 @@ router.post(
  *         schema:
  *          $ref: '#/definitions/ErrorResponse'
  */
-router.post(
-  '/logout',
-  CheckMiddleware.isAuthenticated,
-  AuthAdapter.logout,
-);
-
-router.get(
-  '/me',
-  CheckMiddleware.isAuthenticated,
-  FetchMiddleware.getUserId,
-  AuthAdapter.me,
-);
-
-// module.exports = {
-//   authRouter: router,
-// };
 
 module.exports = {
   authRouter: (fastify, opts, done) => {
