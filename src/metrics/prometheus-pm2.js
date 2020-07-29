@@ -71,7 +71,7 @@ module.exports = async (req, res) => {
       responseData = register.metrics();
     }
   } catch (err) {
-    console.error(err);
+    logger.error(err);
   } finally {
     res.header('Content-Type', prom.register.contentType);
     res.send(responseData);

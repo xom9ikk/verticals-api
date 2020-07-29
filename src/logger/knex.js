@@ -4,8 +4,8 @@ class KnexLogger {
   constructor(knexInstance, options = {}) {
     this.queries = new Map();
 
-    const { logger = console.log, bindings: withBindings = true } = options;
-    this.print = this.makeQueryPrinter(knexInstance, { logger, withBindings });
+    const { bindings: withBindings = true } = options;
+    this.print = this.makeQueryPrinter(knexInstance, { withBindings });
 
     return knexInstance
       .on('query', this.handleQuery.bind(this))
@@ -45,10 +45,10 @@ class KnexLogger {
     });
   }
 
-  makeQueryPrinter(_knex, { logger, withBindings }) {
+  makeQueryPrinter(_knex, { withBindings }) {
     return ({ sql, bindings, duration }, isError) => {
       const sqlRequest = _knex.client._formatQuery(sql, withBindings ? bindings : null);
-      logger({
+      logger.database({
         ms: duration.toFixed(3),
         request: sqlRequest,
         isError,

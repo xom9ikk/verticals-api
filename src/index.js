@@ -15,7 +15,11 @@ const {
 
 const knex = new Knex();
 
-build(knex).listen(PORT, HOST, async () => {
+build(knex).listen(PORT, HOST, async (error) => {
+  if (error) {
+    logger.error(error);
+    process.exit(1);
+  }
   if (NODE_APP_INSTANCE === '0' || cluster.isMaster) {
     await Subscriber.subscribe();
   }
