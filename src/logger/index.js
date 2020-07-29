@@ -4,19 +4,21 @@ const { format } = require('date-fns');
 const pino = require('pino');
 const pinoms = require('pino-multi-stream');
 
-const { NODE_ENV, LOG_FILE_NAME, NODE_APP_INSTANCE } = process.env;
+const {
+  NODE_ENV, LOG_FILE_NAME, NODE_APP_INSTANCE,
+} = process.env;
+
+const worker = NODE_APP_INSTANCE || process.pid;
+const combinedFile = `${__dirname}/../../logs/combined/${LOG_FILE_NAME}_${worker}.log`;
+const errorFile = `${__dirname}/../../logs/error/${LOG_FILE_NAME}_${worker}.log`;
 
 const isProd = NODE_ENV === 'production';
-const isTest = NODE_ENV === 'test';
 const isDev = NODE_ENV === 'development';
-
-const combinedFile = `${__dirname}/../../logs/combined/${LOG_FILE_NAME}_${NODE_APP_INSTANCE}.log`;
-const errorFile = `${__dirname}/../../logs/error/${LOG_FILE_NAME}_${NODE_APP_INSTANCE}.log`;
 
 class Logger {
   constructor() {
     const streams = [];
-    if (isProd || isTest || isDev) {
+    if (isProd) {
       streams.push({ level: 'debug', stream: fs.createWriteStream(combinedFile) }); // 186 257
       streams.push({ level: 'error', stream: fs.createWriteStream(errorFile) }); // 205 215 286
     }
