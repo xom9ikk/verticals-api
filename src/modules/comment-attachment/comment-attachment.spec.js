@@ -398,8 +398,6 @@ describe('remove attachment', () => {
       .set('authorization', `Bearer ${token}`)
       .attach('name', pathToAttachment);
 
-    // console.log(resAttach.body);
-
     const { id: attachmentIdWithoutAccess } = resAttach.body.data;
     const res = await request()
       .delete(`${routes.commentAttachment}/${attachmentIdWithoutAccess}`)

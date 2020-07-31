@@ -1,5 +1,5 @@
 const { CommentService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components');
+const { BackendError } = require('../../components/error');
 
 class CommentController {
   async create({ userId, comment }) {

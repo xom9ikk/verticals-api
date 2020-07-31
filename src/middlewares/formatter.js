@@ -2,7 +2,7 @@ const { CollectionIterator } = require('../utils');
 
 class FormatterMiddleware {
   static castToInteger(type) {
-    return async (req) => {
+    return (req, res, done) => {
       const transformer = (data) => {
         const parsedNumber = parseInt(data);
         if (parsedNumber.toString() === data) {
@@ -12,6 +12,7 @@ class FormatterMiddleware {
       };
 
       req[type] = CollectionIterator.deepIterateValues(req[type], transformer);
+      done();
     };
   }
 }

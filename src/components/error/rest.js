@@ -1,4 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
+const { GeneralError } = require('./general-error');
+
 const status = {
   BadRequest: 400,
   Unauthorized: 401,
@@ -18,17 +20,6 @@ const message = {
   Conflict: 'Conflict',
   InternalError: 'Internal server error',
 };
-
-class GeneralError extends Error {
-  constructor(
-    _status = status.InternalError,
-    _msg = message.InternalError,
-  ) {
-    super();
-    this.status = _status;
-    this.msg = _msg;
-  }
-}
 
 class BadRequest extends GeneralError {
   constructor(_msg = message.BadRequest) {

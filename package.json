@@ -2,7 +2,7 @@
   "name": "verticals-backend",
   "version": "0.1.0",
   "description": "",
-  "main": "server.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "pm2 start --no-daemon",
@@ -25,7 +25,6 @@
     "fastify-helmet": "^4.0.2",
     "fastify-multipart": "^2.0.3",
     "form-data": "^3.0.0",
-    "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.2",
     "lodash.camelcase": "^4.3.0",
@@ -38,13 +37,15 @@
     "middie": "^5.1.0",
     "mime-types": "^2.1.27",
     "npm": "^6.14.7",
+    "performance-now": "^2.1.0",
     "pg": "^8.3.0",
     "pino": "^6.4.1",
     "pino-multi-stream": "^5.1.1",
     "pm2": "^4.4.0",
     "prom-client": "^12.0.0",
     "swagger-jsdoc": "^4.0.0",
-    "uuid": "^8.2.0"
+    "uuid": "^8.2.0",
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",

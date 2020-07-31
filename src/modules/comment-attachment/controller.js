@@ -1,6 +1,6 @@
 const { FileComponent } = require('../../components/file');
 const { BoardAccessService, CommentFilesService } = require('../../services');
-const { BackendError } = require('../../components');
+const { BackendError } = require('../../components/error');
 
 class CommentAttachmentController {
   async saveAttachment({ userId, commentId, file }) {

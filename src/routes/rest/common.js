@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
-const { BackendResponse } = require('../components');
-const { GeneralError } = require('../components/error');
+const { BackendResponse } = require('../../components');
+const { GeneralError } = require('../../components/error');
 
 const corsOrigin = process.env.CORS_ORIGIN;
 
@@ -14,10 +14,6 @@ class RoutesHandler {
       'Access-Control-Allow-Headers',
       'access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,content-type,authorization,accept',
     );
-  }
-
-  parseErrorHandler(error, req, res) {
-    return new BackendResponse(res, 400, 'Invalid JSON. Change the body and try again');
   }
 
   clientErrorHandler(error, req, res) {
