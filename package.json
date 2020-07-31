@@ -2,7 +2,7 @@
   "name": "verticals-backend",
   "version": "0.1.0",
   "description": "",
-  "main": "server.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "pm2 start --no-daemon",
@@ -18,13 +18,13 @@
   "dependencies": {
     "ajv": "^6.12.3",
     "bcryptjs": "^2.4.3",
-    "busboy": "^0.3.1",
     "chalk": "^4.1.0",
+    "date-fns": "^2.15.0",
     "dotenv": "^8.2.0",
     "fastify": "^3.1.1",
+    "fastify-helmet": "^4.0.2",
     "fastify-multipart": "^2.0.3",
     "form-data": "^3.0.0",
-    "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.2",
     "lodash.camelcase": "^4.3.0",
@@ -36,13 +36,16 @@
     "lodash.snakecase": "^4.1.1",
     "middie": "^5.1.0",
     "mime-types": "^2.1.27",
-    "morgan": "^1.10.0",
+    "npm": "^6.14.7",
+    "performance-now": "^2.1.0",
     "pg": "^8.3.0",
+    "pino": "^6.4.1",
+    "pino-multi-stream": "^5.1.1",
     "pm2": "^4.4.0",
     "prom-client": "^12.0.0",
     "swagger-jsdoc": "^4.0.0",
     "uuid": "^8.2.0",
-    "winston": "^3.3.3"
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
@@ -53,8 +56,7 @@
     "eslint-plugin-jest": "^23.18.0",
     "faker": "^4.1.0",
     "jest": "^26.1.0",
-    "nodemon": "^2.0.4",
-    "supertest": "^4.0.2"
+    "nodemon": "^2.0.4"
   },
   "config": {
     "commitizen": {

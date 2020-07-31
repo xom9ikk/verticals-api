@@ -100,8 +100,8 @@ const { RequestPart } = require('../../enums');
  *           color:
  *             type: integer
  *             enum: [0, 1, 2, 3, 4, 5, 6]
- *            message:
- *              type: string
+ *       message:
+ *         type: string
  * /v1/board/:boardId
  *   get:
  *     tags:

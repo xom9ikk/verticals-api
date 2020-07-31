@@ -1,5 +1,5 @@
 const { ColumnService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components');
+const { BackendError } = require('../../components/error');
 
 class ColumnController {
   async create(userId, column) {

@@ -21,9 +21,7 @@ class Knex {
           : origImpl(Formatter.convertToSnakeCase(value))),
     });
     if (global.logger) {
-      this.logger = new KnexLogger(this.knex, {
-        logger: global.logger ? logger.database : null,
-      });
+      this.logger = new KnexLogger(this.knex);
     }
     this.knex.closeConnection = () => new Promise((resolve) => {
       this

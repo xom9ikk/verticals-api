@@ -12,10 +12,12 @@ module.exports = {
     radix: 0,
     'class-methods-use-this': 0,
     'consistent-return': 0,
+    'no-async-promise-executor': 0,
   },
   globals: {
     knex: true,
     logger: true,
+    wss: true,
   },
   env: {
     node: true,

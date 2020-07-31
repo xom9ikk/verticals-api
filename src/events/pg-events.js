@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle,no-async-promise-executor,no-restricted-syntax */
+/* eslint-disable no-underscore-dangle,no-restricted-syntax */
 class PgEvent {
   constructor() {
     return new Promise(async (resolve) => {

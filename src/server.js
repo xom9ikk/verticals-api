@@ -1,10 +1,14 @@
-/* eslint-disable no-new */
+const http = require('http');
 const Fastify = require('fastify');
 const middie = require('middie');
 const fastifyMultipart = require('fastify-multipart');
-const { BackendError } = require('./components');
-const { Logger } = require('./logger/winston');
-const { router } = require('./routes');
+const helmet = require('fastify-helmet');
+const { WebSocketServer } = require('./lib/ws');
+const { Logger } = require('./logger');
+const { HttpLogger } = require('./logger/http');
+const { BackendError } = require('./components/error');
+const { restRouter, socketRouter } = require('./routes');
+const { wssErrorHandler } = require('./routes/socket/common');
 
 global.logger = new Logger();
 
@@ -13,9 +17,21 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
+let server;
+const serverFactory = (handler) => {
+  server = http.createServer((req, res) => {
+    handler(req, res);
+  });
+  return server;
+};
+
 const build = (knex) => {
   global.knex = knex;
-  const app = Fastify();
+  const app = Fastify({ serverFactory });
+  const httpLogger = new HttpLogger();
+  app.addHook('preHandler', httpLogger.request);
+  app.addHook('onResponse', httpLogger.response);
+  app.addHook('preSerialization', httpLogger.catchResponse);
   app.register(async (fastify) => {
     await fastify.register(middie);
     fastify.addContentTypeParser(
@@ -38,16 +54,18 @@ const build = (knex) => {
         parts: 1,
       },
     });
-    // app.use(helmet());
-    // app.set('trust proxy', true);
-    // fastify.use(parseErrorHandler);
-    // new MorganLogger(app, logger);
+    fastify.register(helmet);
     fastify.decorateRequest('file', '');
     fastify.decorateRequest('user', '');
     fastify.decorateRequest('userId', '');
     fastify.decorateRequest('parsedBearerToken', '');
-    fastify.register(router);
+
+    fastify.register(restRouter, { prefix: '/api' });
   });
+
+  global.wss = new WebSocketServer(server);
+  wss.use(socketRouter);
+  wss.setErrorHandler(wssErrorHandler);
   return app;
 };
 
