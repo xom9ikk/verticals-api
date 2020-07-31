@@ -9,10 +9,20 @@ const {
   SWAGGER_BASE_PATH,
 } = process.env;
 
+// fastify.post(
+//   '/register',
+//   {
+//     preHandler: [
+//       SchemaValidator.validate(RequestPart.body, 'register'),
+//       CheckMiddleware.isUserExist,
+//     ],
+//   },
+//   AuthAdapter.register,
+// );
+
 module.exports = {
   swagger: [
-    SWAGGER_JSON_ROUTE,
-    (req, res) => {
+    (fastify) => fastify.get(SWAGGER_JSON_ROUTE, (req, res) => {
       const apis = [
         `${__dirname}/../modules/**/*.js`,
       ];
@@ -28,8 +38,8 @@ module.exports = {
         },
         apis,
       };
-      const data = swaggerJSDoc(options);
-      return res.status(200).json(data);
-    },
+      // const data = swaggerJSDoc(options);
+      // return res.code(200).send(data);
+    }),
   ],
 };

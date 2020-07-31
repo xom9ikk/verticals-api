@@ -4,6 +4,10 @@ module.exports = {
     query: 'query',
     params: 'params',
   },
+  Transport: {
+    rest: 0,
+    socket: 1,
+  },
   CardType: {
     checkboxes: 0,
     arrows: 1,

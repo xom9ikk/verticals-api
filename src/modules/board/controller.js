@@ -1,5 +1,5 @@
 const { BoardService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components');
+const { BackendError } = require('../../components/error');
 
 class BoardController {
   async create(userId, board) {

@@ -1,5 +1,5 @@
 const { TodoService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components');
+const { BackendError } = require('../../components/error');
 
 class TodoController {
   async create(userId, todo) {

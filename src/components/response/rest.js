@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-const { Metrics } = require('../metrics');
+const { Metrics } = require('../../metrics');
 
 const status = {
   Success: 200,

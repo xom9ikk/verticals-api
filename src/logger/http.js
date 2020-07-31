@@ -1,3 +1,4 @@
+const now = require('performance-now');
 const { v4: uuidV4 } = require('uuid');
 
 const worker = uuidV4().substring(0, 5);
@@ -7,7 +8,7 @@ class HttpLogger {
   request(req, res, next) {
     counter += 1;
     req.requestId = `worker-${worker}_${counter}`;
-    req.startTime = process.hrtime();
+    req.startTime = now();
     logger.http({
       method: req.method,
       url: req.url,
@@ -21,7 +22,7 @@ class HttpLogger {
   }
 
   response(req, res, next) {
-    const duration = HttpLogger.measureDuration(req.startTime);
+    const duration = now() - req.startTime;
     logger.http({
       requestId: req.requestId,
       statusCode: res.statusCode,
@@ -32,13 +33,8 @@ class HttpLogger {
   }
 
   catchResponse(req, res, payload, next) {
-    Object.assign(res.raw, { payload });
+    res.raw.payload = payload;
     next();
-  }
-
-  static measureDuration(startTime) {
-    const diff = process.hrtime(startTime);
-    return diff[0] * 1e3 + diff[1] * 1e-6;
   }
 }
 
