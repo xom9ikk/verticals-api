@@ -3,8 +3,7 @@ const { BackendError } = require('../../components/error');
 
 class BoardController {
   async create(userId, board) {
-    const boardId = await BoardService.create(board);
-    await BoardAccessService.create(userId, boardId);
+    const boardId = await BoardService.createWithAccess(userId, board);
     return boardId;
   }
 
@@ -48,8 +47,6 @@ class BoardController {
       throw new BackendError.Forbidden('This account is not allowed to remove this board');
     }
 
-    // TODO cascade
-    await BoardAccessService.removeByBoardId(boardId);
     await BoardService.removeById(boardId);
     return true;
   }

@@ -1,10 +1,9 @@
-const { tables } = require('../database/tables');
 const { Database } = require('../database');
 
 class CommentService extends Database {
-  async create(todo) {
+  async create(comment) {
     const response = await this.comments
-      .insert(todo)
+      .insert(comment)
       .returning('id');
     return response[0];
   }

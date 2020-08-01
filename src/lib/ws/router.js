@@ -41,6 +41,7 @@ class WebSocketRouter {
       const isRouter = pathCallback instanceof WebSocketRouter;
       if (!isRouter) {
         await pathCallback(context, connection);
+        console.log('call with context', context);
       }
     }
   }

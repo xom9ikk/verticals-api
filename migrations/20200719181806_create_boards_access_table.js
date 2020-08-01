@@ -18,7 +18,8 @@ exports.up = async (knex) => {
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('boards');
+      .inTable('boards')
+      .onDelete('CASCADE');
     table
       .timestamps(false, true);
   });

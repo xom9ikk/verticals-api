@@ -1,7 +1,10 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle,no-param-reassign */
 const WebSocket = require('ws');
 const { parse: urlParse } = require('url');
+const { SocketError } = require('../../components');
 const { WebSocketRouter } = require('./router');
+
+const { MAX_SOCKET_CONNECTIONS } = process.env;
 
 class WebSocketServer {
   constructor(server) {
@@ -11,16 +14,15 @@ class WebSocketServer {
     });
     this.socket.on('connection', this.onConnection.bind(this));
     this.connections = new Map();
-    this.userConnections = new Map();
-    this.isFirst = false;
+    this.usersConnections = new Map();
   }
 
   use(router) {
     this.router = router;
   }
 
-  errorHandler(connection, req, e) {
-    connection.close(1000, e.message || e);
+  errorHandler(connection, req, context, error) {
+    this.destroy(connection, error);
   }
 
   setErrorHandler(errorHandler) {
@@ -37,50 +39,41 @@ class WebSocketServer {
     return context;
   }
 
-  _increaseConnection(authorization) {
-    let counter = this.userConnections.get(authorization) || 0;
-    counter += 1;
-    logger.info(authorization, counter);
-    this.userConnections.set(authorization, counter);
-    return counter;
-  }
-
-  _decreaseConnection(authorization) {
-    let counter = this.userConnections.get(authorization);
-    if (!counter) return;
-    counter -= 1;
-    this.userConnections.set(authorization, counter);
-    return counter;
-  }
-
-  async onConnection(connection, req) {
-    try {
-      const context = this._getContext(req);
-      const counter = this._increaseConnection(context.query.authorization);
-      context.counter = counter;
-      this.connections.set(connection, context);
-      await this.router
-        .onConnect(connection, req, context)
-        .then()
-        .catch((e) => {
-          this.errorHandler(connection, req, e);
-        });
-      console.log('router onConnect');
-      this.broadcast({ azazazaza: 'all' });
-      this.broadcast({ azazazaza: 'bearer' }, (context) => context.query.authorization === 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInRpbWVzdGFtcCI6NzY4LCJpYXQiOjE1OTYxOTk3ODIsImV4cCI6MTYyNzc1NzM4Mn0.Y97x1QPPnwQUSEqxKCJ9IXY9lGeO0Y6MVF4nGdf-w0I');
-      this.broadcast({ azazazaza: 'id' }, (context) => context.query.userId === 1);
-      // this.broadcast({ azazazaza: 2 }, (context) => context.counter === 2);
-      connection.on('message', (msg) => this.router
-        .onMessage(connection, req, msg, context)
-        .catch((e) => {
-          this.errorHandler(connection, req, e.message || e);
-        }));
-      connection.on('close', () => this.onClose(context));
-      connection.on('upgrade', this.onUpgrade);
-      connection.on('pong', this.heartbeat);
-    } catch (e) {
-      this.errorHandler(connection, req, e);
+  _increaseConnection(context) {
+    const key = this._getKeyFromContext(context);
+    if (this.usersConnections.has(key)) {
+      this.usersConnections.get(key).add(context);
+    } else {
+      this.usersConnections.set(key, new Set([context]));
     }
+    console.log('_increaseConnection', key, '=>', this.usersConnections.get(key).size);
+    return this.usersConnections.get(key).size;
+  }
+
+  _decreaseConnection(context) {
+    const key = this._getKeyFromContext(context);
+    if (this.usersConnections.has(key)) {
+      this.usersConnections.get(key).delete(context);
+    }
+    console.log('_decreaseConnection', key, '=>', this.usersConnections.get(key) ? this.usersConnections.get(key).size : 0);
+    return this.usersConnections.get(key).size;
+  }
+
+  _getKeyFromContext(context) {
+    return context.query.authorization;
+  }
+
+  _checkLimit(connection, context) {
+    const key = this._getKeyFromContext(context);
+    if (this.usersConnections.get(key).size > MAX_SOCKET_CONNECTIONS) {
+      throw new SocketError.MaxConnections('Account has reached the maximum number of connections');
+    }
+  }
+
+  destroy(connection, context, status, message) {
+    const counter = this._decreaseConnection(context);
+    // console.log('router destroy', counter);
+    connection.close(status || 1000, message);
   }
 
   broadcast(data, filter) {
@@ -95,17 +88,41 @@ class WebSocketServer {
     connection.send(JSON.stringify(data));
   }
 
+  async onConnection(connection, req) {
+    let context = {};
+    try {
+      context = this._getContext(req);
+      const counter = this._increaseConnection(context);
+      this._checkLimit(connection, context);
+      context.counter = counter;
+      this.connections.set(connection, context);
+      await this.router
+        .onConnect(connection, req, context)
+        .then()
+        .catch((e) => {
+          this.errorHandler(connection, req, context, e);
+        });
+      this.broadcast({ azazazaza: 'all' });
+      this.broadcast({ azazazaza: 'bearer' }, (context) => context.query.authorization === 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInRpbWVzdGFtcCI6ODE5LCJpYXQiOjE1OTYyOTMwMzcsImV4cCI6MTYyNzg1MDYzN30.fXoxBV3zPhZw7vvhkPwompCu_1uDbLN2-QJFfjKILgg');
+      this.broadcast({ azazazaza: 'id' }, (context) => context.query.userId === 2);
+      // this.broadcast({ azazazaza: 2 }, (context) => context.counter === 2);
+      connection.on('message', (msg) => this.router
+        .onMessage(connection, req, msg, context)
+        .catch((e) => {
+          this.errorHandler(connection, req, context, e);
+        }));
+      connection.on('close', () => this.onClose(context));
+      // if (Math.random() > 0.5) {
+      //   throw new Error('ss');
+      // }
+    } catch (e) {
+      this.errorHandler(connection, req, context, e);
+    }
+  }
+
   onClose(context) {
-    const counter = this._decreaseConnection(context.query.authorization);
-    logger.info('===============onClose', counter);
-  }
-
-  onUpgrade(req, socket, head) {
-    logger.info('onUpgrade');
-  }
-
-  heartbeat() {
-    logger.info('heartbeat');
+    const counter = this._decreaseConnection(context);
+    logger.info(`===============onClose ${counter} ${JSON.stringify(context)}`);
   }
 }
 

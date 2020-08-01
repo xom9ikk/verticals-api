@@ -30,6 +30,7 @@ module.exports = {
       SWAGGER_BASE_PATH: '/api',
       LOG_FILE_NAME: `app_${new Date().getTime()}`,
       CDN_LINK: 'cdn.verticals.xom9ik.com',
+      MAX_SOCKET_CONNECTIONS: 10,
     },
     env_production: {
       NODE_ENV: 'production',
