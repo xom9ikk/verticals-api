@@ -1,19 +1,11 @@
 const { Database } = require('../database');
 
 class BoardService extends Database {
-  async createWithAccess(userId, board) {
-    let response;
-    await knex.transaction(async (trx) => {
-      const [boardId] = await this.boards
-        .insert(board)
-        .transacting(trx)
-        .returning('id');
-      await this.boardsAccess
-        .insert({ userId, boardId })
-        .transacting(trx);
-      response = boardId;
-    });
-    return response;
+  async create(board) {
+    const [boardId] = await this.boards
+      .insert(board)
+      .returning('id');
+    return boardId;
   }
 
   getById(id) {
@@ -49,19 +41,19 @@ class BoardService extends Database {
   }
 
   async update(id, board) {
-    const response = await this.boards
+    const [boardId] = await this.boards
       .where({
         id,
       })
       .update(board)
       .returning('id');
-    return response[0];
+    return boardId;
   }
 
-  removeById(id) {
+  removeById(boardId) {
     return this.boards
       .where({
-        id,
+        id: boardId,
       })
       .del();
   }

@@ -23,6 +23,7 @@ exports.up = async (knex) => {
     table
       .timestamps(false, true);
   });
+
   await knex.raw(`
     CREATE TRIGGER update_timestamp
     BEFORE UPDATE

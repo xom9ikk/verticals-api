@@ -2,10 +2,10 @@ const { Database } = require('../database');
 
 class CommentService extends Database {
   async create(comment) {
-    const response = await this.comments
+    const [commentId] = await this.comments
       .insert(comment)
       .returning('id');
-    return response[0];
+    return commentId;
   }
 
   async getBoardIdByCommentId(id) {
@@ -139,13 +139,13 @@ class CommentService extends Database {
   }
 
   async update(id, todo) {
-    const response = await this.comments
+    const [commentId] = await this.comments
       .where({
         id,
       })
       .update(todo)
       .returning('id');
-    return response[0];
+    return commentId;
   }
 
   removeById(id) {

@@ -2,10 +2,10 @@ const { Database } = require('../database');
 
 class ColumnService extends Database {
   async create(column) {
-    const response = await this.columns
+    const [columnId] = await this.columns
       .insert(column)
       .returning('id');
-    return response[0];
+    return columnId;
   }
 
   async getBoardIdByColumnId(id) {
@@ -72,13 +72,13 @@ class ColumnService extends Database {
   }
 
   async update(id, column) {
-    const response = await this.columns
+    const [columnId] = await this.columns
       .where({
         id,
       })
       .update(column)
       .returning('id');
-    return response[0];
+    return columnId;
   }
 
   removeById(id) {

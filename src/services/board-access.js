@@ -6,13 +6,13 @@ const { Database } = require('../database');
 
 class BoardAccessService extends Database {
   async create(userId, boardId) {
-    const response = await this.boardsAccess
+    const [boardAccess] = await this.boardsAccess
       .insert({
         userId,
         boardId,
       })
       .returning(['userId', 'boardId']);
-    return response[0];
+    return boardAccess;
   }
 
   getByBoardId(userId, boardId) {
@@ -101,12 +101,20 @@ class BoardAccessService extends Database {
     return response.map((row) => row.boardId);
   }
 
-  removeByBoardId(boardId) {
-    return this.boardsAccess
+  async removeByBoardId(boardId) {
+    await this.boardsAccess
       .where({
         boardId,
       })
       .del();
+    console.log('11');
+    console.log('11');
+    console.log('11');
+    console.log('11');
+    console.log('11');
+    console.log('11');
+    console.log('11');
+    console.log(await this.boardsAccess.select('*').where({ boardId }));
   }
 }
 
