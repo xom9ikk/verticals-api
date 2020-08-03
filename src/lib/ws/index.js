@@ -46,7 +46,6 @@ class WebSocketServer {
     } else {
       this.usersConnections.set(key, new Set([context]));
     }
-    console.log('_increaseConnection', key, '=>', this.usersConnections.get(key).size);
     return this.usersConnections.get(key).size;
   }
 
@@ -55,7 +54,6 @@ class WebSocketServer {
     if (this.usersConnections.has(key)) {
       this.usersConnections.get(key).delete(context);
     }
-    console.log('_decreaseConnection', key, '=>', this.usersConnections.get(key) ? this.usersConnections.get(key).size : 0);
     return this.usersConnections.get(key).size;
   }
 
@@ -102,19 +100,12 @@ class WebSocketServer {
         .catch((e) => {
           this.errorHandler(connection, req, context, e);
         });
-      this.broadcast({ azazazaza: 'all' });
-      this.broadcast({ azazazaza: 'bearer' }, (context) => context.query.authorization === 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInRpbWVzdGFtcCI6ODE5LCJpYXQiOjE1OTYyOTMwMzcsImV4cCI6MTYyNzg1MDYzN30.fXoxBV3zPhZw7vvhkPwompCu_1uDbLN2-QJFfjKILgg');
-      this.broadcast({ azazazaza: 'id' }, (context) => context.query.userId === 2);
-      // this.broadcast({ azazazaza: 2 }, (context) => context.counter === 2);
       connection.on('message', (msg) => this.router
         .onMessage(connection, req, msg, context)
         .catch((e) => {
           this.errorHandler(connection, req, context, e);
         }));
       connection.on('close', () => this.onClose(context));
-      // if (Math.random() > 0.5) {
-      //   throw new Error('ss');
-      // }
     } catch (e) {
       this.errorHandler(connection, req, context, e);
     }

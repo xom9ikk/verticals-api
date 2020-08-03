@@ -107,14 +107,6 @@ class BoardAccessService extends Database {
         boardId,
       })
       .del();
-    console.log('11');
-    console.log('11');
-    console.log('11');
-    console.log('11');
-    console.log('11');
-    console.log('11');
-    console.log('11');
-    console.log(await this.boardsAccess.select('*').where({ boardId }));
   }
 }
 

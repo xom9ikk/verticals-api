@@ -1,8 +1,4 @@
-const operations = {
-  INSERT: 0,
-  UPDATE: 1,
-  DELETE: 2,
-};
+const { Operations } = require('../../enums');
 
 class UpdatesHandler {
   async updateHandler(data) {
@@ -12,7 +8,7 @@ class UpdatesHandler {
       } = data;
       logger.info(`userIds: ${JSON.stringify(userIds)}`);
       if (userIds) {
-        const operation = operations[op];
+        const operation = Operations[op.toLowerCase()];
         const channel = c.replace('_change', '');
         delete object.createdAt;
         delete object.updatedAt;

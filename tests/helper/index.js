@@ -23,6 +23,7 @@ class Helper {
       this._logError('createUser', res);
       return this.createUser(config);
     }
+
     const { token, refreshToken } = res.body.data;
 
     let boards = [];
