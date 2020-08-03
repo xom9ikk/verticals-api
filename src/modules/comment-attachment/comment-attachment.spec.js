@@ -399,6 +399,7 @@ describe('remove attachment', () => {
       .attach('name', pathToAttachment);
 
     const { id: attachmentIdWithoutAccess } = resAttach.body.data;
+
     const res = await request()
       .delete(`${routes.commentAttachment}/${attachmentIdWithoutAccess}`)
       .send();

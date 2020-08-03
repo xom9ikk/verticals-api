@@ -1,14 +1,14 @@
 const path = require('path');
 const superagent = require('superagent');
 const superagentAbsolute = require('superagent-absolute');
-const { WS } = require('../../../tests/ws');
-const { build } = require('../../server');
-const { Knex } = require('../../knex');
-const { Subscriber } = require('../subscriber');
-const { Generator } = require('../../../tests/generator');
-const { Helper } = require('../../../tests/helper');
-const { routes } = require('../../../tests/routes');
-const { Operations } = require('../../enums');
+const { build } = require('../../../server');
+const { Knex } = require('../../../knex');
+const { Subscriber } = require('../../subscriber');
+const { Operations } = require('../../../enums');
+const { WS } = require('../../../../tests/ws');
+const { Generator } = require('../../../../tests/generator');
+const { Helper } = require('../../../../tests/helper');
+const { routes } = require('../../../../tests/routes');
 
 const pathToAttachment = path.resolve('tests', 'files', 'node.jpg');
 

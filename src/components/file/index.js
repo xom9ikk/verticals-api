@@ -3,19 +3,30 @@ const path = require('path');
 const { v4: uuidV4 } = require('uuid');
 const mime = require('mime-types');
 
+const { UPLOADS_FOLDER, COMMENTS_FOLDER } = process.env;
+
 class FileComponent {
-  saveCommentAttachment(data) {
-    const relativePathToFolder = path.join(
-      'uploads',
-      'comments',
+  constructor() {
+    this.relativePathToComments = path.join(
+      UPLOADS_FOLDER,
+      COMMENTS_FOLDER,
     );
-    return this.saveFile(relativePathToFolder, data);
+  }
+
+  createFolders() {
+    const comments = path.resolve(this.relativePathToComments);
+    fs.mkdirSync(comments, { recursive: true });
+  }
+
+  saveCommentAttachment(data) {
+    return this.saveFile(this.relativePathToComments, data);
   }
 
   removeFile(relativePathToFile) {
     if (!relativePathToFile) return;
     return new Promise((resolve, reject) => {
       const fullPath = path.resolve(relativePathToFile);
+
       fs.unlink(fullPath, (e) => {
         if (e) {
           reject(e);

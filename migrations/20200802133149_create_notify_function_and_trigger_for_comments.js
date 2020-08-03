@@ -19,9 +19,7 @@ exports.up = async (knex) => {
       THEN
           object := OLD;
       END IF;
-      RAISE LOG 'start comments';
       userIds := get_user_ids_by_comment_id(object.id);
-      RAISE LOG 'end comments';
       PERFORM pg_notify('${triggers.commentChange}', json_build_object(
               'userIds', userIds,
               'object', row_to_json(object),

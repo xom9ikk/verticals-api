@@ -31,6 +31,8 @@ module.exports = {
       LOG_FILE_NAME: `app_${new Date().getTime()}`,
       CDN_LINK: 'cdn.verticals.xom9ik.com',
       MAX_SOCKET_CONNECTIONS: 10,
+      UPLOADS_FOLDER: 'uploads',
+      COMMENTS_FOLDER: 'comments',
     },
     env_production: {
       NODE_ENV: 'production',

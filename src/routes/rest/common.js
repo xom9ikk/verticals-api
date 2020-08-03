@@ -26,7 +26,8 @@ class RoutesHandler {
       return new BackendResponse(res, 415, 'Invalid Media Type');
     }
     logger.error(error);
-    return new BackendResponse(res, 500, 'Internal') && process.exit(1);
+    console.error(error);
+    // return new BackendResponse(res, 500, 'Internal') && process.exit(1);
   }
 
   notFoundHandler(req, res) {
