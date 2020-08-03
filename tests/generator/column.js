@@ -1,5 +1,4 @@
 const faker = require('faker');
-const { Color } = require('../../src/enums');
 
 class ColumnDataGenerator {
   static getUnique(boardId) {

@@ -2,10 +2,10 @@ const { Database } = require('../database');
 
 class TodoService extends Database {
   async create(todo) {
-    const response = await this.todos
+    const [todoId] = await this.todos
       .insert(todo)
       .returning('id');
-    return response[0];
+    return todoId;
   }
 
   async getBoardIdByTodoId(id) {
@@ -94,13 +94,13 @@ class TodoService extends Database {
   }
 
   async update(id, todo) {
-    const response = await this.todos
+    const [todoId] = await this.todos
       .where({
         id,
       })
       .update(todo)
       .returning('id');
-    return response[0];
+    return todoId;
   }
 
   removeById(id) {

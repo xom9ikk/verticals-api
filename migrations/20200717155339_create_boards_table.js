@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const { tables } = require('../src/database/tables');
 
 const tableName = tables.boards;
@@ -24,6 +23,7 @@ exports.up = async (knex) => {
     table
       .timestamps(false, true);
   });
+
   await knex.raw(`
     CREATE TRIGGER update_timestamp
     BEFORE UPDATE
@@ -33,4 +33,6 @@ exports.up = async (knex) => {
   `);
 };
 
-exports.down = async (knex) => await knex.schema.dropTable('boards');
+exports.down = async (knex) => {
+  await knex.schema.dropTable(tableName);
+};

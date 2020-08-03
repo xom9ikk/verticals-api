@@ -18,10 +18,12 @@ exports.up = async (knex) => {
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('boards');
+      .inTable('boards')
+      .onDelete('CASCADE');
     table
       .timestamps(false, true);
   });
+
   await knex.raw(`
     CREATE TRIGGER update_timestamp
     BEFORE UPDATE

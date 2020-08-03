@@ -1,4 +1,6 @@
 /* eslint-disable no-underscore-dangle,no-restricted-syntax */
+const { Formatter } = require('../utils');
+
 class PgEvent {
   constructor() {
     return new Promise(async (resolve) => {
@@ -96,19 +98,24 @@ class PgEvent {
   async _setupConnection() {
     this._connection = await knex.client.acquireConnection();
     this._connection.on('notification', (data) => {
-      const { channel } = data;
-      const event = this._events.get(channel);
-      if (!event) return;
-      for (const callback of event.values()) {
-        const { payload } = data;
-        logger.database({
-          ms: 0,
-          request: `[notification] ${channel} ${payload}`,
-        });
-        callback({
-          ...data,
-          payload: JSON.parse(payload),
-        });
+      try {
+        const { channel } = data;
+        const event = this._events.get(channel);
+        if (!event) return;
+        for (const callback of event.values()) {
+          const { payload } = data;
+          const parsedPayload = Formatter.deepConvertToCamelCase(JSON.parse(payload));
+          logger.database({
+            ms: 0,
+            request: `[notification] ${channel} ${payload}`,
+          });
+          callback({
+            ...data,
+            ...parsedPayload,
+          });
+        }
+      } catch (e) {
+        logger.error(e);
       }
     });
   }

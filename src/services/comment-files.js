@@ -2,10 +2,10 @@ const { Database } = require('../database');
 
 class CommentFilesService extends Database {
   async create(todo) {
-    const response = await this.commentFiles
+    const [commentFileId] = await this.commentFiles
       .insert(todo)
       .returning('id');
-    return response[0];
+    return commentFileId;
   }
 
   removeById(id) {

@@ -30,7 +30,7 @@ class RoutesHandler {
   }
 
   notFoundHandler(req, res) {
-    return new BackendResponse(res, 404, `Route not found ${req.get('host')}${req.originalUrl}`);
+    return new BackendResponse(res, 404, `Route ${req.url} not found`);
   }
 }
 

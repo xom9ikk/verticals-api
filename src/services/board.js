@@ -2,10 +2,10 @@ const { Database } = require('../database');
 
 class BoardService extends Database {
   async create(board) {
-    const response = await this.boards
+    const [boardId] = await this.boards
       .insert(board)
       .returning('id');
-    return response[0];
+    return boardId;
   }
 
   getById(id) {
@@ -41,19 +41,19 @@ class BoardService extends Database {
   }
 
   async update(id, board) {
-    const response = await this.boards
+    const [boardId] = await this.boards
       .where({
         id,
       })
       .update(board)
       .returning('id');
-    return response[0];
+    return boardId;
   }
 
-  removeById(id) {
+  removeById(boardId) {
     return this.boards
       .where({
-        id,
+        id: boardId,
       })
       .del();
   }

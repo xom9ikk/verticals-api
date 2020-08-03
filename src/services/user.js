@@ -3,10 +3,10 @@ const { Database } = require('../database');
 class UserService extends Database {
   async create(user) {
     try {
-      const response = await this.users
+      const [userId] = await this.users
         .insert(user)
         .returning('id');
-      return response[0];
+      return userId;
     } catch (e) {
       if (e.code === '23505') {
         return undefined;

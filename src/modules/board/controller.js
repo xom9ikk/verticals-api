@@ -48,7 +48,6 @@ class BoardController {
       throw new BackendError.Forbidden('This account is not allowed to remove this board');
     }
 
-    // TODO cascade
     await BoardAccessService.removeByBoardId(boardId);
     await BoardService.removeById(boardId);
     return true;

@@ -6,6 +6,7 @@ const status = {
   UnsupportedData: 1003,
   InternalError: 1011,
   Unauthorized: 1011,
+  MaxConnections: 4000,
 };
 
 const message = {
@@ -13,6 +14,7 @@ const message = {
   UnsupportedData: 'Unsupported data',
   InternalError: 'Internal socket error',
   Unauthorized: 'Unauthorized',
+  MaxConnections: 'MaxConnections',
 };
 
 class NormalClosure extends GeneralError {
@@ -40,6 +42,12 @@ class Unauthorized extends GeneralError {
   }
 }
 
+class MaxConnections extends GeneralError {
+  constructor(_msg = message.MaxConnections) {
+    super(status.MaxConnections, _msg);
+  }
+}
+
 module.exports = {
   GeneralError,
   SocketError: {
@@ -47,5 +55,6 @@ module.exports = {
     UnsupportedData,
     InternalError,
     Unauthorized,
+    MaxConnections,
   },
 };
