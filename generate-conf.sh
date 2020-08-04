@@ -5,7 +5,7 @@ echo "server {
         gzip_static on;
         gunzip on;
         location / {
-            proxy_pass http://$DOCKER_ADDRESS;
+            proxy_pass http://$2;
             proxy_http_version 1.1;
             proxy_set_header Upgrade \$http_upgrade;
             proxy_set_header Connection 'upgrade';
@@ -25,4 +25,4 @@ server {
   listen 80;
   listen [::]:80;
   return 301 https://\$host\$request_uri;
-}" >> /etc/nginx/sites-enabled/$APP_NAME.conf
+}" >> /etc/nginx/sites-enabled/$1.conf

@@ -5,3 +5,5 @@
 /.DS_Store
 *.log
 /uploads*
+.env
+.env.production

@@ -1,14 +1,26 @@
+const {
+  DB_HOST,
+  DB_PORT,
+  POSTGRES_DB,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
+  DB_POOL_MIN,
+  DB_POOL_MAX,
+} = process.env;
+
 module.exports = {
   development: {
     client: 'pg',
     connection: {
-      host: '0.0.0.0',
-      database: 'verticals',
-      port: 5432,
+      host: DB_HOST,
+      port: DB_PORT,
+      database: POSTGRES_DB,
+      user: POSTGRES_USER,
+      password: POSTGRES_PASSWORD,
     },
     pool: {
-      min: 2,
-      max: 10000,
+      min: parseInt(DB_POOL_MIN),
+      max: parseInt(DB_POOL_MAX),
     },
     migrations: {
       tableName: 'knex_migrations',
@@ -18,13 +30,15 @@ module.exports = {
   test: {
     client: 'pg',
     connection: {
-      host: '0.0.0.0',
-      database: 'verticals_test',
-      port: 5432,
+      host: DB_HOST,
+      port: DB_PORT,
+      database: POSTGRES_DB,
+      user: POSTGRES_USER,
+      password: POSTGRES_PASSWORD,
     },
     pool: {
-      min: 2,
-      max: 10000,
+      min: parseInt(DB_POOL_MIN),
+      max: parseInt(DB_POOL_MAX),
     },
     migrations: {
       tableName: 'knex_migrations',
@@ -34,15 +48,15 @@ module.exports = {
   production: {
     client: 'pg',
     connection: {
-      host: 'verticals_backend_postgresql',
-      port: 5432,
-      database: 'verticals',
-      user: 'prod_user',
-      password: 'prod_password_uygf2836gyi',
+      host: DB_HOST,
+      port: DB_PORT,
+      database: POSTGRES_DB,
+      user: POSTGRES_USER,
+      password: POSTGRES_PASSWORD,
     },
     pool: {
-      min: 2,
-      max: 10000,
+      min: parseInt(DB_POOL_MIN),
+      max: parseInt(DB_POOL_MAX),
     },
     migrations: {
       tableName: 'knex_migrations',

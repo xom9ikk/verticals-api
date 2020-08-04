@@ -4,9 +4,9 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
+    "knex": "knex",
     "start": "node ./src/index.js",
-    "dev": "pm2 start --no-daemon",
-    "dev:nodemon": "cross-env NODE_ENV=development nodemon --inspect=127.0.0.1:3340 ./src/server.js --watch ./src",
+    "dev": "pm2 start --node-args '-r dotenv/config' --no-daemon --env development",
     "lint": "eslint --ext .js ./src",
     "lint:fix": "eslint --ext .js ./src --fix",
     "test": "jest --config ./jest.config.js",
@@ -50,15 +50,13 @@
     "ws": "^7.3.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
     "cz-conventional-changelog": "^3.2.0",
     "eslint": "^7.4.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^23.18.0",
     "faker": "^4.1.0",
-    "jest": "^26.1.0",
-    "nodemon": "^2.0.4"
+    "jest": "^26.1.0"
   },
   "config": {
     "commitizen": {

@@ -1,17 +1,16 @@
 version: "3.5"
 services:
   verticals_backend_postgresql:
+    container_name: verticals_backend_postgresql
     image: postgres
     restart: always
-    environment:
-      POSTGRES_USER: prod_user
-      POSTGRES_PASSWORD: prod_password_uygf2836gyi
-      POSTGRES_DB: verticals
+    env_file:
+      - .env.production
     ports:
-      - "127.0.0.1:5433:5432"
+      - "172.50.15.1:5432:5432"
     networks:
-      - verticals_backend_metrics_net
-      - verticals_backend_net
+      verticals_backend_net:
+        ipv4_address: 172.50.15.10
     command: postgres -c config_file=/etc/postgresql.conf
     volumes:
       - 'verticals_backend_postgresql_data:/var/lib/postgresql'
@@ -19,47 +18,59 @@ services:
 
   verticals_backend:
     container_name: verticals_backend
+    restart: always
     build:
       context: ./
       dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    env_file:
+      - .env.production
     depends_on:
       - verticals_backend_postgresql
     ports:
-      - "0.0.0.0:3000:3000"
-      - "0.0.0.0:3001:3001"
+      - "172.50.15.1:8080:3000"
+      - "172.50.15.1:8081:3001"
     volumes:
       - './logs:/app/logs'
     networks:
-      - verticals_backend_metrics_net
+      verticals_backend_metrics_net:
+      verticals_backend_net:
+        ipv4_address: 172.50.15.11
 
   verticals_backend_swagger:
     image: swaggerapi/swagger-ui
+    restart: always
     container_name: verticals_backend_swagger
     environment:
       URL: verticals_backend:3001/doc.json
     ports:
-      - "0.0.0.0:3002:8080"
+      - "172.50.15.1:8082:8080"
     networks:
-      - verticals_backend_metrics_net
+      verticals_backend_net:
+        ipv4_address: 172.50.15.12
 
   verticals_backend_grafana:
     image: grafana/grafana
+    restart: always
     container_name: verticals_backend_grafana
     ports:
-      - "127.0.0.1:4000:3000"
+      - "172.50.14.1:3000:3000"
     networks:
-      - verticals_backend_metrics_net
+      verticals_backend_metrics_net:
+        ipv4_address: 172.50.14.10
     volumes:
       - 'verticals_backend_grafana_data:/var/lib/grafana'
 
   verticals_backend_prometheus:
     image: prom/prometheus
+    restart: always
     container_name: verticals_backend_prometheus
     ports:
-      - "127.0.0.1:9090:9090"
-      - "127.0.0.1:9090:9090/udp"
+      - "172.50.14.1:9090:9090"
     networks:
-      - verticals_backend_metrics_net
+      verticals_backend_metrics_net:
+        ipv4_address: 172.50.14.11
     command: --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - './prometheus.yml:/etc/prometheus/prometheus.yml'
@@ -75,7 +86,15 @@ volumes:
     driver: local
 networks:
   verticals_backend_metrics_net:
-  verticals_backend_net:
+    name: verticals_backend_metrics_net
     ipam:
       driver: default
+      config:
+        - subnet: 172.50.14.0/24
+  verticals_backend_net:
+    name: verticals_backend_net
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.50.15.0/24
 
