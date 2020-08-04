@@ -102,7 +102,7 @@ const { RequestPart } = require('../../enums');
  *             type: boolean
  *       message:
  *         type: string
- * /v1/column/:columnId
+ * /v1/column/:columnId:
  *   get:
  *     tags:
  *       - Column
@@ -147,7 +147,7 @@ const { RequestPart } = require('../../enums');
  *             type: integer
  *       message:
  *         type: string
- * /v1/column
+ * /v1/column:
  *   get:
  *     tags:
  *       - Column
@@ -199,7 +199,7 @@ const { RequestPart } = require('../../enums');
  *     properties:
  *       message:
  *         type: string
- * /v1/column/:columnId
+ * /v1/column/:columnId:
  *   patch:
  *     tags:
  *       - Column

@@ -102,7 +102,7 @@ const { RequestPart } = require('../../enums');
  *             enum: [0, 1, 2, 3, 4, 5, 6]
  *       message:
  *         type: string
- * /v1/board/:boardId
+ * /v1/board/:boardId:
  *   get:
  *     tags:
  *       - Board
@@ -142,7 +142,7 @@ const { RequestPart } = require('../../enums');
  *             type: integer
  *       message:
  *         type: string
- * /v1/board
+ * /v1/board:
  *   get:
  *     tags:
  *       - Board
@@ -192,7 +192,7 @@ const { RequestPart } = require('../../enums');
  *     properties:
  *       message:
  *         type: string
- * /v1/board/:boardId
+ * /v1/board/:boardId:
  *   patch:
  *     tags:
  *       - Board

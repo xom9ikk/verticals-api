@@ -9,6 +9,7 @@ const { HttpLogger } = require('./logger/http');
 const { BackendError } = require('./components/error');
 const { restRouter, socketRouter } = require('./routes');
 const { wssErrorHandler } = require('./routes/socket/common');
+const { swagger } = require('./swagger');
 
 global.logger = new Logger();
 
@@ -59,10 +60,8 @@ const build = (knex) => {
     fastify.decorateRequest('user', '');
     fastify.decorateRequest('userId', '');
     fastify.decorateRequest('parsedBearerToken', '');
-    fastify.get('/', (req, res) => {
-      res.send('up');
-    });
     fastify.register(restRouter, { prefix: '/api' });
+    fastify.register(swagger);
   });
 
   global.wss = new WebSocketServer(server);

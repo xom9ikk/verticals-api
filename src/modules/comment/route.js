@@ -86,7 +86,7 @@ const { RequestPart } = require('../../enums');
  *             type: string
  *       message:
  *         type: string
- * /v1/comment/:commentId
+ * /v1/comment/:commentId:
  *   get:
  *     tags:
  *       - Comment
@@ -133,7 +133,7 @@ const { RequestPart } = require('../../enums');
  *             type: integer
  *       message:
  *         type: string
- * /v1/comment
+ * /v1/comment:
  *   get:
  *     tags:
  *       - Comment
@@ -178,7 +178,7 @@ const { RequestPart } = require('../../enums');
  *     properties:
  *       message:
  *         type: string
- * /v1/comment/:commentId
+ * /v1/comment/:commentId:
  *   patch:
  *     tags:
  *       - Comment

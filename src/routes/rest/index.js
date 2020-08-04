@@ -1,4 +1,3 @@
-const { swagger } = require('../../swagger');
 const {
   allowHeadersHandler,
   clientErrorHandler,
@@ -24,7 +23,6 @@ const { commentAttachmentRouter } = require('../../modules/comment-attachment/ro
 module.exports = {
   restRouter: (fastify, opts, done) => {
     fastify.addHook('onRequest', allowHeadersHandler);
-    fastify.register(...swagger);
     fastify.register(authRouter, { prefix: '/v1/auth' });
     fastify.register(boardRouter, { prefix: '/v1/board' });
     fastify.register(columnRouter, { prefix: '/v1/column' });

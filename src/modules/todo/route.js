@@ -112,7 +112,7 @@ const { RequestPart } = require('../../enums');
  *             type: boolean
  *       message:
  *         type: string
- * /v1/todo/:todoId
+ * /v1/todo/:todoId:
  *   get:
  *     tags:
  *       - Todo
@@ -159,7 +159,7 @@ const { RequestPart } = require('../../enums');
  *             type: integer
  *       message:
  *         type: string
- * /v1/todo
+ * /v1/todo:
  *   get:
  *     tags:
  *       - Todo
@@ -216,7 +216,7 @@ const { RequestPart } = require('../../enums');
  *     properties:
  *       message:
  *         type: string
- * /v1/todo/:todoId
+ * /v1/todo/:todoId:
  *   patch:
  *     tags:
  *       - Todo

@@ -25,6 +25,7 @@ build(knex).listen(PORT, HOST, async (error) => {
   logger.info(`Server has been started on ${HOST}:${PORT} in ${NODE_ENV} mode`);
   if (NODE_APP_INSTANCE === '0' || cluster.isMaster) {
     await Subscriber.subscribe();
+    FileComponent.createFolders();
   }
 });
 
