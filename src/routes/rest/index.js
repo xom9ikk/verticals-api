@@ -1,3 +1,4 @@
+const { swagger } = require('../../swagger');
 const {
   allowHeadersHandler,
   clientErrorHandler,
@@ -23,12 +24,17 @@ const { commentAttachmentRouter } = require('../../modules/comment-attachment/ro
 module.exports = {
   restRouter: (fastify, opts, done) => {
     fastify.addHook('onRequest', allowHeadersHandler);
-    fastify.register(authRouter, { prefix: '/v1/auth' });
-    fastify.register(boardRouter, { prefix: '/v1/board' });
-    fastify.register(columnRouter, { prefix: '/v1/column' });
-    fastify.register(todoRouter, { prefix: '/v1/todo' });
-    fastify.register(commentRouter, { prefix: '/v1/comment' });
-    fastify.register(commentAttachmentRouter, { prefix: '/v1/comment-attachment' });
+    fastify.options('*', (req, res) => {
+      res.status(200);
+      res.json();
+    });
+    fastify.register(authRouter, { prefix: '/api/v1/auth' });
+    fastify.register(boardRouter, { prefix: '/api/v1/board' });
+    fastify.register(columnRouter, { prefix: '/api/v1/column' });
+    fastify.register(todoRouter, { prefix: '/api/v1/todo' });
+    fastify.register(commentRouter, { prefix: '/api/v1/comment' });
+    fastify.register(commentAttachmentRouter, { prefix: '/api/v1/comment-attachment' });
+    fastify.register(swagger);
     fastify.setErrorHandler(clientErrorHandler);
     fastify.setNotFoundHandler(notFoundHandler);
     done();

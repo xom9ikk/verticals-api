@@ -43,7 +43,7 @@ services:
     restart: always
     container_name: verticals_backend_swagger
     environment:
-      URL: verticals_backend:3001/doc.json
+      URL: https://verticals-backend.xom9ik.com/doc.json
     ports:
       - "172.50.15.1:8082:8080"
     networks:
