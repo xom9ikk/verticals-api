@@ -59,10 +59,7 @@ const build = (knex) => {
     fastify.decorateRequest('user', '');
     fastify.decorateRequest('userId', '');
     fastify.decorateRequest('parsedBearerToken', '');
-    fastify.get('/', (req, res) => {
-      res.send('up');
-    });
-    fastify.register(restRouter, { prefix: '/api' });
+    fastify.register(restRouter);
   });
 
   global.wss = new WebSocketServer(server);

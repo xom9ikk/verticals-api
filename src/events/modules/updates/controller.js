@@ -1,7 +1,7 @@
-const { Operations } = require('../../enums');
+const { Operations } = require('../../../enums');
 
-class UpdatesHandler {
-  async updateHandler(data) {
+class UpdatesController {
+  async updateController(data) {
     try {
       const {
         object, operation: op, userIds, channel: c,
@@ -30,5 +30,5 @@ class UpdatesHandler {
 }
 
 module.exports = {
-  UpdatesHandler: new UpdatesHandler(),
+  UpdatesController: new UpdatesController(),
 };

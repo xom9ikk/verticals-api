@@ -1,18 +1,16 @@
 const path = require('path');
-const superagent = require('superagent');
-const superagentAbsolute = require('superagent-absolute');
-const { WS } = require('../../../tests/ws');
-const { build } = require('../../server');
-const { Knex } = require('../../knex');
-const { Subscriber } = require('../subscriber');
-const { Generator } = require('../../../tests/generator');
-const { Helper } = require('../../../tests/helper');
-const { routes } = require('../../../tests/routes');
-const { Operations } = require('../../enums');
+const { build } = require('../../../server');
+const { Knex } = require('../../../knex');
+const { Subscriber } = require('../../subscriber');
+const { Operations } = require('../../../enums');
+const { WS } = require('../../../../tests/ws');
+const { Generator } = require('../../../../tests/generator');
+const { Helper } = require('../../../../tests/helper');
+const { routes } = require('../../../../tests/routes');
+const { SuperagentRequest } = require('../../../../tests/request');
 
 const pathToAttachment = path.resolve('tests', 'files', 'node.jpg');
 
-const agent = superagent.agent();
 let baseUrl;
 let baseUrlWs;
 let request;
@@ -27,7 +25,7 @@ beforeAll(async (done) => {
     const { address, port } = app.server.address();
     baseUrl = `http://${address}:${port}`;
     baseUrlWs = `ws://${address}:${port}`;
-    request = () => superagentAbsolute(agent)(baseUrl);
+    request = new SuperagentRequest(baseUrl).request;
     helper = new Helper(request);
 
     await Subscriber.subscribe();

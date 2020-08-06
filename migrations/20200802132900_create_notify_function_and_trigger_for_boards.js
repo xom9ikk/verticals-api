@@ -15,9 +15,7 @@ exports.up = async (knex) => {
       userIds integer[];
     BEGIN
       object := NEW;
-      RAISE LOG 'start board %', object.id;
       userIds := get_user_ids_by_board_id(object.id);
-      RAISE LOG 'end board';
       PERFORM pg_notify('${triggers.boardChange}', json_build_object(
               'userIds', userIds,
               'object', row_to_json(object),

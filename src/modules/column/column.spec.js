@@ -3,12 +3,12 @@ const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
 const { Helper } = require('../../../tests/helper');
 const { routes } = require('../../../tests/routes');
-const { Request } = require('../../../tests/request');
+const { FastifyRequest } = require('../../../tests/request');
 
 let knex;
 let app;
 
-const request = () => new Request(app);
+const request = () => new FastifyRequest(app);
 
 const helper = new Helper(request);
 

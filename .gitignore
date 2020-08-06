@@ -4,4 +4,6 @@
 /.vscode/
 /.DS_Store
 *.log
-/uploads
+/uploads*
+.env
+.env.production

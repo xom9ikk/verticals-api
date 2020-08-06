@@ -19,9 +19,7 @@ exports.up = async (knex) => {
       THEN
           object := OLD;
       END IF;
-      RAISE LOG 'start todos';
       userIds := get_user_ids_by_todo_id(object.id);
-      RAISE LOG 'end todos';
       PERFORM pg_notify('${triggers.todoChange}', json_build_object(
               'userIds', userIds,
               'object', row_to_json(object),
