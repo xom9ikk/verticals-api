@@ -2,15 +2,12 @@ const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
 const { routes } = require('../../../tests/routes');
-const { FastifyRequest, SuperagentRequest } = require('../../../tests/request');
+const { FastifyRequest } = require('../../../tests/request');
 
 let knex;
 let app;
 
-// const request = () => new FastifyRequest(app);
-
-const baseUrl = 'https://backend.verticals.xom9ik.com';
-const { request } = new SuperagentRequest(baseUrl);
+const request = () => new FastifyRequest(app);
 
 beforeAll(async (done) => {
   knex = new Knex();
