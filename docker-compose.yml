@@ -6,14 +6,17 @@ services:
     restart: always
     env_file:
       - .env.production
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "172.50.15.1:5432:5432"
+      - "0.0.0.0:5433:5432"
     networks:
       verticals_backend_net:
         ipv4_address: 172.50.15.10
     command: postgres -c config_file=/etc/postgresql.conf
     volumes:
-      - 'verticals_backend_postgresql_data:/var/lib/postgresql'
+      - 'verticals_backend_postgresql_data:/var/lib/postgresql/data/pgdata'
       - './postgresql.conf:/etc/postgresql.conf'
 
   verticals_backend:
@@ -33,6 +36,7 @@ services:
       - "172.50.15.1:8081:3001"
     volumes:
       - './logs:/app/logs'
+      - './uploads:/app/uploads'
     networks:
       verticals_backend_metrics_net:
       verticals_backend_net:
@@ -43,7 +47,7 @@ services:
     restart: always
     container_name: verticals_backend_swagger
     environment:
-      URL: https://verticals-backend.xom9ik.com/doc.json
+      URL: https://backend.verticals.xom9ik.com/doc.json
     ports:
       - "172.50.15.1:8082:8080"
     networks:

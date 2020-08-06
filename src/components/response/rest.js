@@ -24,8 +24,8 @@ class BackendResponse {
   static send(res, _status, msg, data) {
     Metrics.counterRequests({
       status: _status,
-      method: res.method,
-      route: res.url,
+      method: res.request.raw.method,
+      route: res.request.raw.url,
     });
     return res
       .code(_status)
