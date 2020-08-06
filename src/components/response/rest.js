@@ -22,10 +22,15 @@ class BackendResponse {
   }
 
   static send(res, _status, msg, data) {
+    console.log({
+      status: _status,
+      method: res.context.config.method,
+      route: res.context.config.url,
+    });
     Metrics.counterRequests({
       status: _status,
-      method: res.request.raw.method,
-      route: res.request.raw.url,
+      method: res.context.config.method,
+      route: res.context.config.url,
     });
     return res
       .code(_status)
