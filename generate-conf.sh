@@ -8,6 +8,8 @@ echo "server {
 if [ "$3" = true ] ; then
   echo "location / {
             root $2;
+            limit_req zone=req_limit_per_ip burst=5 nodelay;
+            limit_conn conn_limit_per_ip 30;
         }
 " >> /etc/nginx/sites-enabled/$1.conf
 else
@@ -20,6 +22,8 @@ else
             proxy_cache_bypass \$http_upgrade;
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header X-Real-IP \$remote_addr;
+            limit_req zone=req_limit_per_ip_verticals_backend burst=5 nodelay;
+            limit_conn conn_limit_per_ip_verticals_backend 30;
         }
 " >> /etc/nginx/sites-enabled/$1.conf
 
