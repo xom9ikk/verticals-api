@@ -1,12 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidV4 } = require('uuid');
-const { TokenService } = require('../../services');
 
 const { JWT_EXPIRE, JWT_SECRET } = process.env;
 
 class TokenComponent {
   async issueTokenPair(
-    { userId, ip },
+    userId,
     expiresIn = JWT_EXPIRE,
     secret = JWT_SECRET,
   ) {
@@ -19,12 +18,6 @@ class TokenComponent {
       secret,
       { expiresIn },
     );
-    await TokenService.add({
-      refreshToken,
-      token,
-      userId,
-      ip,
-    });
     return {
       token,
       refreshToken,

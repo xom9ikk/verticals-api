@@ -2,7 +2,7 @@
 const fs = require('fs');
 const FormData = require('form-data');
 
-class Request {
+class FastifyRequest {
   constructor(app) {
     this.app = app;
     this.headers = {};
@@ -67,5 +67,5 @@ class Request {
 }
 
 module.exports = {
-  Request,
+  FastifyRequest,
 };

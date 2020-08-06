@@ -2,12 +2,15 @@ const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
 const { routes } = require('../../../tests/routes');
-const { Request } = require('../../../tests/request');
+const { FastifyRequest, SuperagentRequest } = require('../../../tests/request');
 
 let knex;
 let app;
 
-const request = () => new Request(app);
+// const request = () => new FastifyRequest(app);
+
+const baseUrl = 'https://backend.verticals.xom9ik.com';
+const { request } = new SuperagentRequest(baseUrl);
 
 beforeAll(async (done) => {
   knex = new Knex();
@@ -38,26 +41,10 @@ describe('registration', () => {
 
     done();
   });
-  it('user can successfully register', async (done) => {
-    const user = Generator.User.getUnique();
-    const res = await request()
-      .post(`${routes.auth}/register`)
-      .send(user);
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.objectContaining({
-        token: expect.any(String),
-        refreshToken: expect.any(String),
-      }),
-    }));
-
-    done();
-  });
   it('user can`t register with a non-unique username', async (done) => {
     const firstUser = Generator.User.getUnique();
     const secondUser = Generator.User.getUnique();
+
     await request()
       .post(`${routes.auth}/register`)
       .send(firstUser);
@@ -615,10 +602,7 @@ describe('logout ', () => {
     done();
   });
   it('user can`t logout with expired authorization headers', async (done) => {
-    const { token } = await Generator.Auth.getExpiredTokenPair({
-      userId: 1,
-      ip: 'test.test.test.test',
-    });
+    const { token } = await Generator.Auth.getExpiredTokenPair(1);
     const res = await request()
       .post(`${routes.auth}/logout`)
       .set('authorization', `Bearer ${token}`)
@@ -754,10 +738,7 @@ describe('me', () => {
     done();
   });
   it('user can`t get information about himself with expired token', async (done) => {
-    const { token } = await Generator.Auth.getExpiredTokenPair({
-      userId: 1,
-      ip: 'test.test.test.test',
-    });
+    const { token } = await Generator.Auth.getExpiredTokenPair(1);
     const res = await request()
       .get(`${routes.auth}/me`)
       .set('authorization', `Bearer ${token}`)

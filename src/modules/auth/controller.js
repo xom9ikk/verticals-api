@@ -16,10 +16,14 @@ class AuthController {
       throw new BackendError.Conflict('User with this email or username already registered');
     }
 
-    const tokens = await TokenComponent.issueTokenPair({
+    const tokens = await TokenComponent.issueTokenPair(registeredUserId);
+
+    await TokenService.add({
+      ...tokens,
       userId: registeredUserId,
       ip,
     });
+
     return tokens;
   }
 
@@ -46,9 +50,14 @@ class AuthController {
       throw new BackendError.Forbidden('Email or password is wrong');
     }
 
-    const tokens = await TokenComponent.issueTokenPair({
-      userId, ip,
+    const tokens = await TokenComponent.issueTokenPair(userId);
+
+    await TokenService.add({
+      ...tokens,
+      userId,
+      ip,
     });
+
     return tokens;
   }
 
@@ -61,12 +70,16 @@ class AuthController {
 
     const { userId } = pairTokens;
     const [tokens] = await Promise.all([
-      TokenComponent.issueTokenPair({
-        userId,
-        ip,
-      }),
+      TokenComponent.issueTokenPair(userId),
       TokenService.removeByRefreshToken(refreshToken),
     ]);
+
+    await TokenService.add({
+      ...tokens,
+      userId,
+      ip,
+    });
+
     return tokens;
   }
 
