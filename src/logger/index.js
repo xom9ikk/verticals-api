@@ -18,7 +18,7 @@ const isDev = NODE_ENV === 'development';
 class Logger {
   constructor() {
     const streams = [];
-    if (isProd) {
+    if (isProd || isDev) {
       streams.push({ level: 'debug', stream: fs.createWriteStream(combinedFile) }); // 186 257
       streams.push({ level: 'error', stream: fs.createWriteStream(errorFile) }); // 205 215 286
     }
