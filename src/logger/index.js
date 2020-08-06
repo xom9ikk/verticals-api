@@ -18,31 +18,36 @@ const isDev = NODE_ENV === 'development';
 class Logger {
   constructor() {
     const streams = [];
-    if (isProd || isDev) {
+    if (isProd) {
       streams.push({ level: 'debug', stream: fs.createWriteStream(combinedFile) }); // 186 257
       streams.push({ level: 'error', stream: fs.createWriteStream(errorFile) }); // 205 215 286
     }
 
-    if (isDev) {
-      const prettyStream = pinoms.prettyStream({
-        prettyPrint: {
-          levelFirst: true,
-        },
-        prettifier: () => (data) => {
-          switch (data.level) {
-            case 31: {
-              return Logger.httpPrettifier(data);
-            }
-            case 32: {
-              return Logger.databasePrettifier(data);
-            }
-            default: {
-              return Logger.defaultPrettifier(data);
-            }
+    const prettyStream = pinoms.prettyStream({
+      prettyPrint: {
+        levelFirst: true,
+      },
+      prettifier: () => (data) => {
+        switch (data.level) {
+          case 31: {
+            return Logger.httpPrettifier(data);
           }
-        },
-      });
+          case 32: {
+            return Logger.databasePrettifier(data);
+          }
+          default: {
+            return Logger.defaultPrettifier(data);
+          }
+        }
+      },
+    });
+
+    if (isDev) {
       streams.push({ level: 'debug', stream: prettyStream });
+    }
+
+    if (isProd) {
+      streams.push({ level: 'error', stream: prettyStream });
     }
 
     return pino({
