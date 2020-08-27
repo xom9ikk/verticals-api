@@ -24,13 +24,10 @@ const { RequestPart } = require('../../enums');
  *    type: object
  *    required:
  *      - title
- *      - position
  *      - cardType
  *    properties:
  *      title:
  *        type: string
- *      position:
- *        type: integer
  *      cardType:
  *        type: string
  *        enum: [0, 1, 2, 3, 4]

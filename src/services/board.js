@@ -17,6 +17,7 @@ class BoardService extends Database {
         'cardType',
         'description',
         'color',
+        'icon',
       ])
       .where({
         id,
@@ -33,6 +34,7 @@ class BoardService extends Database {
         'cardType',
         'description',
         'color',
+        'icon',
       ])
       .whereIn(
         'id',

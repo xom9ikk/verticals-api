@@ -4,8 +4,8 @@ const { BoardController } = require('./controller');
 class BoardAdapter {
   async create(req, res) {
     const { userId } = req;
-    const boardId = await BoardController.create(userId, req.body);
-    return BackendResponse.Created(res, 'Board successfully created', { boardId });
+    const board = await BoardController.create(userId, req.body);
+    return BackendResponse.Created(res, 'Board successfully created', board);
   }
 
   async get(req, res) {

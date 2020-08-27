@@ -4,14 +4,15 @@ class BoardSchema {
   createBoard = {
     type: 'object',
     properties: {
-      title: {
+      icon: {
         type: 'string',
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
+      title: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 255,
       },
       cardType: {
         type: 'integer',
@@ -27,7 +28,7 @@ class BoardSchema {
         enum: Object.values(Color),
       },
     },
-    required: ['title', 'position', 'cardType'],
+    required: ['icon', 'title', 'cardType'],
   }
   getBoard = {
     type: 'object',
@@ -42,6 +43,11 @@ class BoardSchema {
   patchBoardBody = {
     type: 'object',
     properties: {
+      icon: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 255,
+      },
       title: {
         type: 'string',
         minLength: 1,
@@ -66,6 +72,7 @@ class BoardSchema {
       },
     },
     anyOf: [
+      { required: ["icon"] },
       { required: ["title"] },
       { required: ["position"] },
       { required: ["cardType"] },

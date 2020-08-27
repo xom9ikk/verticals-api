@@ -3,9 +3,14 @@ const { BackendError } = require('../../components/error');
 
 class BoardController {
   async create(userId, board) {
-    const boardId = await BoardService.create(board);
+    const boards = await BoardAccessService.getAllBoardIdsByUserId(userId);
+    const position = boards.length;
+    const boardId = await BoardService.create({
+      ...board,
+      position,
+    });
     await BoardAccessService.create(userId, boardId);
-    return boardId;
+    return { boardId, position };
   }
 
   async get(userId, boardId) {

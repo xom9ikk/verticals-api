@@ -20,9 +20,8 @@ exports.up = async (knex) => {
             object := OLD;
         END IF;
         
-        SELECT 
-        id, title, position, card_type, description, color, created_at, updated_at
-          INTO board.id, board.title, board.position, board.card_type, board.description, board.color, board.created_at, board.updated_at
+        SELECT *
+          INTO board
           FROM boards
           WHERE id = object.board_id
           LIMIT 1;
