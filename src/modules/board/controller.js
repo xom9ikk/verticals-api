@@ -3,8 +3,8 @@ const { BackendError } = require('../../components/error');
 
 class BoardController {
   async create(userId, board) {
-    const boards = await BoardAccessService.getAllBoardIdsByUserId(userId);
-    const position = boards.length;
+    const boardIds = await BoardAccessService.getAllBoardIdsByUserId(userId);
+    const position = boardIds.length;
     const boardId = await BoardService.create({
       ...board,
       position,
@@ -33,6 +33,50 @@ class BoardController {
 
     const boards = await BoardService.getByBoardIds(boardIdsWithAccess);
     return boards;
+  }
+
+  async updatePosition({ userId, sourcePosition, destinationPosition }) {
+    const boardIds = await BoardAccessService.getAllBoardIdsByUserId(userId);
+    const boards = await BoardService.getByBoardIds(boardIds);
+
+    const maxPosition = Math.max(sourcePosition, destinationPosition);
+    const minPosition = Math.min(sourcePosition, destinationPosition);
+
+    if (sourcePosition === destinationPosition
+      || maxPosition > boardIds.length || minPosition < 1) {
+      throw new BackendError.Forbidden('Invalid source or destination position');
+    }
+
+    const updates = [];
+
+    boards.forEach((board) => {
+      const currentPosition = board.position;
+      let newPosition;
+
+      if (sourcePosition < destinationPosition) {
+        if (currentPosition === sourcePosition) {
+          newPosition = destinationPosition;
+        } else if (currentPosition > sourcePosition && currentPosition <= destinationPosition) {
+          newPosition = currentPosition - 1;
+        }
+      } else if (sourcePosition > destinationPosition) {
+        if (currentPosition === sourcePosition) {
+          newPosition = destinationPosition;
+        } else if (currentPosition < sourcePosition && currentPosition >= destinationPosition) {
+          newPosition = currentPosition + 1;
+        }
+      }
+
+      if (newPosition !== undefined) {
+        updates.push(BoardService.update(board.id, {
+          position: newPosition,
+        }));
+      }
+    });
+
+    await Promise.all(updates);
+
+    return true;
   }
 
   async update({ userId, boardId, patch }) {

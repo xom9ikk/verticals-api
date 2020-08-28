@@ -53,10 +53,10 @@ class BoardSchema {
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
+      // position: {
+      //   type: 'integer',
+      //   minimum: 0,
+      // },
       cardType: {
         type: 'integer',
         enum: Object.values(CardType),
@@ -67,14 +67,19 @@ class BoardSchema {
         maxLength: 4096,
       },
       color: {
-        type: 'number',
-        enum: Object.values(Color),
+        oneOf: [
+          {
+            type: 'number',
+            enum: Object.values(Color),
+          },
+          { type: 'null' },
+        ],
       },
     },
     anyOf: [
       { required: ["icon"] },
       { required: ["title"] },
-      { required: ["position"] },
+      // { required: ["position"] },
       { required: ["cardType"] },
       { required: ["description"] },
       { required: ["color"] },
@@ -89,6 +94,20 @@ class BoardSchema {
       },
     },
     required: ['boardId'],
+  }
+  patchBoardPositionBody = {
+    type: 'object',
+    properties: {
+      sourcePosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+      destinationPosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['sourcePosition', 'destinationPosition'],
   }
   deleteBoardParams = {
     type: 'object',

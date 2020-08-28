@@ -21,6 +21,19 @@ class BoardAdapter {
     return BackendResponse.Success(res, 'Boards information successfully received', { boards });
   }
 
+  async updatePosition(req, res) {
+    const { userId } = req;
+    const { sourcePosition, destinationPosition } = req.body;
+
+    await BoardController.updatePosition({
+      userId,
+      sourcePosition,
+      destinationPosition,
+    });
+
+    return BackendResponse.Success(res, 'Board position successfully updated');
+  }
+
   async update(req, res) {
     const { userId } = req;
     const { boardId } = req.params;

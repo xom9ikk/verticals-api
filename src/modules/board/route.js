@@ -300,6 +300,17 @@ module.exports = {
       BoardAdapter.getAll,
     );
     fastify.patch(
+      '/position',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'patchBoardPositionBody'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.updatePosition,
+    );
+    fastify.patch(
       '/:boardId',
       {
         preHandler: [
