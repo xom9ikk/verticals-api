@@ -56,12 +56,30 @@ class BoardService extends Database {
     };
   }
 
-  removeById(boardId) {
-    return this.boards
+  async removeById(boardId) {
+    const [removedBoard] = await this.boards
       .where({
         id: boardId,
       })
+      .returning([
+        'id',
+        'title',
+        'position',
+        'cardType',
+        'description',
+        'color',
+        'icon',
+      ])
       .del();
+    return removedBoard;
+  }
+
+  decreaseAfterPosition(position) {
+    return this.boards
+      .where('position', '>', position)
+      .decrement({
+        position: 1,
+      });
   }
 }
 

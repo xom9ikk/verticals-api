@@ -27,6 +27,10 @@ class BoardSchema {
         type: 'number',
         enum: Object.values(Color),
       },
+      belowId: {
+        type: 'integer',
+        minimum: 1,
+      }
     },
     required: ['icon', 'title', 'cardType'],
   }
