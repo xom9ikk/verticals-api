@@ -8,5 +8,6 @@ module.exports = {
     todos: 'todos',
     comments: 'comments',
     commentFiles: 'comment_files',
+    boardPositions: 'board_positions',
   },
 };

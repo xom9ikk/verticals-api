@@ -74,9 +74,13 @@ class BoardService extends Database {
     return removedBoard;
   }
 
-  decreaseAfterPosition(position) {
+  decreaseAfterPosition(boardIds, position) {
     return this.boards
-      .where('position', '>', position)
+      .whereIn(
+        'id',
+        boardIds,
+      )
+      .andWhere('position', '>', position)
       .decrement({
         position: 1,
       });

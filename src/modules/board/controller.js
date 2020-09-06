@@ -115,18 +115,18 @@ class BoardController {
   }
 
   async remove({ userId, boardId }) {
-    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
+    const boardIdsWithAccess = await BoardAccessService.getAllBoardIdsByUserId(userId);
+
+    const isAccess = boardIdsWithAccess.includes(boardId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to remove this board');
     }
 
-    await BoardAccessService.removeByBoardId(boardId);
-
     const removedBoard = await BoardService.removeById(boardId);
     const { position } = removedBoard;
 
-    await BoardService.decreaseAfterPosition(position);
+    await BoardService.decreaseAfterPosition(boardIdsWithAccess, position);
 
     return true;
   }
