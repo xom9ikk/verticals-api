@@ -1,6 +1,6 @@
 const { compare, hash } = require('bcryptjs');
 const { BackendError, TokenComponent } = require('../../components');
-const { TokenService, UserService } = require('../../services');
+const { TokenService, UserService, BoardPositionsService } = require('../../services');
 
 class AuthController {
   async register({
@@ -18,11 +18,13 @@ class AuthController {
 
     const tokens = await TokenComponent.issueTokenPair(registeredUserId);
 
-    await TokenService.add({
+    await TokenService.create({
       ...tokens,
       userId: registeredUserId,
       ip,
     });
+
+    await BoardPositionsService.create(registeredUserId, []);
 
     return tokens;
   }
@@ -52,7 +54,7 @@ class AuthController {
 
     const tokens = await TokenComponent.issueTokenPair(userId);
 
-    await TokenService.add({
+    await TokenService.create({
       ...tokens,
       userId,
       ip,
@@ -74,7 +76,7 @@ class AuthController {
       TokenService.removeByRefreshToken(refreshToken),
     ]);
 
-    await TokenService.add({
+    await TokenService.create({
       ...tokens,
       userId,
       ip,

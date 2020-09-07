@@ -1,5 +1,6 @@
-const { BoardService, BoardAccessService } = require('../../services');
+const { BoardService, BoardAccessService, BoardPositionsService } = require('../../services');
 const { BackendError } = require('../../components/error');
+const { PositionComponent } = require('../../components');
 
 class BoardController {
   async create(userId, { belowId, ...board }) {
@@ -11,29 +12,19 @@ class BoardController {
       }
     }
 
-    const boardIds = await BoardAccessService.getAllBoardIdsByUserId(userId);
-    const position = boardIds.length;
-    const boardId = await BoardService.create({
-      ...board,
-      position,
-    });
+    const boardId = await BoardService.create(board);
 
     await BoardAccessService.create(userId, boardId);
+    const boardPositions = await BoardPositionsService.getByUserId(userId);
 
-    if (belowId) {
-      const belowBoard = await BoardService.getById(belowId);
-      const destinationPosition = belowBoard.position + 1;
-      if (position !== destinationPosition) {
-        const newPosition = await this.updatePosition({
-          userId,
-          sourcePosition: position,
-          destinationPosition,
-        });
-        return { boardId, position: newPosition };
-      }
-    }
+    const {
+      newPosition,
+      newPositions,
+    } = PositionComponent.insert(boardId, boardPositions, belowId);
 
-    return { boardId, position };
+    await BoardPositionsService.update(userId, newPositions);
+
+    return { boardId, position: newPosition };
   }
 
   async get(userId, boardId) {
@@ -44,7 +35,11 @@ class BoardController {
     }
 
     const board = await BoardService.getById(boardId);
-    return board;
+    const boardPositions = await BoardPositionsService.getByUserId(userId);
+    return {
+      ...board,
+      position: PositionComponent.calculatePosition(boardPositions, board.id),
+    };
   }
 
   async getAll(userId) {
@@ -55,13 +50,13 @@ class BoardController {
     }
 
     const boards = await BoardService.getByBoardIds(boardIdsWithAccess);
-    return boards;
+    const boardPositions = await BoardPositionsService.getByUserId(userId);
+    return PositionComponent.orderByPosition(boards, boardPositions);
   }
 
   // TODO: write tests for updatePosition
   async updatePosition({ userId, sourcePosition, destinationPosition }) {
     const boardIds = await BoardAccessService.getAllBoardIdsByUserId(userId);
-    const boards = await BoardService.getByBoardIds(boardIds);
 
     const maxPosition = Math.max(sourcePosition, destinationPosition);
     const minPosition = Math.min(sourcePosition, destinationPosition);
@@ -71,34 +66,13 @@ class BoardController {
       throw new BackendError.BadRequest('Invalid source or destination position');
     }
 
-    const updates = [];
+    const boardPositions = await BoardPositionsService.getByUserId(userId);
 
-    boards.forEach((board) => {
-      const currentPosition = board.position;
-      let newPosition;
+    const newBoardPositions = PositionComponent.move(
+      boardPositions, sourcePosition, destinationPosition,
+    );
 
-      if (sourcePosition < destinationPosition) {
-        if (currentPosition === sourcePosition) {
-          newPosition = destinationPosition;
-        } else if (currentPosition > sourcePosition && currentPosition <= destinationPosition) {
-          newPosition = currentPosition - 1;
-        }
-      } else if (sourcePosition > destinationPosition) {
-        if (currentPosition === sourcePosition) {
-          newPosition = destinationPosition;
-        } else if (currentPosition < sourcePosition && currentPosition >= destinationPosition) {
-          newPosition = currentPosition + 1;
-        }
-      }
-
-      if (newPosition !== undefined) {
-        updates.push(BoardService.update(board.id, {
-          position: newPosition,
-        }));
-      }
-    });
-
-    await Promise.all(updates);
+    await BoardPositionsService.update(userId, newBoardPositions);
 
     return destinationPosition;
   }
@@ -124,9 +98,10 @@ class BoardController {
     }
 
     const removedBoard = await BoardService.removeById(boardId);
-    const { position } = removedBoard;
-
-    await BoardService.decreaseAfterPosition(boardIdsWithAccess, position);
+    const { id: removedId } = removedBoard;
+    const boardPositions = await BoardPositionsService.getByUserId(userId);
+    const newPositions = PositionComponent.remove(boardPositions, removedId);
+    await BoardPositionsService.update(userId, newPositions);
 
     return true;
   }

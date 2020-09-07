@@ -1,22 +1,19 @@
 const { tables } = require('../src/database/tables');
 
-const tableName = tables.boards;
+const tableName = tables.boardPositions;
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
     table
-      .increments('id')
-      .primary();
+      .integer('user_id')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('users')
+      .onDelete('CASCADE');
     table
-      .string('title')
-      .notNullable();
-    table
-      .integer('card_type')
-      .defaultTo(0);
-    table
-      .string('description', 4096);
-    table
-      .integer('color');
+      .specificType('positions', 'integer ARRAY')
+      .references('id');
     table
       .timestamps(false, true);
   });

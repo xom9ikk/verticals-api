@@ -13,7 +13,6 @@ class BoardService extends Database {
       .select([
         'id',
         'title',
-        'position',
         'cardType',
         'description',
         'color',
@@ -30,7 +29,6 @@ class BoardService extends Database {
       .select([
         'id',
         'title',
-        'position',
         'cardType',
         'description',
         'color',
@@ -64,7 +62,6 @@ class BoardService extends Database {
       .returning([
         'id',
         'title',
-        'position',
         'cardType',
         'description',
         'color',

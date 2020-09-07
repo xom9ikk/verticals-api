@@ -1,7 +1,7 @@
 const { Database } = require('../database');
 
 class TokenService extends Database {
-  add(pairTokens) {
+  create(pairTokens) {
     return this.tokens
       .insert(pairTokens)
       .returning('*');
