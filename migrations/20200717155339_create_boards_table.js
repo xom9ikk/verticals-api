@@ -11,9 +11,6 @@ exports.up = async (knex) => {
       .string('title')
       .notNullable();
     table
-      .integer('position')
-      .notNullable();
-    table
       .integer('card_type')
       .defaultTo(0);
     table

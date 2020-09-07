@@ -101,8 +101,8 @@ class BoardAccessService extends Database {
     return response.map((row) => row.boardId);
   }
 
-  async removeByBoardId(boardId) {
-    await this.boardsAccess
+  removeByBoardId(boardId) {
+    return this.boardsAccess
       .where({
         boardId,
       })

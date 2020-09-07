@@ -136,24 +136,6 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board without position', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.position;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
   it('user can`t create board without card type', async (done) => {
     const { token } = await helper.createUser();
 
@@ -202,46 +184,6 @@ describe('create', () => {
       .send({
         ...board,
         title: Generator.Board.getLongTitle(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with negative position', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        position: Generator.Board.getNegativePosition(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with string position', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        position: Generator.Board.getStringPosition(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -396,6 +338,7 @@ describe('get board by id', () => {
     }));
     expect(res.body.data).toEqual({
       id: boardId,
+      position: expect.any(Number),
       ...board,
     });
 
@@ -507,9 +450,11 @@ describe('get all boards', () => {
     expect(boards).toEqual([
       {
         id: boardIdTwo,
+        position: expect.any(Number),
         ...boardTwo,
       }, {
         id: boardIdThree,
+        position: expect.any(Number),
         ...boardThree,
       },
     ]);
@@ -681,6 +626,7 @@ describe('update board', () => {
 
     expect(res.body.data).toEqual({
       id: boardId,
+      position: expect.any(Number),
       ...newBoard,
     });
 

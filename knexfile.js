@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const {
   DB_HOST,
   DB_PORT,

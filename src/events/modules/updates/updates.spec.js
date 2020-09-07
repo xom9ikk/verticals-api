@@ -256,6 +256,7 @@ describe('board', () => {
             channel: 'board',
             data: expect.objectContaining({
               id: expect.any(Number),
+              position: expect.any(Number), // TODO
               ...board,
             }),
           }));

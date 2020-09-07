@@ -4,8 +4,8 @@ const { BoardController } = require('./controller');
 class BoardAdapter {
   async create(req, res) {
     const { userId } = req;
-    const boardId = await BoardController.create(userId, req.body);
-    return BackendResponse.Created(res, 'Board successfully created', { boardId });
+    const board = await BoardController.create(userId, req.body);
+    return BackendResponse.Created(res, 'Board successfully created', board);
   }
 
   async get(req, res) {
@@ -19,6 +19,19 @@ class BoardAdapter {
     const { userId } = req;
     const boards = await BoardController.getAll(userId);
     return BackendResponse.Success(res, 'Boards information successfully received', { boards });
+  }
+
+  async updatePosition(req, res) {
+    const { userId } = req;
+    const { sourcePosition, destinationPosition } = req.body;
+
+    await BoardController.updatePosition({
+      userId,
+      sourcePosition,
+      destinationPosition,
+    });
+
+    return BackendResponse.Success(res, 'Board position successfully updated');
   }
 
   async update(req, res) {

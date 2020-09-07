@@ -1,29 +1,18 @@
 const { tables } = require('../src/database/tables');
 
-const tableName = tables.columns;
+const tableName = tables.boardPositions;
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
     table
-      .increments('id')
-      .primary();
-    table
-      .integer('board_id')
+      .integer('user_id')
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('boards')
+      .inTable('users')
       .onDelete('CASCADE');
     table
-      .string('title')
-      .notNullable();
-    table
-      .string('description', 4096);
-    table
-      .integer('color');
-    table
-      .boolean('is_collapsed')
-      .defaultTo(false);
+      .specificType('order', 'integer ARRAY');
     table
       .timestamps(false, true);
   });

@@ -24,13 +24,12 @@ const { RequestPart } = require('../../enums');
  *    type: object
  *    required:
  *      - title
- *      - position
- *      - cardType
+ *      - icon
  *    properties:
  *      title:
  *        type: string
- *      position:
- *        type: integer
+ *      icon:
+ *        type: string
  *      cardType:
  *        type: string
  *        enum: [0, 1, 2, 3, 4]
@@ -301,6 +300,17 @@ module.exports = {
         ],
       },
       BoardAdapter.getAll,
+    );
+    fastify.patch(
+      '/position',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'patchBoardPositionBody'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.updatePosition,
     );
     fastify.patch(
       '/:boardId',

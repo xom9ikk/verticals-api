@@ -11,22 +11,12 @@ const { todoRouter } = require('../../modules/todo/route');
 const { commentRouter } = require('../../modules/comment/route');
 const { commentAttachmentRouter } = require('../../modules/comment-attachment/route');
 
-// router.all('*', allowHeadersHandler);
-// router.options('*', (req, res) => {
-//   res.status(200);
-//   res.json();
-// });
-
-// router.use(clientErrorHandler);
-// router.use(uncaughtErrorHandler);
-// router.use(notFoundHandler);
-
 module.exports = {
   restRouter: (fastify, opts, done) => {
     fastify.addHook('onRequest', allowHeadersHandler);
     fastify.options('*', (req, res) => {
       res.status(200);
-      res.json();
+      res.send();
     });
     fastify.register(authRouter, { prefix: '/api/v1/auth' });
     fastify.register(boardRouter, { prefix: '/api/v1/board' });

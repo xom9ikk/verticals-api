@@ -3,8 +3,6 @@ const { triggers } = require('../src/database/triggers');
 
 const tableName = tables.boards;
 
-// userIds := get_user_ids_by_board_id(object.id);
-
 exports.up = async (knex) => {
   await knex.raw(`
     CREATE FUNCTION notify_${triggers.boardChange}()
@@ -31,17 +29,9 @@ exports.up = async (knex) => {
     FOR EACH ROW
     EXECUTE PROCEDURE notify_${triggers.boardChange}();
   `);
-
-  // await knex.raw(`CREATE TRIGGER ${triggers.boardChange}_delete_trigger
-  //   BEFORE DELETE
-  //   ON ${tableName}
-  //   FOR EACH ROW
-  //   EXECUTE PROCEDURE notify_${triggers.boardChange}();
-  // `);
 };
 
 exports.down = async (knex) => {
   await knex.raw(`DROP TRIGGER IF EXISTS ${triggers.boardChange}_trigger ON ${tableName};`);
-  // await knex.raw(`DROP TRIGGER IF EXISTS ${triggers.boardChange}_delete_trigger ON ${tableName};`);
   await knex.raw(`DROP FUNCTION IF EXISTS notify_${triggers.boardChange};`);
 };

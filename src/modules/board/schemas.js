@@ -4,14 +4,15 @@ class BoardSchema {
   createBoard = {
     type: 'object',
     properties: {
-      title: {
+      icon: {
         type: 'string',
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
+      title: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 255,
       },
       cardType: {
         type: 'integer',
@@ -26,8 +27,12 @@ class BoardSchema {
         type: 'number',
         enum: Object.values(Color),
       },
+      belowId: {
+        type: 'integer',
+        minimum: 1,
+      }
     },
-    required: ['title', 'position', 'cardType'],
+    required: ['icon', 'title'],
   }
   getBoard = {
     type: 'object',
@@ -39,18 +44,37 @@ class BoardSchema {
     },
     required: ['boardId'],
   }
+  patchBoardPositionBody = {
+    type: 'object',
+    properties: {
+      sourcePosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+      destinationPosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['sourcePosition', 'destinationPosition'],
+  }
   patchBoardBody = {
     type: 'object',
     properties: {
+      icon: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 255,
+      },
       title: {
         type: 'string',
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
+      // position: {
+      //   type: 'integer',
+      //   minimum: 0,
+      // },
       cardType: {
         type: 'integer',
         enum: Object.values(CardType),
@@ -61,13 +85,19 @@ class BoardSchema {
         maxLength: 4096,
       },
       color: {
-        type: 'number',
-        enum: Object.values(Color),
+        oneOf: [
+          {
+            type: 'number',
+            enum: Object.values(Color),
+          },
+          { type: 'null' },
+        ],
       },
     },
     anyOf: [
+      { required: ["icon"] },
       { required: ["title"] },
-      { required: ["position"] },
+      // { required: ["position"] },
       { required: ["cardType"] },
       { required: ["description"] },
       { required: ["color"] },

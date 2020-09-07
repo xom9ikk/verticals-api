@@ -32,6 +32,14 @@ class Database {
   get commentFiles() {
     return knex(tables.commentFiles);
   }
+
+  get boardPositions() {
+    return knex(tables.boardPositions);
+  }
+
+  get columnPositions() {
+    return knex(tables.columnPositions);
+  }
 }
 
 module.exports = {
