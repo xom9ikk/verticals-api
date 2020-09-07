@@ -1,7 +1,9 @@
 const { compare, hash } = require('bcryptjs');
 const { BackendError, TokenComponent } = require('../../components');
 const { BoardController } = require('../board/controller');
-const { TokenService, UserService, PositionsService } = require('../../services');
+const {
+  TokenService, UserService, BoardPositionsService, ColumnPositionsService,
+} = require('../../services');
 
 class AuthController {
   async register({
@@ -25,17 +27,14 @@ class AuthController {
       ip,
     });
 
-    await PositionsService.create(registeredUserId, {
-      boards: [],
-      columns: [],
-      todos: [],
-    });
-
-    // TODO: move to seed component
-    await BoardController.create(registeredUserId, {
-      icon: '/assets/svg/board/star.svg',
-      title: 'Today',
-    });
+    await Promise.all([
+      BoardPositionsService.create(registeredUserId, []),
+      // TODO: move to seed component
+      BoardController.create(registeredUserId, {
+        icon: '/assets/svg/board/star.svg',
+        title: 'Today',
+      }),
+    ]);
 
     return tokens;
   }

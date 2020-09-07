@@ -1,6 +1,6 @@
 const { tables } = require('../src/database/tables');
 
-const tableName = tables.positions;
+const tableName = tables.boardPositions;
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
@@ -12,11 +12,7 @@ exports.up = async (knex) => {
       .inTable('users')
       .onDelete('CASCADE');
     table
-      .specificType('boards', 'integer ARRAY');
-    table
-      .specificType('columns', 'integer ARRAY');
-    table
-      .specificType('todos', 'integer ARRAY');
+      .specificType('order', 'integer ARRAY');
     table
       .timestamps(false, true);
   });

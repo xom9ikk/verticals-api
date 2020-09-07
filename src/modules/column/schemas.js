@@ -54,6 +54,10 @@ class ColumnSchema {
   patchColumnPositionBody = {
     type: 'object',
     properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
       sourcePosition: {
         type: 'integer',
         minimum: 0,
@@ -63,7 +67,7 @@ class ColumnSchema {
         minimum: 0,
       },
     },
-    required: ['sourcePosition', 'destinationPosition'],
+    required: ['boardId', 'sourcePosition', 'destinationPosition'],
   }
   patchColumnBody = {
     type: 'object',
@@ -87,8 +91,13 @@ class ColumnSchema {
         maxLength: 4096,
       },
       color: {
-        type: 'number',
-        enum: Object.values(Color),
+        oneOf: [
+          {
+            type: 'number',
+            enum: Object.values(Color),
+          },
+          { type: 'null' },
+        ],
       },
       isCollapsed: {
         type: 'boolean',

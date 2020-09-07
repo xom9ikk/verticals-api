@@ -33,8 +33,12 @@ class Database {
     return knex(tables.commentFiles);
   }
 
-  get positions() {
-    return knex(tables.positions);
+  get boardPositions() {
+    return knex(tables.boardPositions);
+  }
+
+  get columnPositions() {
+    return knex(tables.columnPositions);
   }
 }
 
