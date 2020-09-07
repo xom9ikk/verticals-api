@@ -4,8 +4,8 @@ const { ColumnController } = require('./controller');
 class ColumnAdapter {
   async create(req, res) {
     const { userId } = req;
-    const columnId = await ColumnController.create(userId, req.body);
-    return BackendResponse.Created(res, 'Column successfully created', { columnId });
+    const column = await ColumnController.create(userId, req.body);
+    return BackendResponse.Created(res, 'Column successfully created', column);
   }
 
   async get(req, res) {
@@ -20,6 +20,19 @@ class ColumnAdapter {
     const { boardId } = req.query;
     const columns = await ColumnController.getAll(userId, boardId);
     return BackendResponse.Success(res, 'Columns information successfully received', { columns });
+  }
+
+  async updatePosition(req, res) {
+    const { userId } = req;
+    const { sourcePosition, destinationPosition } = req.body;
+
+    await ColumnController.updatePosition({
+      userId,
+      sourcePosition,
+      destinationPosition,
+    });
+
+    return BackendResponse.Success(res, 'Board position successfully updated');
   }
 
   async update(req, res) {

@@ -13,10 +13,6 @@ class ColumnSchema {
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
       description: {
         type: 'string',
         minLength: 1,
@@ -29,8 +25,12 @@ class ColumnSchema {
       isCollapsed: {
         type: 'boolean',
       },
+      belowId: {
+        type: 'integer',
+        minimum: 1,
+      }
     },
-    required: ['boardId', 'title', 'position'],
+    required: ['boardId', 'title'],
   }
   getColumn = {
     type: 'object',
@@ -50,6 +50,20 @@ class ColumnSchema {
         minimum: 1,
       },
     },
+  }
+  patchColumnPositionBody = {
+    type: 'object',
+    properties: {
+      sourcePosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+      destinationPosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['sourcePosition', 'destinationPosition'],
   }
   patchColumnBody = {
     type: 'object',

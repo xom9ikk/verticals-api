@@ -33,8 +33,8 @@ class Database {
     return knex(tables.commentFiles);
   }
 
-  get boardPositions() {
-    return knex(tables.boardPositions);
+  get positions() {
+    return knex(tables.positions);
   }
 }
 

@@ -25,14 +25,11 @@ const { RequestPart } = require('../../enums');
  *    required:
  *      - boardId
  *      - title
- *      - position
  *    properties:
  *      boardId:
  *        type: integer
  *      title:
  *        type: string
- *      position:
- *        type: integer
  *      description:
  *        type: string
  *      color:
@@ -185,8 +182,6 @@ const { RequestPart } = require('../../enums');
  *        type: integer
  *      title:
  *        type: string
- *      position:
- *        type: integer
  *      description:
  *        type: string
  *      color:
@@ -310,6 +305,17 @@ module.exports = {
         ],
       },
       ColumnAdapter.getAll,
+    );
+    fastify.patch(
+      '/position',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'patchColumnPositionBody'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.updatePosition,
     );
     fastify.patch(
       '/:columnId',

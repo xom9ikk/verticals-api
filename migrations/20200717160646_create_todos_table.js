@@ -18,9 +18,6 @@ exports.up = async (knex) => {
       .string('title')
       .notNullable();
     table
-      .integer('position')
-      .notNullable();
-    table
       .string('description', 4096);
     table
       .integer('status')

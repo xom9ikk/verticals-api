@@ -46,6 +46,17 @@ class PositionComponent {
   remove(positions, removedId) {
     return positions.filter((id) => id !== removedId);
   }
+
+  isValid(sourcePosition, destinationPosition, ids) {
+    const maxPosition = Math.max(sourcePosition, destinationPosition);
+    const minPosition = Math.min(sourcePosition, destinationPosition);
+
+    return !(
+      sourcePosition === destinationPosition
+      || maxPosition >= ids.length
+      || minPosition < 0
+    );
+  }
 }
 
 module.exports = {

@@ -32,7 +32,7 @@ class BoardSchema {
         minimum: 1,
       }
     },
-    required: ['icon', 'title', 'cardType'],
+    required: ['icon', 'title'],
   }
   getBoard = {
     type: 'object',
@@ -43,6 +43,20 @@ class BoardSchema {
       },
     },
     required: ['boardId'],
+  }
+  patchBoardPositionBody = {
+    type: 'object',
+    properties: {
+      sourcePosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+      destinationPosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['sourcePosition', 'destinationPosition'],
   }
   patchBoardBody = {
     type: 'object',
@@ -98,20 +112,6 @@ class BoardSchema {
       },
     },
     required: ['boardId'],
-  }
-  patchBoardPositionBody = {
-    type: 'object',
-    properties: {
-      sourcePosition: {
-        type: 'integer',
-        minimum: 0,
-      },
-      destinationPosition: {
-        type: 'integer',
-        minimum: 0,
-      },
-    },
-    required: ['sourcePosition', 'destinationPosition'],
   }
   deleteBoardParams = {
     type: 'object',

@@ -1,8 +1,17 @@
-const { ColumnService, BoardAccessService } = require('../../services');
+const { ColumnService, BoardAccessService, PositionsService } = require('../../services');
 const { BackendError } = require('../../components/error');
+const { PositionComponent } = require('../../components');
 
 class ColumnController {
-  async create(userId, column) {
+  async create(userId, { belowId, ...column }) {
+    // TODO: write tests with belowId
+    if (belowId) {
+      const isAccessToBelowBoardId = await BoardAccessService.getByColumnId(userId, belowId);
+      if (!isAccessToBelowBoardId) {
+        throw new BackendError.Forbidden('This account is not allowed to create column below this column');
+      }
+    }
+
     const { boardId } = column;
     const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
@@ -11,7 +20,16 @@ class ColumnController {
     }
 
     const columnId = await ColumnService.create(column);
-    return columnId;
+    const columnPositions = await PositionsService.getColumnPositions(userId);
+
+    const {
+      newPosition,
+      newPositions,
+    } = PositionComponent.insert(columnPositions, columnId, belowId);
+
+    await PositionsService.updateColumnPositions(userId, newPositions);
+
+    return { columnId, position: newPosition };
   }
 
   async get(userId, columnId) {
@@ -22,7 +40,11 @@ class ColumnController {
     }
 
     const column = await ColumnService.getById(columnId);
-    return column;
+    const columnPositions = await PositionsService.getColumnPositions(userId);
+    return {
+      ...column,
+      position: PositionComponent.calculatePosition(columnPositions, column.id),
+    };
   }
 
   async getAll(userId, boardId) {
@@ -48,7 +70,25 @@ class ColumnController {
       throw new BackendError.Forbidden('This account does not have access to any columns');
     }
 
-    return columns;
+    const columnPositions = await PositionsService.getColumnPositions(userId);
+    return PositionComponent.orderByPosition(columnPositions, columns);
+  }
+
+  // TODO: write tests for updatePosition
+  async updatePosition({ userId, sourcePosition, destinationPosition }) {
+    const columnPositions = await PositionsService.getColumnPositions(userId);
+
+    if (!PositionComponent.isValid(sourcePosition, destinationPosition, columnPositions)) {
+      throw new BackendError.BadRequest('Invalid source or destination position');
+    }
+
+    const newColumnPositions = PositionComponent.move(
+      columnPositions, sourcePosition, destinationPosition,
+    );
+
+    await PositionsService.updateColumnPositions(userId, newColumnPositions);
+
+    return destinationPosition;
   }
 
   async update({ userId, columnId, patch }) {
@@ -82,8 +122,12 @@ class ColumnController {
       throw new BackendError.Forbidden('This account is not allowed to remove this column');
     }
 
-    // TODO cascade
-    await ColumnService.removeById(columnId);
+    const removedColumn = await ColumnService.removeById(columnId);
+    const { id: removedId } = removedColumn;
+    const columnPositions = await PositionsService.getColumnPositions(userId);
+    const newPositions = PositionComponent.remove(columnPositions, removedId);
+    await PositionsService.updateColumnPositions(userId, newPositions);
+
     return true;
   }
 }

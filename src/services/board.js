@@ -70,18 +70,6 @@ class BoardService extends Database {
       .del();
     return removedBoard;
   }
-
-  decreaseAfterPosition(boardIds, position) {
-    return this.boards
-      .whereIn(
-        'id',
-        boardIds,
-      )
-      .andWhere('position', '>', position)
-      .decrement({
-        position: 1,
-      });
-  }
 }
 
 module.exports = {

@@ -24,9 +24,11 @@ const { RequestPart } = require('../../enums');
  *    type: object
  *    required:
  *      - title
- *      - cardType
+ *      - icon
  *    properties:
  *      title:
+ *        type: string
+ *      icon:
  *        type: string
  *      cardType:
  *        type: string

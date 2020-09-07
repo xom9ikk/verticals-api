@@ -81,12 +81,22 @@ class ColumnService extends Database {
     return columnId;
   }
 
-  removeById(id) {
-    return this.columns
+  async removeById(boardId) {
+    const [removedBoard] = await this.columns
       .where({
-        id,
+        id: boardId,
       })
+      .returning([
+        'id',
+        'boardId',
+        'title',
+        'position',
+        'description',
+        'color',
+        'isCollapsed',
+      ])
       .del();
+    return removedBoard;
   }
 
   getBoardId(id) {
