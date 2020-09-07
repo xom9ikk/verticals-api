@@ -20,7 +20,7 @@ class BoardController {
     const {
       newPosition,
       newPositions,
-    } = PositionComponent.insert(boardId, boardPositions, belowId);
+    } = PositionComponent.insert(boardPositions, boardId, belowId);
 
     await BoardPositionsService.update(userId, newPositions);
 
@@ -51,7 +51,7 @@ class BoardController {
 
     const boards = await BoardService.getByBoardIds(boardIdsWithAccess);
     const boardPositions = await BoardPositionsService.getByUserId(userId);
-    return PositionComponent.orderByPosition(boards, boardPositions);
+    return PositionComponent.orderByPosition(boardPositions, boards);
   }
 
   // TODO: write tests for updatePosition

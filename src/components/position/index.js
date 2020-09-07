@@ -3,16 +3,16 @@ class PositionComponent {
     return positions.findIndex((id) => id === neededId);
   }
 
-  insert(currentId, positions, belowId) {
+  insert(positions, id, belowId) {
     let newPosition = positions.length;
     const newPositions = [...positions];
 
     if (belowId) {
       const currentPosition = this.calculatePosition(positions, belowId);
       newPosition = currentPosition + 1;
-      newPositions.splice(newPosition, 0, currentId);
+      newPositions.splice(newPosition, 0, id);
     } else {
-      newPositions.push(currentId);
+      newPositions.push(id);
     }
 
     return {
@@ -21,7 +21,7 @@ class PositionComponent {
     };
   }
 
-  orderByPosition(data, positions) {
+  orderByPosition(positions, data) {
     return data
       .map((el) => {
         const currentPosition = this.calculatePosition(positions, el.id);
