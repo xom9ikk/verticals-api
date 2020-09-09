@@ -84,7 +84,7 @@ class ColumnController {
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    userId, boardId, sourcePosition, destinationPosition,
+    boardId, sourcePosition, destinationPosition,
   }) {
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
@@ -123,6 +123,28 @@ class ColumnController {
     }
 
     return true;
+  }
+
+  // TODO: write tests
+  async duplicate({ userId, columnId }) {
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to duplicate this column');
+    }
+
+    const { id, ...columnToDuplicate } = await ColumnService.getById(columnId);
+
+    const {
+      columnId: newColumnId,
+      position,
+    } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
+
+    return {
+      ...columnToDuplicate,
+      columnId: newColumnId,
+      position,
+    };
   }
 
   async remove({ userId, columnId }) {

@@ -330,6 +330,17 @@ module.exports = {
       },
       ColumnAdapter.update,
     );
+    fastify.post(
+      '/duplicate',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'duplicateColumn'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.duplicate,
+    );
     fastify.delete(
       '/:columnId',
       {

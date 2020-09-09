@@ -122,6 +122,16 @@ class ColumnSchema {
     },
     required: ['columnId'],
   }
+  duplicateColumn = {
+    type: 'object',
+    properties: {
+      columnId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['columnId'],
+  }
   deleteColumnParams = {
     type: 'object',
     properties: {
