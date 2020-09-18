@@ -40,6 +40,10 @@ class Database {
   get columnPositions() {
     return knex(tables.columnPositions);
   }
+
+  get todoPositions() {
+    return knex(tables.todoPositions);
+  }
 }
 
 module.exports = {

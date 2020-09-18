@@ -6,8 +6,8 @@ class ColumnController {
   async create(userId, { belowId, ...column }) {
     // TODO: write tests with belowId
     if (belowId) {
-      const isAccessToBelowBoardId = await BoardAccessService.getByColumnId(userId, belowId);
-      if (!isAccessToBelowBoardId) {
+      const isAccessToBelowColumnId = await BoardAccessService.getByColumnId(userId, belowId);
+      if (!isAccessToBelowColumnId) {
         throw new BackendError.Forbidden('This account is not allowed to create column below this column');
       }
     }
@@ -76,15 +76,13 @@ class ColumnController {
       throw new BackendError.Forbidden('This account does not have access to any columns');
     }
 
-    console.log('ColumnPositionsService.getPositions');
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    console.log('ColumnPositionsService.getPositions', columnPositions);
     return PositionComponent.orderByPosition(columnPositions, columns);
   }
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    userId, boardId, sourcePosition, destinationPosition,
+    boardId, sourcePosition, destinationPosition,
   }) {
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
@@ -123,6 +121,28 @@ class ColumnController {
     }
 
     return true;
+  }
+
+  // TODO: write tests
+  async duplicate({ userId, columnId }) {
+    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to duplicate this column');
+    }
+
+    const { id, ...columnToDuplicate } = await ColumnService.getById(columnId);
+
+    const {
+      columnId: newColumnId,
+      position,
+    } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
+
+    return {
+      ...columnToDuplicate,
+      columnId: newColumnId,
+      position,
+    };
   }
 
   async remove({ userId, columnId }) {

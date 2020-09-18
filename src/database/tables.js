@@ -10,5 +10,6 @@ module.exports = {
     commentFiles: 'comment_files',
     boardPositions: 'board_positions',
     columnPositions: 'column_positions',
+    todoPositions: 'todo_positions',
   },
 };

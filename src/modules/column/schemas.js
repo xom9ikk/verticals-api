@@ -81,10 +81,6 @@ class ColumnSchema {
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
       description: {
         type: 'string',
         minLength: 1,
@@ -106,13 +102,22 @@ class ColumnSchema {
     anyOf: [
       { required: ["boardId"] },
       { required: ["title"] },
-      { required: ["position"] },
       { required: ["description"] },
       { required: ["color"] },
       { required: ["isCollapsed"] },
     ],
   }
   patchColumnParams = {
+    type: 'object',
+    properties: {
+      columnId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['columnId'],
+  }
+  duplicateColumn = {
     type: 'object',
     properties: {
       columnId: {

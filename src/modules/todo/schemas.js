@@ -13,10 +13,6 @@ class TodoSchema {
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
       description: {
         type: 'string',
         minLength: 1,
@@ -36,8 +32,12 @@ class TodoSchema {
       isNotificationsEnabled: {
         type: 'boolean',
       },
+      belowId: {
+        type: 'integer',
+        minimum: 1,
+      }
     },
-    required: ['columnId', 'title', 'position'],
+    required: ['columnId', 'title'],
   }
   getTodo = {
     type: 'object',
@@ -62,6 +62,24 @@ class TodoSchema {
       },
     },
   }
+  patchTodoPositionBody = {
+    type: 'object',
+    properties: {
+      columnId: {
+        type: 'integer',
+        minimum: 1,
+      },
+      sourcePosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+      destinationPosition: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['columnId', 'sourcePosition', 'destinationPosition'],
+  }
   patchTodoBody = {
     type: 'object',
     properties: {
@@ -74,10 +92,6 @@ class TodoSchema {
         minLength: 1,
         maxLength: 255,
       },
-      position: {
-        type: 'integer',
-        minimum: 0,
-      },
       description: {
         type: 'string',
         minLength: 1,
@@ -88,8 +102,13 @@ class TodoSchema {
         enum: Object.values(TodoStatus),
       },
       color: {
-        type: 'number',
-        enum: Object.values(Color),
+        oneOf: [
+          {
+            type: 'number',
+            enum: Object.values(Color),
+          },
+          { type: 'null' },
+        ],
       },
       isArchived: {
         type: 'boolean',
@@ -101,7 +120,6 @@ class TodoSchema {
     anyOf: [
       { required: ["columnId"] },
       { required: ["title"] },
-      { required: ["position"] },
       { required: ["description"] },
       { required: ["status"] },
       { required: ["color"] },
@@ -110,6 +128,16 @@ class TodoSchema {
     ],
   }
   patchTodoParams = {
+    type: 'object',
+    properties: {
+      todoId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['todoId'],
+  }
+  duplicateTodo = {
     type: 'object',
     properties: {
       todoId: {
