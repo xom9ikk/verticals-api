@@ -37,7 +37,7 @@ class ColumnAdapter {
       destinationPosition,
     });
 
-    return BackendResponse.Success(res, 'Board position successfully updated');
+    return BackendResponse.Success(res, 'Column position successfully updated');
   }
 
   async update(req, res) {

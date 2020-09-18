@@ -1,8 +1,17 @@
-const { TodoService, BoardAccessService } = require('../../services');
+const { TodoService, BoardAccessService, TodoPositionsService } = require('../../services');
 const { BackendError } = require('../../components/error');
+const { PositionComponent } = require('../../components');
 
 class TodoController {
-  async create(userId, todo) {
+  async create(userId, { belowId, ...todo }) {
+    // TODO: write tests with belowId
+    if (belowId) {
+      const isAccessToBelowTodoId = await BoardAccessService.getByTodoId(userId, belowId);
+      if (!isAccessToBelowTodoId) {
+        throw new BackendError.Forbidden('This account is not allowed to create todo below this todo');
+      }
+    }
+
     const { columnId } = todo;
     const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
@@ -11,7 +20,19 @@ class TodoController {
     }
 
     const todoId = await TodoService.create(todo);
-    return todoId;
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    if (todoPositions.length === 0) {
+      await TodoPositionsService.create(columnId, []);
+    }
+
+    const {
+      newPosition,
+      newPositions,
+    } = PositionComponent.insert(todoPositions, todoId, belowId);
+
+    await TodoPositionsService.updatePositions(columnId, newPositions);
+
+    return { todoId, position: newPosition };
   }
 
   async get(userId, todoId) {
@@ -21,8 +42,15 @@ class TodoController {
       throw new BackendError.Forbidden('This account is not allowed to receive this todo');
     }
 
+    const columnId = await TodoService.getColumnId(todoId);
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
+
     const todo = await TodoService.getById(todoId);
-    return todo;
+
+    return {
+      ...todo,
+      position: PositionComponent.calculatePosition(todoPositions, todo.id),
+    };
   }
 
   async getAll(userId, boardId, columnId) {
@@ -57,7 +85,50 @@ class TodoController {
       throw new BackendError.Forbidden('This account does not have access to any todos');
     }
 
-    return todos;
+    if (columnId) {
+      const todoPositions = await TodoPositionsService.getPositions(columnId);
+      return PositionComponent.orderByPosition(todoPositions, todos);
+    }
+
+    const columnIdsMap = new Set();
+    todos.forEach((todo) => {
+      columnIdsMap.add(todo.columnId);
+    });
+    const columnIds = [...columnIdsMap];
+
+    const todoPositionsByColumnIds = await TodoPositionsService.getPositionsByColumnIds(columnIds);
+
+    let orderedTodos = [];
+
+    columnIds.forEach((id) => {
+      const todoPositions = todoPositionsByColumnIds.find((el) => el.columnId === id).order;
+      const todosByColumn = todos.filter((todo) => todo.columnId === id);
+      orderedTodos = [
+        ...orderedTodos,
+        ...PositionComponent.orderByPosition(todoPositions, todosByColumn),
+      ];
+    });
+
+    return orderedTodos;
+  }
+
+  // TODO: write tests for updatePosition
+  async updatePosition({
+    columnId, sourcePosition, destinationPosition,
+  }) {
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
+
+    if (!PositionComponent.isValid(sourcePosition, destinationPosition, todoPositions)) {
+      throw new BackendError.BadRequest('Invalid source or destination position');
+    }
+
+    const newTodoPositions = PositionComponent.move(
+      todoPositions, sourcePosition, destinationPosition,
+    );
+
+    await TodoPositionsService.updatePositions(columnId, newTodoPositions);
+
+    return destinationPosition;
   }
 
   async update({ userId, todoId, patch }) {
@@ -85,6 +156,28 @@ class TodoController {
     return true;
   }
 
+  // TODO: write tests
+  async duplicate({ userId, todoId }) {
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to duplicate this todo');
+    }
+
+    const { id, ...todoToDuplicate } = await TodoService.getById(todoId);
+
+    const {
+      todoId: newTodoId,
+      position,
+    } = await this.create(userId, { belowId: todoId, ...todoToDuplicate });
+
+    return {
+      ...todoToDuplicate,
+      columnId: newTodoId,
+      position,
+    };
+  }
+
   async remove({ userId, todoId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -92,8 +185,12 @@ class TodoController {
       throw new BackendError.Forbidden('This account is not allowed to remove this todo');
     }
 
-    // TODO cascade
-    await TodoService.removeById(todoId);
+    const removedTodo = await TodoService.removeById(todoId);
+    const { id: removedId, columnId } = removedTodo;
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const newPositions = PositionComponent.remove(todoPositions, removedId);
+    await TodoPositionsService.updatePositions(columnId, newPositions);
+
     return true;
   }
 }

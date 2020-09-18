@@ -71,10 +71,6 @@ class BoardSchema {
         minLength: 1,
         maxLength: 255,
       },
-      // position: {
-      //   type: 'integer',
-      //   minimum: 0,
-      // },
       cardType: {
         type: 'integer',
         enum: Object.values(CardType),
@@ -97,7 +93,6 @@ class BoardSchema {
     anyOf: [
       { required: ["icon"] },
       { required: ["title"] },
-      // { required: ["position"] },
       { required: ["cardType"] },
       { required: ["description"] },
       { required: ["color"] },

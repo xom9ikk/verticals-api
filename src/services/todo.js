@@ -35,7 +35,6 @@ class TodoService extends Database {
         'id',
         'columnId',
         'title',
-        'position',
         'description',
         'status',
         'color',
@@ -54,7 +53,6 @@ class TodoService extends Database {
         'id',
         'columnId',
         'title',
-        'position',
         'description',
         'status',
         'color',
@@ -80,7 +78,6 @@ class TodoService extends Database {
         'id',
         'columnId',
         'title',
-        'position',
         'description',
         'status',
         'color',
@@ -103,12 +100,23 @@ class TodoService extends Database {
     return todoId;
   }
 
-  removeById(id) {
-    return this.todos
+  async removeById(boardId) {
+    const [removedTodo] = await this.todos
       .where({
-        id,
+        id: boardId,
       })
+      .returning([
+        'id',
+        'columnId',
+        'title',
+        'description',
+        'status',
+        'color',
+        'isArchived',
+        'isNotificationsEnabled',
+      ])
       .del();
+    return removedTodo;
   }
 
   getColumnId(id) {

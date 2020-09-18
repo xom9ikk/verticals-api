@@ -61,7 +61,6 @@ class AuthSchema {
       { required: ["username"] },
     ]
   }
-
   refresh = {
     type: 'object',
     properties: {

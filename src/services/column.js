@@ -78,10 +78,10 @@ class ColumnService extends Database {
     return columnId;
   }
 
-  async removeById(boardId) {
-    const [removedBoard] = await this.columns
+  async removeById(id) {
+    const [removedColumn] = await this.columns
       .where({
-        id: boardId,
+        id,
       })
       .returning([
         'id',
@@ -92,7 +92,7 @@ class ColumnService extends Database {
         'isCollapsed',
       ])
       .del();
-    return removedBoard;
+    return removedColumn;
   }
 
   getBoardId(id) {

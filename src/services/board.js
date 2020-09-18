@@ -40,18 +40,14 @@ class BoardService extends Database {
       );
   }
 
-  update(id, board) {
-    return {
-      then: async (resolve) => {
-        const [boardId] = await this.boards
-          .where({
-            id,
-          })
-          .update(board)
-          .returning('id');
-        return resolve(boardId);
-      },
-    };
+  async update(id, board) {
+    const [boardId] = await this.boards
+      .where({
+        id,
+      })
+      .update(board)
+      .returning('id');
+    return boardId;
   }
 
   async removeById(boardId) {

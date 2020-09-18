@@ -25,7 +25,6 @@ const { RequestPart } = require('../../enums');
  *    required:
  *      - columnId
  *      - title
- *      - position
  *    properties:
  *      columnId:
  *        type: integer
@@ -329,6 +328,17 @@ module.exports = {
       TodoAdapter.getAll,
     );
     fastify.patch(
+      '/position',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'patchTodoPositionBody'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.updatePosition,
+    );
+    fastify.patch(
       '/:todoId',
       {
         preHandler: [
@@ -340,6 +350,17 @@ module.exports = {
         ],
       },
       TodoAdapter.update,
+    );
+    fastify.post(
+      '/duplicate',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'duplicateTodo'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.duplicate,
     );
     fastify.delete(
       '/:todoId',
