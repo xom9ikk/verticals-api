@@ -173,7 +173,7 @@ class TodoController {
 
     return {
       ...todoToDuplicate,
-      columnId: newTodoId,
+      todoId: newTodoId,
       position,
     };
   }
