@@ -77,16 +77,16 @@ class TodoSchema {
         type: 'integer',
         minimum: 0,
       },
+      targetColumnId: {
+        type: 'integer',
+        minimum: 1,
+      },
     },
     required: ['columnId', 'sourcePosition', 'destinationPosition'],
   }
   patchTodoBody = {
     type: 'object',
     properties: {
-      columnId: {
-        type: 'integer',
-        minimum: 1,
-      },
       title: {
         type: 'string',
         minLength: 1,
@@ -118,7 +118,6 @@ class TodoSchema {
       },
     },
     anyOf: [
-      { required: ["columnId"] },
       { required: ["title"] },
       { required: ["description"] },
       { required: ["status"] },

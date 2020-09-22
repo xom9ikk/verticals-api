@@ -21,9 +21,6 @@ class TodoController {
 
     const todoId = await TodoService.create(todo);
     const todoPositions = await TodoPositionsService.getPositions(columnId);
-    if (todoPositions.length === 0) {
-      await TodoPositionsService.create(columnId, []);
-    }
 
     const {
       newPosition,
@@ -49,7 +46,7 @@ class TodoController {
 
     return {
       ...todo,
-      position: PositionComponent.calculatePosition(todoPositions, todo.id),
+      position: PositionComponent.getPositionById(todoPositions, todo.id),
     };
   }
 
@@ -114,19 +111,57 @@ class TodoController {
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    columnId, sourcePosition, destinationPosition,
+    userId, columnId, sourcePosition, destinationPosition, targetColumnId,
   }) {
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const isAccessToSourceColumn = await BoardAccessService.getByColumnId(userId, columnId);
 
-    if (!PositionComponent.isValid(sourcePosition, destinationPosition, todoPositions)) {
-      throw new BackendError.BadRequest('Invalid source or destination position');
+    if (!isAccessToSourceColumn) {
+      throw new BackendError.Forbidden('This account does not have access to source column');
     }
 
-    const newTodoPositions = PositionComponent.move(
-      todoPositions, sourcePosition, destinationPosition,
-    );
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
 
-    await TodoPositionsService.updatePositions(columnId, newTodoPositions);
+    if (targetColumnId) {
+      const isAccessToTargetColumn = await BoardAccessService.getByColumnId(userId, targetColumnId);
+
+      if (!isAccessToTargetColumn) {
+        throw new BackendError.Forbidden('This account does not have access to target column');
+      }
+
+      const targetTodoPositions = await TodoPositionsService.getPositions(targetColumnId);
+
+      if (!PositionComponent.isValidSource(todoPositions, sourcePosition)
+        || !PositionComponent.isValidDestination(targetTodoPositions, destinationPosition)) {
+        throw new BackendError.BadRequest('Invalid source or destination position');
+      }
+
+      const todoId = todoPositions[sourcePosition];
+      const { id, ...todoToMove } = await TodoService.getById(todoId);
+      const movedTodoId = await TodoService.create({ ...todoToMove, columnId: targetColumnId });
+
+      const newTargetTodoPositions = PositionComponent.insertInPosition(
+        targetTodoPositions, destinationPosition, movedTodoId,
+      );
+
+      await TodoPositionsService.updatePositions(targetColumnId, newTargetTodoPositions);
+
+      await TodoService.removeById(todoId);
+      const newSourceTodoPositions = PositionComponent.removeByPosition(
+        todoPositions, sourcePosition,
+      );
+      console.log(columnId, todoPositions, ' => newSourceTodoPositions', newSourceTodoPositions);
+      await TodoPositionsService.updatePositions(columnId, newSourceTodoPositions);
+    } else {
+      if (!PositionComponent.isValidSource(todoPositions, sourcePosition, destinationPosition)) {
+        throw new BackendError.BadRequest('Invalid source or destination position');
+      }
+
+      const newTodoPositions = PositionComponent.move(
+        todoPositions, sourcePosition, destinationPosition,
+      );
+
+      await TodoPositionsService.updatePositions(columnId, newTodoPositions);
+    }
 
     return destinationPosition;
   }
@@ -188,7 +223,7 @@ class TodoController {
     const removedTodo = await TodoService.removeById(todoId);
     const { id: removedId, columnId } = removedTodo;
     const todoPositions = await TodoPositionsService.getPositions(columnId);
-    const newPositions = PositionComponent.remove(todoPositions, removedId);
+    const newPositions = PositionComponent.removeById(todoPositions, removedId);
     await TodoPositionsService.updatePositions(columnId, newPositions);
 
     return true;

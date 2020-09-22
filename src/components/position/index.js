@@ -1,5 +1,5 @@
 class PositionComponent {
-  calculatePosition(positions, neededId) {
+  getPositionById(positions, neededId) {
     return positions.findIndex((id) => id === neededId);
   }
 
@@ -8,7 +8,7 @@ class PositionComponent {
     const newPositions = [...positions];
 
     if (belowId) {
-      const currentPosition = this.calculatePosition(positions, belowId);
+      const currentPosition = this.getPositionById(positions, belowId);
       newPosition = currentPosition + 1;
       newPositions.splice(newPosition, 0, id);
     } else {
@@ -21,10 +21,16 @@ class PositionComponent {
     };
   }
 
+  insertInPosition(positions, position, id) {
+    const newPositions = [...positions];
+    newPositions.splice(position, 0, id);
+    return newPositions;
+  }
+
   orderByPosition(positions, data) {
     return data
       .map((el) => {
-        const currentPosition = this.calculatePosition(positions, el.id);
+        const currentPosition = this.getPositionById(positions, el.id);
         return {
           ...el,
           position: currentPosition,
@@ -43,19 +49,27 @@ class PositionComponent {
     return newPositions;
   }
 
-  remove(positions, removedId) {
+  removeById(positions, removedId) {
     return positions.filter((id) => id !== removedId);
   }
 
-  isValid(sourcePosition, destinationPosition, ids) {
-    const maxPosition = Math.max(sourcePosition, destinationPosition);
-    const minPosition = Math.min(sourcePosition, destinationPosition);
+  removeByPosition(positions, position) {
+    const newPositions = [...positions];
+    newPositions.splice(position, 1);
+    return newPositions;
+  }
 
-    return !(
-      sourcePosition === destinationPosition
-      || maxPosition >= ids.length
-      || minPosition < 0
-    );
+  static isValid(ids, availableSize, ...positions) {
+    const indexes = [...Array(availableSize).keys()].map((i) => i);
+    return positions.every((position) => indexes.includes(position));
+  }
+
+  isValidSource(ids, ...positions) {
+    return PositionComponent.isValid(ids, ids.length, ...positions);
+  }
+
+  isValidDestination(ids, ...positions) {
+    return PositionComponent.isValid(ids, ids.length + 1, ...positions);
   }
 }
 

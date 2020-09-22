@@ -29,9 +29,11 @@ class ColumnAdapter {
   }
 
   async updatePosition(req, res) {
+    const { userId } = req;
     const { boardId, sourcePosition, destinationPosition } = req.body;
 
     await ColumnController.updatePosition({
+      userId,
       boardId,
       sourcePosition,
       destinationPosition,

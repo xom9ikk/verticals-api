@@ -1,4 +1,6 @@
-const { ColumnService, BoardAccessService, ColumnPositionsService } = require('../../services');
+const {
+  ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService,
+} = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
 
@@ -21,9 +23,7 @@ class ColumnController {
 
     const columnId = await ColumnService.create(column);
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    if (columnPositions.length === 0) {
-      await ColumnPositionsService.create(boardId, []);
-    }
+    await TodoPositionsService.create(columnId, []);
 
     const {
       newPosition,
@@ -49,7 +49,7 @@ class ColumnController {
 
     return {
       ...column,
-      position: PositionComponent.calculatePosition(columnPositions, column.id),
+      position: PositionComponent.getPositionById(columnPositions, column.id),
     };
   }
 
@@ -82,11 +82,17 @@ class ColumnController {
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    boardId, sourcePosition, destinationPosition,
+    userId, boardId, sourcePosition, destinationPosition,
   }) {
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to edit this column');
+    }
+
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
-    if (!PositionComponent.isValid(sourcePosition, destinationPosition, columnPositions)) {
+    if (!PositionComponent.isValidSource(columnPositions, sourcePosition, destinationPosition)) {
       throw new BackendError.BadRequest('Invalid source or destination position');
     }
 
@@ -155,7 +161,7 @@ class ColumnController {
     const removedColumn = await ColumnService.removeById(columnId);
     const { id: removedId, boardId } = removedColumn;
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    const newPositions = PositionComponent.remove(columnPositions, removedId);
+    const newPositions = PositionComponent.removeById(columnPositions, removedId);
     await ColumnPositionsService.updatePositions(boardId, newPositions);
 
     return true;

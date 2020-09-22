@@ -1,4 +1,6 @@
-const { BoardService, BoardAccessService, BoardPositionsService } = require('../../services');
+const {
+  BoardService, BoardAccessService, BoardPositionsService, ColumnPositionsService,
+} = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
 
@@ -16,14 +18,14 @@ class BoardController {
 
     await BoardAccessService.create(userId, boardId);
     const boardPositions = await BoardPositionsService.getPositions(userId);
-    console.log('create get pos', boardPositions);
+
     const {
       newPosition,
       newPositions,
     } = PositionComponent.insert(boardPositions, boardId, belowId);
 
     await BoardPositionsService.updatePositions(userId, newPositions);
-    console.log('create new pos', newPositions);
+    await ColumnPositionsService.create(boardId, []);
 
     return { boardId, position: newPosition };
   }
@@ -39,7 +41,7 @@ class BoardController {
     const boardPositions = await BoardPositionsService.getPositions(userId);
     return {
       ...board,
-      position: PositionComponent.calculatePosition(boardPositions, board.id),
+      position: PositionComponent.getPositionById(boardPositions, board.id),
     };
   }
 
@@ -58,8 +60,8 @@ class BoardController {
   // TODO: write tests for updatePosition
   async updatePosition({ userId, sourcePosition, destinationPosition }) {
     const boardPositions = await BoardPositionsService.getPositions(userId);
-    console.log('old', boardPositions);
-    if (!PositionComponent.isValid(sourcePosition, destinationPosition, boardPositions)) {
+
+    if (!PositionComponent.isValidSource(boardPositions, sourcePosition, destinationPosition)) {
       throw new BackendError.BadRequest('Invalid source or destination position');
     }
 
@@ -68,7 +70,6 @@ class BoardController {
     );
 
     await BoardPositionsService.updatePositions(userId, newBoardPositions);
-    console.log('new', newBoardPositions);
 
     return destinationPosition;
   }
@@ -96,7 +97,7 @@ class BoardController {
     const removedBoard = await BoardService.removeById(boardId);
     const { id: removedId } = removedBoard;
     const boardPositions = await BoardPositionsService.getPositions(userId);
-    const newPositions = PositionComponent.remove(boardPositions, removedId);
+    const newPositions = PositionComponent.removeById(boardPositions, removedId);
     await BoardPositionsService.updatePositions(userId, newPositions);
 
     return true;
