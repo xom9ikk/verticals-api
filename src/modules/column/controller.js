@@ -1,8 +1,10 @@
+/* eslint-disable no-restricted-syntax */
 const {
   ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
+const { TodoController } = require('../todo/controller');
 
 class ColumnController {
   async create(userId, { belowId, ...column }) {
@@ -144,10 +146,26 @@ class ColumnController {
       position,
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
+    const todos = await TodoController.getAll(userId, undefined, columnId);
+
+    const todosToDuplicate = todos.map((todo) => {
+      const newTodo = { ...todo, columnId: newColumnId };
+      delete newTodo.id;
+      delete newTodo.position;
+      return newTodo;
+    });
+
+    for await (const todo of todosToDuplicate) {
+      await TodoController.create(userId, todo);
+    }
+
+    const duplicatedTodos = await TodoController.getAll(userId, undefined, newColumnId);
+
     return {
       ...columnToDuplicate,
       columnId: newColumnId,
       position,
+      todos: duplicatedTodos,
     };
   }
 
