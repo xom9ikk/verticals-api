@@ -136,20 +136,15 @@ class TodoController {
       }
 
       const todoId = todoPositions[sourcePosition];
-      const { id, ...todoToMove } = await TodoService.getById(todoId);
-      const movedTodoId = await TodoService.create({ ...todoToMove, columnId: targetColumnId });
-
+      await TodoService.update(todoId, { columnId: targetColumnId });
       const newTargetTodoPositions = PositionComponent.insertInPosition(
-        targetTodoPositions, destinationPosition, movedTodoId,
+        targetTodoPositions, destinationPosition, todoId,
       );
-
       await TodoPositionsService.updatePositions(targetColumnId, newTargetTodoPositions);
 
-      await TodoService.removeById(todoId);
       const newSourceTodoPositions = PositionComponent.removeByPosition(
         todoPositions, sourcePosition,
       );
-      console.log(columnId, todoPositions, ' => newSourceTodoPositions', newSourceTodoPositions);
       await TodoPositionsService.updatePositions(columnId, newSourceTodoPositions);
     } else {
       if (!PositionComponent.isValidSource(todoPositions, sourcePosition, destinationPosition)) {
