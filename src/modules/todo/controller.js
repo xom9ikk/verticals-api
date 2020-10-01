@@ -79,7 +79,7 @@ class TodoController {
     }
 
     if (!todos.length) {
-      throw new BackendError.Forbidden('This account does not have access to any todos');
+      return [];
     }
 
     if (columnId) {
@@ -105,7 +105,6 @@ class TodoController {
         ...PositionComponent.orderByPosition(todoPositions, todosByColumn),
       ];
     });
-
     return orderedTodos;
   }
 

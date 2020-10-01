@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const {
-  ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService,
+  ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService, TodoService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
@@ -75,7 +75,7 @@ class ColumnController {
     const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
 
     if (!columns.length) {
-      throw new BackendError.Forbidden('This account does not have access to any columns');
+      return [];
     }
 
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
@@ -146,12 +146,11 @@ class ColumnController {
       position,
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
-    const todos = await TodoController.getAll(userId, undefined, columnId);
+    const todos = await TodoService.getByColumnId(columnId);
 
     const todosToDuplicate = todos.map((todo) => {
       const newTodo = { ...todo, columnId: newColumnId };
       delete newTodo.id;
-      delete newTodo.position;
       return newTodo;
     });
 
