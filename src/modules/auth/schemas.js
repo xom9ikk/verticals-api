@@ -34,7 +34,6 @@ class AuthSchema {
     },
     required: ['email', 'password', 'name', 'surname', 'username'],
   }
-
   login = {
     type: 'object',
     properties: {

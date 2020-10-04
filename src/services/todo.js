@@ -100,10 +100,10 @@ class TodoService extends Database {
     return todoId;
   }
 
-  async removeById(boardId) {
+  async removeById(todoId) {
     const [removedTodo] = await this.todos
       .where({
-        id: boardId,
+        id: todoId,
       })
       .returning([
         'id',

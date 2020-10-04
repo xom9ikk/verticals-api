@@ -1,6 +1,10 @@
-const { ColumnService, BoardAccessService, ColumnPositionsService } = require('../../services');
+/* eslint-disable no-restricted-syntax */
+const {
+  ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService, TodoService,
+} = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
+const { TodoController } = require('../todo/controller');
 
 class ColumnController {
   async create(userId, { belowId, ...column }) {
@@ -21,9 +25,7 @@ class ColumnController {
 
     const columnId = await ColumnService.create(column);
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    if (columnPositions.length === 0) {
-      await ColumnPositionsService.create(boardId, []);
-    }
+    await TodoPositionsService.create(columnId, []);
 
     const {
       newPosition,
@@ -49,7 +51,7 @@ class ColumnController {
 
     return {
       ...column,
-      position: PositionComponent.calculatePosition(columnPositions, column.id),
+      position: PositionComponent.getPositionById(columnPositions, column.id),
     };
   }
 
@@ -73,7 +75,7 @@ class ColumnController {
     const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
 
     if (!columns.length) {
-      throw new BackendError.Forbidden('This account does not have access to any columns');
+      return [];
     }
 
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
@@ -82,11 +84,17 @@ class ColumnController {
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    boardId, sourcePosition, destinationPosition,
+    userId, boardId, sourcePosition, destinationPosition,
   }) {
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to edit this column');
+    }
+
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
-    if (!PositionComponent.isValid(sourcePosition, destinationPosition, columnPositions)) {
+    if (!PositionComponent.isValidSource(columnPositions, sourcePosition, destinationPosition)) {
       throw new BackendError.BadRequest('Invalid source or destination position');
     }
 
@@ -138,10 +146,25 @@ class ColumnController {
       position,
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
+    const todos = await TodoService.getByColumnId(columnId);
+
+    const todosToDuplicate = todos.map((todo) => {
+      const newTodo = { ...todo, columnId: newColumnId };
+      delete newTodo.id;
+      return newTodo;
+    });
+
+    for await (const todo of todosToDuplicate) {
+      await TodoController.create(userId, todo);
+    }
+
+    const duplicatedTodos = await TodoController.getAll(userId, undefined, newColumnId);
+
     return {
       ...columnToDuplicate,
       columnId: newColumnId,
       position,
+      todos: duplicatedTodos,
     };
   }
 
@@ -155,7 +178,7 @@ class ColumnController {
     const removedColumn = await ColumnService.removeById(columnId);
     const { id: removedId, boardId } = removedColumn;
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    const newPositions = PositionComponent.remove(columnPositions, removedId);
+    const newPositions = PositionComponent.removeById(columnPositions, removedId);
     await ColumnPositionsService.updatePositions(boardId, newPositions);
 
     return true;

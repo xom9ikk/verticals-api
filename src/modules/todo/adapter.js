@@ -29,12 +29,17 @@ class TodoAdapter {
   }
 
   async updatePosition(req, res) {
-    const { columnId, sourcePosition, destinationPosition } = req.body;
+    const { userId } = req;
+    const {
+      columnId, sourcePosition, destinationPosition, targetColumnId,
+    } = req.body;
 
     await TodoController.updatePosition({
+      userId,
       columnId,
       sourcePosition,
       destinationPosition,
+      targetColumnId,
     });
 
     return BackendResponse.Success(res, 'Todo position successfully updated');
