@@ -325,17 +325,6 @@ module.exports = {
       },
       BoardAdapter.update,
     );
-    fastify.post(
-      '/reverse',
-      {
-        preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'reverseColumnOrder'),
-          CheckMiddleware.isAuthenticated,
-          FetchMiddleware.getUserId,
-        ],
-      },
-      BoardAdapter.reverseColumnOrder,
-    );
     fastify.delete(
       '/:boardId',
       {

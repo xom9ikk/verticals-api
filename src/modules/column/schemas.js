@@ -127,6 +127,16 @@ class ColumnSchema {
     },
     required: ['columnId'],
   }
+  reverseOrder = {
+    type: 'object',
+    properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['boardId'],
+  }
   deleteColumnParams = {
     type: 'object',
     properties: {

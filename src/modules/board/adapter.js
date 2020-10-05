@@ -47,18 +47,6 @@ class BoardAdapter {
     return BackendResponse.Success(res, 'Board successfully updated');
   }
 
-  async reverseColumnOrder(req, res) {
-    const { userId } = req;
-    const { boardId } = req.body;
-
-    await BoardController.reverseColumnOrder({
-      userId,
-      boardId,
-    });
-
-    return BackendResponse.Success(res, 'Columns successfully reversed');
-  }
-
   async remove(req, res) {
     const { userId } = req;
     const { boardId } = req.params;

@@ -168,6 +168,23 @@ class ColumnController {
     };
   }
 
+  // TODO: write tests for reverseOrder
+  async reverseOrder({ userId, boardId }) {
+    const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to reverse columns in this board');
+    }
+
+    const columnPositions = await ColumnPositionsService.getPositions(boardId);
+
+    const newColumnPositions = PositionComponent.reverse(columnPositions);
+
+    await ColumnPositionsService.updatePositions(boardId, newColumnPositions);
+
+    return true;
+  }
+
   async remove({ userId, columnId }) {
     const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 

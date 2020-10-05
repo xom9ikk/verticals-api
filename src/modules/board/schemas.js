@@ -108,16 +108,6 @@ class BoardSchema {
     },
     required: ['boardId'],
   }
-  reverseColumnOrder = {
-    type: 'object',
-    properties: {
-      boardId: {
-        type: 'integer',
-        minimum: 1,
-      },
-    },
-    required: ['boardId'],
-  }
   deleteBoardParams = {
     type: 'object',
     properties: {
