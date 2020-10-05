@@ -305,7 +305,7 @@ module.exports = {
       '/position',
       {
         preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'patchBoardPositionBody'),
+          SchemaValidator.validate(RequestPart.body, 'patchBoardPosition'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
@@ -324,6 +324,17 @@ module.exports = {
         ],
       },
       BoardAdapter.update,
+    );
+    fastify.post(
+      '/reverse',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'reverseColumnOrder'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      BoardAdapter.reverseColumnOrder,
     );
     fastify.delete(
       '/:boardId',

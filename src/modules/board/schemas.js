@@ -44,7 +44,7 @@ class BoardSchema {
     },
     required: ['boardId'],
   }
-  patchBoardPositionBody = {
+  patchBoardPosition = {
     type: 'object',
     properties: {
       sourcePosition: {
@@ -99,6 +99,16 @@ class BoardSchema {
     ]
   }
   patchBoardParams = {
+    type: 'object',
+    properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['boardId'],
+  }
+  reverseColumnOrder = {
     type: 'object',
     properties: {
       boardId: {
