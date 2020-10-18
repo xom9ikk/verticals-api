@@ -2,7 +2,7 @@ const { compare, hash } = require('bcryptjs');
 const { BackendError, TokenComponent } = require('../../components');
 const { BoardController } = require('../board/controller');
 const {
-  TokenService, UserService, BoardPositionsService, ColumnPositionsService,
+  TokenService, UserService, BoardPositionsService,
 } = require('../../services');
 
 class AuthController {
@@ -101,14 +101,6 @@ class AuthController {
       throw new BackendError.NotFound(`Logout failed. Token ${token} not found`);
     }
     return true;
-  }
-
-  async me({ userId }) {
-    const user = await UserService.getById(userId);
-    if (!user) {
-      throw new BackendError.NotFound('User not found');
-    }
-    return user;
   }
 }
 

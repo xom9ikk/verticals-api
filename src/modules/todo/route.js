@@ -36,7 +36,7 @@ const { RequestPart } = require('../../enums');
  *        type: string
  *      status:
  *        type: integer
- *        enum: [0, 1, 2]
+ *        enum: [0, 1, 2, 3]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
@@ -101,7 +101,7 @@ const { RequestPart } = require('../../enums');
  *             type: string
  *           status:
  *             type: integer
- *             enum: [0, 1, 2]
+ *             enum: [0, 1, 2, 3]
  *           color:
  *             type: integer
  *             enum: [0, 1, 2, 3, 4, 5, 6]
@@ -202,7 +202,7 @@ const { RequestPart } = require('../../enums');
  *        type: string
  *      status:
  *        type: integer
- *        enum: [0, 1, 2]
+ *        enum: [0, 1, 2, 3]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]

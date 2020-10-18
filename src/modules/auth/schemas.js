@@ -34,6 +34,7 @@ class AuthSchema {
     },
     required: ['email', 'password', 'name', 'surname', 'username'],
   }
+
   login = {
     type: 'object',
     properties: {
@@ -56,10 +57,11 @@ class AuthSchema {
     },
     required: ['password'],
     anyOf: [
-      { required: ["email"] },
-      { required: ["username"] },
-    ]
+      { required: ['email'] },
+      { required: ['username'] },
+    ],
   }
+
   refresh = {
     type: 'object',
     properties: {

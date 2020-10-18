@@ -35,10 +35,11 @@ class TodoSchema {
       belowId: {
         type: 'integer',
         minimum: 1,
-      }
+      },
     },
     required: ['columnId', 'title'],
   }
+
   getTodo = {
     type: 'object',
     properties: {
@@ -49,6 +50,7 @@ class TodoSchema {
     },
     required: ['todoId'],
   }
+
   getTodosQuery = {
     type: 'object',
     properties: {
@@ -62,6 +64,7 @@ class TodoSchema {
       },
     },
   }
+
   patchTodoPositionBody = {
     type: 'object',
     properties: {
@@ -84,6 +87,7 @@ class TodoSchema {
     },
     required: ['columnId', 'sourcePosition', 'destinationPosition'],
   }
+
   patchTodoBody = {
     type: 'object',
     properties: {
@@ -118,14 +122,15 @@ class TodoSchema {
       },
     },
     anyOf: [
-      { required: ["title"] },
-      { required: ["description"] },
-      { required: ["status"] },
-      { required: ["color"] },
-      { required: ["isArchived"] },
-      { required: ["isNotificationsEnabled"] },
+      { required: ['title'] },
+      { required: ['description'] },
+      { required: ['status'] },
+      { required: ['color'] },
+      { required: ['isArchived'] },
+      { required: ['isNotificationsEnabled'] },
     ],
   }
+
   patchTodoParams = {
     type: 'object',
     properties: {
@@ -136,6 +141,7 @@ class TodoSchema {
     },
     required: ['todoId'],
   }
+
   duplicateTodo = {
     type: 'object',
     properties: {
@@ -146,6 +152,7 @@ class TodoSchema {
     },
     required: ['todoId'],
   }
+
   deleteTodoParams = {
     type: 'object',
     properties: {

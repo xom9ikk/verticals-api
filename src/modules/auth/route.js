@@ -2,7 +2,6 @@ const { AuthAdapter } = require('./adapter');
 const {
   SchemaValidator,
   CheckMiddleware,
-  FetchMiddleware,
 } = require('../../middlewares');
 const { RequestPart } = require('../../enums');
 
@@ -269,15 +268,6 @@ module.exports = {
           CheckMiddleware.isAuthenticated,
         ],
       }, AuthAdapter.logout,
-    );
-    fastify.get(
-      '/me',
-      {
-        preHandler: [
-          CheckMiddleware.isAuthenticated,
-          FetchMiddleware.getUserId,
-        ],
-      }, AuthAdapter.me,
     );
     done();
   },

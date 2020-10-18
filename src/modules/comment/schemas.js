@@ -18,6 +18,7 @@ class CommentSchema {
     },
     required: ['todoId'],
   }
+
   getComment = {
     type: 'object',
     properties: {
@@ -28,6 +29,7 @@ class CommentSchema {
     },
     required: ['commentId'],
   }
+
   getCommentsQuery = {
     type: 'object',
     properties: {
@@ -42,6 +44,7 @@ class CommentSchema {
       },
     },
   }
+
   patchCommentBody = {
     type: 'object',
     properties: {
@@ -53,6 +56,7 @@ class CommentSchema {
     },
     required: ['text'],
   }
+
   patchCommentParams = {
     type: 'object',
     properties: {
@@ -63,6 +67,7 @@ class CommentSchema {
     },
     required: ['commentId'],
   }
+
   deleteCommentParams = {
     type: 'object',
     properties: {

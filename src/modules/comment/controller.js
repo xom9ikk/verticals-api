@@ -82,7 +82,7 @@ class CommentController {
 
     const updatedComment = await CommentService.update(commentId, {
       ...patch,
-      isEdited: true,
+      editDate: new Date(),
     });
 
     if (updatedComment === undefined) {

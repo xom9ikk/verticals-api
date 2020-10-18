@@ -9,6 +9,7 @@ class CommentAttachmentSchema {
     },
     required: ['commentId'],
   }
+
   deleteAttachmentParams = {
     type: 'object',
     properties: {

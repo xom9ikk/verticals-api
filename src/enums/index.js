@@ -32,5 +32,6 @@ module.exports = {
     todo: 0,
     doing: 1,
     done: 2,
+    canceled: 3,
   },
 };

@@ -30,7 +30,6 @@ class BoardPositionsService extends Database {
         userId,
       })
       .first();
-    console.log('getPositions', response);
     return response ? response.order : [];
   }
 }
