@@ -305,7 +305,7 @@ module.exports = {
       '/position',
       {
         preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'patchBoardPositionBody'),
+          SchemaValidator.validate(RequestPart.body, 'patchBoardPosition'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],

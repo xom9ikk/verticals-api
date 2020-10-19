@@ -64,6 +64,18 @@ class ColumnAdapter {
     return BackendResponse.Success(res, 'Column successfully duplicated', column);
   }
 
+  async reverseOrder(req, res) {
+    const { userId } = req;
+    const { boardId } = req.body;
+
+    await ColumnController.reverseOrder({
+      userId,
+      boardId,
+    });
+
+    return BackendResponse.Success(res, 'Columns successfully reversed');
+  }
+
   async remove(req, res) {
     const { userId } = req;
     const { columnId } = req.params;

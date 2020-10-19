@@ -116,7 +116,7 @@ module.exports = {
           SchemaValidator.validate(RequestPart.params, 'uploadAttachmentToCommentParams'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
-          BusboyMiddleware.generateFileInfo('uploads'),
+          BusboyMiddleware.generateFileInfo,
         ],
       },
       CommentAttachmentAdapter.saveAttachment,

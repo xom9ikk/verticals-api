@@ -1,4 +1,4 @@
-const { CardType, Color } = require("../../enums");
+const { CardType, Color } = require('../../enums');
 
 class BoardSchema {
   createBoard = {
@@ -30,10 +30,11 @@ class BoardSchema {
       belowId: {
         type: 'integer',
         minimum: 1,
-      }
+      },
     },
     required: ['icon', 'title'],
   }
+
   getBoard = {
     type: 'object',
     properties: {
@@ -44,7 +45,8 @@ class BoardSchema {
     },
     required: ['boardId'],
   }
-  patchBoardPositionBody = {
+
+  patchBoardPosition = {
     type: 'object',
     properties: {
       sourcePosition: {
@@ -58,6 +60,7 @@ class BoardSchema {
     },
     required: ['sourcePosition', 'destinationPosition'],
   }
+
   patchBoardBody = {
     type: 'object',
     properties: {
@@ -91,13 +94,14 @@ class BoardSchema {
       },
     },
     anyOf: [
-      { required: ["icon"] },
-      { required: ["title"] },
-      { required: ["cardType"] },
-      { required: ["description"] },
-      { required: ["color"] },
-    ]
+      { required: ['icon'] },
+      { required: ['title'] },
+      { required: ['cardType'] },
+      { required: ['description'] },
+      { required: ['color'] },
+    ],
   }
+
   patchBoardParams = {
     type: 'object',
     properties: {
@@ -108,6 +112,7 @@ class BoardSchema {
     },
     required: ['boardId'],
   }
+
   deleteBoardParams = {
     type: 'object',
     properties: {

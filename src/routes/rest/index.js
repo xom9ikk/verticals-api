@@ -1,10 +1,11 @@
 const { swagger } = require('../../swagger');
 const {
   allowHeadersHandler,
-  clientErrorHandler,
+  errorHandler,
   notFoundHandler,
 } = require('./common');
 const { authRouter } = require('../../modules/auth/route');
+const { userRouter } = require('../../modules/user/route');
 const { boardRouter } = require('../../modules/board/route');
 const { columnRouter } = require('../../modules/column/route');
 const { todoRouter } = require('../../modules/todo/route');
@@ -18,6 +19,7 @@ module.exports = {
       res.status(200);
       res.send();
     });
+    fastify.register(userRouter, { prefix: '/api/v1/user' });
     fastify.register(authRouter, { prefix: '/api/v1/auth' });
     fastify.register(boardRouter, { prefix: '/api/v1/board' });
     fastify.register(columnRouter, { prefix: '/api/v1/column' });
@@ -25,7 +27,7 @@ module.exports = {
     fastify.register(commentRouter, { prefix: '/api/v1/comment' });
     fastify.register(commentAttachmentRouter, { prefix: '/api/v1/comment-attachment' });
     fastify.register(swagger);
-    fastify.setErrorHandler(clientErrorHandler);
+    fastify.setErrorHandler(errorHandler);
     fastify.setNotFoundHandler(notFoundHandler);
     done();
   },

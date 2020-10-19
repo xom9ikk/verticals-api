@@ -39,12 +39,6 @@ class AuthAdapter {
     await AuthController.logout({ token: parsedBearerToken });
     return BackendResponse.Success(res, 'Success logout');
   }
-
-  async me(req, res) {
-    const { userId } = req;
-    const user = await AuthController.me({ userId });
-    return BackendResponse.Success(res, 'User successfully received', user);
-  }
 }
 
 module.exports = {

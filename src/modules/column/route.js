@@ -341,6 +341,17 @@ module.exports = {
       },
       ColumnAdapter.duplicate,
     );
+    fastify.post(
+      '/reverse',
+      {
+        preHandler: [
+          SchemaValidator.validate(RequestPart.body, 'reverseOrder'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      ColumnAdapter.reverseOrder,
+    );
     fastify.delete(
       '/:columnId',
       {

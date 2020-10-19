@@ -1,4 +1,4 @@
-const { Color } = require("../../enums");
+const { Color } = require('../../enums');
 
 class ColumnSchema {
   createColumn = {
@@ -28,10 +28,11 @@ class ColumnSchema {
       belowId: {
         type: 'integer',
         minimum: 1,
-      }
+      },
     },
     required: ['boardId', 'title'],
   }
+
   getColumn = {
     type: 'object',
     properties: {
@@ -42,6 +43,7 @@ class ColumnSchema {
     },
     required: ['columnId'],
   }
+
   getColumnsQuery = {
     type: 'object',
     properties: {
@@ -51,6 +53,7 @@ class ColumnSchema {
       },
     },
   }
+
   patchColumnPositionBody = {
     type: 'object',
     properties: {
@@ -69,6 +72,7 @@ class ColumnSchema {
     },
     required: ['boardId', 'sourcePosition', 'destinationPosition'],
   }
+
   patchColumnBody = {
     type: 'object',
     properties: {
@@ -100,13 +104,14 @@ class ColumnSchema {
       },
     },
     anyOf: [
-      { required: ["boardId"] },
-      { required: ["title"] },
-      { required: ["description"] },
-      { required: ["color"] },
-      { required: ["isCollapsed"] },
+      { required: ['boardId'] },
+      { required: ['title'] },
+      { required: ['description'] },
+      { required: ['color'] },
+      { required: ['isCollapsed'] },
     ],
   }
+
   patchColumnParams = {
     type: 'object',
     properties: {
@@ -117,6 +122,7 @@ class ColumnSchema {
     },
     required: ['columnId'],
   }
+
   duplicateColumn = {
     type: 'object',
     properties: {
@@ -127,6 +133,18 @@ class ColumnSchema {
     },
     required: ['columnId'],
   }
+
+  reverseOrder = {
+    type: 'object',
+    properties: {
+      boardId: {
+        type: 'integer',
+        minimum: 1,
+      },
+    },
+    required: ['boardId'],
+  }
+
   deleteColumnParams = {
     type: 'object',
     properties: {

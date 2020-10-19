@@ -3,23 +3,34 @@ const path = require('path');
 const { v4: uuidV4 } = require('uuid');
 const mime = require('mime-types');
 
-const { UPLOADS_FOLDER, COMMENTS_FOLDER } = process.env;
+const {
+  FOLDER_UPLOADS,
+  FOLDER_COMMENTS,
+  FOLDER_AVATARS,
+} = process.env;
 
 class FileComponent {
   constructor() {
-    this.relativePathToComments = path.join(
-      UPLOADS_FOLDER,
-      COMMENTS_FOLDER,
-    );
+    this.folders = {
+      comments: FileComponent.generateRelativePath(FOLDER_COMMENTS),
+      avatars: FileComponent.generateRelativePath(FOLDER_AVATARS),
+    };
+  }
+
+  static generateRelativePath(folder) {
+    return path.join(FOLDER_UPLOADS, folder);
   }
 
   createFolders() {
-    const comments = path.resolve(this.relativePathToComments);
-    fs.mkdirSync(comments, { recursive: true });
+    const folderKeys = Object.keys(this.folders);
+    folderKeys.forEach((key) => {
+      const absolutePathToFolder = path.resolve(this.folders[key]);
+      this.createFolder(absolutePathToFolder);
+    });
   }
 
-  saveCommentAttachment(data) {
-    return this.saveFile(this.relativePathToComments, data);
+  createFolder(pathToFolder) {
+    fs.mkdirSync(pathToFolder, { recursive: true });
   }
 
   removeFile(relativePathToFile) {

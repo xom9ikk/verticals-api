@@ -71,6 +71,10 @@ class PositionComponent {
   isValidDestination(ids, ...positions) {
     return PositionComponent.isValid(ids, ids.length + 1, ...positions);
   }
+
+  reverse(ids) {
+    return ids.reverse();
+  }
 }
 
 module.exports = {

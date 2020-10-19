@@ -1,6 +1,8 @@
 module.exports = {
+  parser: 'babel-eslint',
   parserOptions: {
     ecmaVersion: 2020,
+    sourceType: 'module',
   },
   extends: [
     'airbnb-base',
@@ -20,6 +22,7 @@ module.exports = {
     wss: true,
   },
   env: {
+    es6: true,
     node: true,
     'jest/globals': true,
   },

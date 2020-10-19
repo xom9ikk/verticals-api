@@ -1,9 +1,10 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle,max-len */
 const ajv = require('ajv');
 const { SocketError } = require('../components/error');
 const { BackendError } = require('../components/error');
 
 const { AuthSchema } = require('../modules/auth/schemas');
+const { UserSchema } = require('../modules/user/schemas');
 const { BoardSchema } = require('../modules/board/schemas');
 const { ColumnSchema } = require('../modules/column/schemas');
 const { TodoSchema } = require('../modules/todo/schemas');
@@ -17,6 +18,7 @@ class SchemaValidator {
       removeAdditional: 'all',
     });
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
+    Object.keys(UserSchema).map((key) => this.ajv.addSchema(UserSchema[key], key));
     Object.keys(BoardSchema).map((key) => this.ajv.addSchema(BoardSchema[key], key));
     Object.keys(ColumnSchema).map((key) => this.ajv.addSchema(ColumnSchema[key], key));
     Object.keys(TodoSchema).map((key) => this.ajv.addSchema(TodoSchema[key], key));

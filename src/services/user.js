@@ -22,6 +22,8 @@ class UserService extends Database {
         'name',
         'surname',
         'username',
+        'bio',
+        'avatar',
       ])
       .where({
         id,
@@ -36,6 +38,8 @@ class UserService extends Database {
         'name',
         'surname',
         'username',
+        'bio',
+        'avatar',
       ])
       .where({
         email,
@@ -50,6 +54,8 @@ class UserService extends Database {
         'name',
         'surname',
         'username',
+        'bio',
+        'avatar',
       ])
       .where({
         username,
@@ -79,6 +85,16 @@ class UserService extends Database {
         username,
       })
       .first();
+  }
+
+  async update(id, data) {
+    const [userId] = await this.users
+      .where({
+        id,
+      })
+      .update(data)
+      .returning('id');
+    return userId;
   }
 }
 
