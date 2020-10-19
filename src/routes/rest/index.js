@@ -1,7 +1,7 @@
 const { swagger } = require('../../swagger');
 const {
   allowHeadersHandler,
-  clientErrorHandler,
+  errorHandler,
   notFoundHandler,
 } = require('./common');
 const { authRouter } = require('../../modules/auth/route');
@@ -27,7 +27,7 @@ module.exports = {
     fastify.register(commentRouter, { prefix: '/api/v1/comment' });
     fastify.register(commentAttachmentRouter, { prefix: '/api/v1/comment-attachment' });
     fastify.register(swagger);
-    fastify.setErrorHandler(clientErrorHandler);
+    fastify.setErrorHandler(errorHandler);
     fastify.setNotFoundHandler(notFoundHandler);
     done();
   },

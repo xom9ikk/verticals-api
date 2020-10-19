@@ -1,6 +1,5 @@
-const { FileComponent } = require('../../components/file');
 const { BoardAccessService, CommentFilesService } = require('../../services');
-const { BackendError } = require('../../components/error');
+const { BackendError, FileComponent } = require('../../components');
 
 class CommentAttachmentController {
   async saveAttachment({ userId, commentId, file }) {
@@ -10,7 +9,7 @@ class CommentAttachmentController {
       throw new BackendError.Forbidden('This account is not allowed to attach files to this comment');
     }
 
-    const savedFile = await FileComponent.saveCommentAttachment(file);
+    const savedFile = await FileComponent.saveFile(FileComponent.folders.comments, file);
 
     const attachmentId = await CommentFilesService.create({
       ...savedFile,

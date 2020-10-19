@@ -16,7 +16,7 @@ class RoutesHandler {
     );
   }
 
-  clientErrorHandler(error, req, res) {
+  errorHandler(error, req, res) {
     const isCustomError = error instanceof GeneralError;
     if (isCustomError) {
       const { status, msg } = error;

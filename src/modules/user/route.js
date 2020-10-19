@@ -3,6 +3,7 @@ const {
   SchemaValidator,
   CheckMiddleware,
   FetchMiddleware,
+  BusboyMiddleware,
 } = require('../../middlewares');
 
 const { RequestPart } = require('../../enums');
@@ -106,6 +107,27 @@ module.exports = {
         ],
       },
       UserAdapter.update,
+    );
+    fastify.post(
+      '/avatar',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+          BusboyMiddleware.generateFileInfo,
+        ],
+      },
+      UserAdapter.saveAvatar,
+    );
+    fastify.delete(
+      '/avatar',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      UserAdapter.removeAvatar,
     );
     done();
   },

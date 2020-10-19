@@ -23,6 +23,7 @@ class UserService extends Database {
         'surname',
         'username',
         'bio',
+        'avatar',
       ])
       .where({
         id,
@@ -38,6 +39,7 @@ class UserService extends Database {
         'surname',
         'username',
         'bio',
+        'avatar',
       ])
       .where({
         email,
@@ -53,6 +55,7 @@ class UserService extends Database {
         'surname',
         'username',
         'bio',
+        'avatar',
       ])
       .where({
         username,
