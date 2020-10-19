@@ -3,6 +3,8 @@ const {
   UserService,
 } = require('../../services');
 
+const { CDN_DOMAIN } = process.env;
+
 // TODO: tests
 class UserController {
   async me({ userId }) {
@@ -10,7 +12,13 @@ class UserController {
     if (!user) {
       throw new BackendError.NotFound('User not found');
     }
-    return user;
+
+    const avatar = user.avatar ? `http://${CDN_DOMAIN}/${user.avatar}` : user.avatar;
+
+    return {
+      ...user,
+      avatar,
+    };
   }
 
   async update({ userId, patch }) {
