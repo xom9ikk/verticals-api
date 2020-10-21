@@ -1,5 +1,4 @@
-const { compare, hash } = require('bcryptjs');
-const { BackendError, TokenComponent } = require('../../components');
+const { BackendError, PasswordComponent, TokenComponent } = require('../../components');
 const { BoardController } = require('../board/controller');
 const {
   TokenService, UserService, BoardPositionsService,
@@ -9,15 +8,11 @@ class AuthController {
   async register({
     email, password, name, surname, username, ip,
   }) {
-    const hashPassword = await hash(password, 10);
+    const hashPassword = await PasswordComponent.hash(password);
 
     const registeredUserId = await UserService.create({
       password: hashPassword, email, name, surname, username,
     });
-
-    if (!registeredUserId) {
-      throw new BackendError.Conflict('User with this email or username already registered');
-    }
 
     const tokens = await TokenComponent.issueTokenPair(registeredUserId);
 
@@ -56,7 +51,7 @@ class AuthController {
 
     const { password, id: userId } = user;
 
-    const isValidPassword = await compare(userInputPassword, password);
+    const isValidPassword = await PasswordComponent.compare(userInputPassword, password);
 
     if (!isValidPassword) {
       throw new BackendError.Forbidden('Email or password is wrong');
@@ -100,6 +95,22 @@ class AuthController {
     if (!removeTokenPair) {
       throw new BackendError.NotFound(`Logout failed. Token ${token} not found`);
     }
+    return true;
+  }
+
+  async changePassword({ userId, oldPassword, newPassword }) {
+    const { password } = await UserService.getPasswordById(userId);
+
+    const isValidPassword = await PasswordComponent.compare(oldPassword, password);
+
+    if (!isValidPassword) {
+      throw new BackendError.Forbidden('Old password is wrong');
+    }
+
+    const hashPassword = await PasswordComponent.hash(newPassword);
+
+    await UserService.update(userId, { password: hashPassword });
+
     return true;
   }
 }

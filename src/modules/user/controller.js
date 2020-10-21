@@ -5,6 +5,8 @@ const {
 
 const { CDN_DOMAIN } = process.env;
 
+const transformAvatarLink = (avatar) => (avatar ? `http://${CDN_DOMAIN}/${avatar}` : avatar);
+
 // TODO: tests
 class UserController {
   async me({ userId }) {
@@ -13,7 +15,7 @@ class UserController {
       throw new BackendError.NotFound('User not found');
     }
 
-    const avatar = user.avatar ? `http://${CDN_DOMAIN}/${user.avatar}` : user.avatar;
+    const avatar = transformAvatarLink(user.avatar);
 
     return {
       ...user,
@@ -33,7 +35,7 @@ class UserController {
       avatar: path,
     });
 
-    return path;
+    return transformAvatarLink(path);
   }
 
   async removeAvatar({ userId }) {
