@@ -159,7 +159,7 @@ describe('create', () => {
     const todoId = user.getRandomTodoId();
 
     const comment = Generator.Comment.getUnique(todoId);
-    delete comment.editDate;
+    delete comment.updatedAt;
     const res = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -204,7 +204,7 @@ describe('create', () => {
 
     const comment = Generator.Comment.getUnique(todoId);
     delete comment.text;
-    delete comment.editDate;
+    delete comment.updatedAt;
     delete comment.replyCommentId;
     const res = await request()
       .post(`${routes.comment}/`)
@@ -354,7 +354,7 @@ describe('get comment by id', () => {
       id: commentId,
       ...comment,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
       attachedFiles: [],
     });
 
@@ -477,12 +477,12 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
     }, {
       id: commentIdTwo,
       ...commentTwo,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
     }]);
 
     done();
@@ -527,7 +527,7 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
     }]);
 
     done();
@@ -573,7 +573,7 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
     }]);
 
     done();
@@ -619,7 +619,7 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      editDate: null,
+      updatedAt: null,
     }]);
 
     done();
@@ -912,7 +912,7 @@ describe('update comment', () => {
       id: commentId,
       ...newComment,
       replyCommentId: null,
-      editDate: expect.any(Date),
+      updatedAt: expect.any(Date),
       attachedFiles: [],
     });
 

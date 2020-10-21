@@ -53,7 +53,8 @@ class CommentService extends Database {
         'comments.todoId',
         'comments.text',
         'comments.replyCommentId',
-        'comments.editDate',
+        'comments.createdAt',
+        'comments.updatedAt',
         knex.raw(`COALESCE(json_agg(json_build_object(
                'id', comment_files.id,
                'path', comment_files.path,
@@ -75,7 +76,8 @@ class CommentService extends Database {
         'todoId',
         'text',
         'replyCommentId',
-        'editDate',
+        'updatedAt',
+        'createdAt',
       ])
       .where({
         todoId,
@@ -97,7 +99,8 @@ class CommentService extends Database {
         'todoId',
         'text',
         'replyCommentId',
-        'editDate',
+        'updatedAt',
+        'createdAt',
       ])
       .whereIn(
         'todoId',
@@ -130,7 +133,8 @@ class CommentService extends Database {
         'todoId',
         'text',
         'replyCommentId',
-        'editDate',
+        'updatedAt',
+        'createdAt',
       ])
       .whereIn(
         'todoId',

@@ -80,10 +80,7 @@ class CommentController {
       }
     }
 
-    const updatedComment = await CommentService.update(commentId, {
-      ...patch,
-      editDate: new Date(),
-    });
+    const updatedComment = await CommentService.update(commentId, patch);
 
     if (updatedComment === undefined) {
       throw new BackendError.Forbidden('This account is not allowed to edit this comment');

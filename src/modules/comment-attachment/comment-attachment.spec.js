@@ -255,7 +255,7 @@ describe('upload attachment', () => {
         todoId: expect.any(Number),
         text: expect.any(String),
         replyCommentId: null,
-        editDate: expect.any(Date),
+        updatedAt: expect.any(Date),
         attachedFiles: expect.arrayContaining([{
           ...resAttach.body.data,
         }]),

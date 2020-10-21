@@ -23,6 +23,9 @@ class CollectionIterator {
     if (isArray(data)) {
       return map(data, (element) => CollectionIterator._deepIterate(element, transformer, type));
     }
+    if (data instanceof Date) {
+      return data.getTime();
+    }
     if (isObject(data)) {
       let iterateData = data;
       if (type === iterationType.keys) {
