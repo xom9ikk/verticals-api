@@ -5,6 +5,7 @@ const { ValidatorComponent } = require('./auth/validator');
 const { PasswordComponent } = require('./auth/password');
 const { PositionComponent } = require('./position');
 const { FileComponent } = require('./file');
+const { TransformerComponent } = require('./transformer');
 
 module.exports = {
   BackendError,
@@ -15,4 +16,5 @@ module.exports = {
   PasswordComponent,
   PositionComponent,
   FileComponent,
+  TransformerComponent,
 };

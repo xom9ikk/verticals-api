@@ -38,34 +38,18 @@ class CommentService extends Database {
   }
 
   getById(id) {
-    return knex('comments')
+    return this.comments
+      .select([
+        'id',
+        'todoId',
+        'text',
+        'replyCommentId',
+        'updatedAt',
+        'createdAt',
+      ])
       .where({
-        'comments.id':
         id,
       })
-      .leftJoin(
-        'comment_files',
-        'comment_files.comment_id',
-        id,
-      )
-      .select(
-        'comments.id',
-        'comments.todoId',
-        'comments.text',
-        'comments.replyCommentId',
-        'comments.createdAt',
-        'comments.updatedAt',
-        knex.raw(`COALESCE(json_agg(json_build_object(
-               'id', comment_files.id,
-               'path', comment_files.path,
-               'name', comment_files.name,
-               'extension', comment_files.extension,
-               'size', comment_files.size,
-               'mime_type', comment_files.mime_type,
-               'encoding', comment_files.encoding
-           )) FILTER (WHERE comment_files.comment_id IS NOT NULL), '[]') AS attached_files`),
-      )
-      .groupBy('comments.id')
       .first();
   }
 
