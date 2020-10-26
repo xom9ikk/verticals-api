@@ -71,6 +71,19 @@ class AuthSchema {
     },
     required: ['refreshToken'],
   }
+
+  changePassword = {
+    type: 'object',
+    properties: {
+      oldPassword: {
+        type: 'string',
+      },
+      newPassword: {
+        type: 'string',
+      },
+    },
+    required: ['oldPassword', 'newPassword'],
+  }
 }
 
 module.exports = {

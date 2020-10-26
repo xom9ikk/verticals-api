@@ -22,9 +22,6 @@ exports.up = async (knex) => {
       .inTable('comments')
       .onDelete('CASCADE');
     table
-      .boolean('is_edited')
-      .defaultTo(false);
-    table
       .timestamps(false, true);
   });
 

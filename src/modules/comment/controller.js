@@ -33,7 +33,7 @@ class CommentController {
     if (boardId) {
       const isAccessToBoard = await BoardAccessService.getByBoardId(userId, boardId);
       if (!isAccessToBoard) {
-        throw new BackendError.Forbidden('1This account is not allowed to receive comments for this board');
+        throw new BackendError.Forbidden('This account is not allowed to receive comments for this board');
       }
       boardIdsWithAccess = [boardId];
     } else {
@@ -41,7 +41,7 @@ class CommentController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('2This account does not have access to any boards');
+      throw new BackendError.Forbidden('This account does not have access to any boards');
     }
 
     let comments;
@@ -80,10 +80,7 @@ class CommentController {
       }
     }
 
-    const updatedComment = await CommentService.update(commentId, {
-      ...patch,
-      editDate: new Date(),
-    });
+    const updatedComment = await CommentService.update(commentId, patch);
 
     if (updatedComment === undefined) {
       throw new BackendError.Forbidden('This account is not allowed to edit this comment');

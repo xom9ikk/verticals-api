@@ -2,17 +2,10 @@ const { Database } = require('../database');
 
 class UserService extends Database {
   async create(user) {
-    try {
-      const [userId] = await this.users
-        .insert(user)
-        .returning('id');
-      return userId;
-    } catch (e) {
-      if (e.code === '23505') {
-        return undefined;
-      }
-      throw new Error(e);
-    }
+    const [userId] = await this.users
+      .insert(user)
+      .returning('id');
+    return userId;
   }
 
   getById(id) {
@@ -24,6 +17,17 @@ class UserService extends Database {
         'username',
         'bio',
         'avatar',
+      ])
+      .where({
+        id,
+      })
+      .first();
+  }
+
+  getPasswordById(id) {
+    return this.users
+      .select([
+        'password',
       ])
       .where({
         id,

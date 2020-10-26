@@ -10,6 +10,21 @@ class CommentAttachmentSchema {
     required: ['commentId'],
   }
 
+  getCommentAttachmentsQuery = {
+    type: 'object',
+    properties: {
+      boardId: {
+        type: 'integer',
+      },
+      columnId: {
+        type: 'integer',
+      },
+      todoId: {
+        type: 'integer',
+      },
+    },
+  }
+
   deleteAttachmentParams = {
     type: 'object',
     properties: {

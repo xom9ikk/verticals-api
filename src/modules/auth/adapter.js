@@ -37,7 +37,14 @@ class AuthAdapter {
   async logout(req, res) {
     const { parsedBearerToken } = req;
     await AuthController.logout({ token: parsedBearerToken });
-    return BackendResponse.Success(res, 'Success logout');
+    return BackendResponse.Success(res, 'Successful logout');
+  }
+
+  async changePassword(req, res) {
+    const { userId } = req;
+    const { oldPassword, newPassword } = req.body;
+    await AuthController.changePassword({ userId, oldPassword, newPassword });
+    return BackendResponse.Success(res, 'Successful password change');
   }
 }
 

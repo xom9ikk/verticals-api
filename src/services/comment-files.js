@@ -8,24 +8,136 @@ class CommentFilesService extends Database {
     return commentFileId;
   }
 
+  getById(id) {
+    return this.commentFiles
+      .select([
+        'id',
+        'commentId',
+        'path',
+        'name',
+        'extension',
+        'size',
+        'mimeType',
+        'encoding',
+      ])
+      .where({
+        id,
+      })
+      .first();
+  }
+
+  getByTodoId(todoId) {
+    const getCommentIds = this.comments
+      .select([
+        'id',
+      ])
+      .where({
+        todoId,
+      });
+
+    return this.commentFiles
+      .select([
+        'id',
+        'commentId',
+        'path',
+        'name',
+        'extension',
+        'size',
+        'mimeType',
+        'encoding',
+      ])
+      .whereIn(
+        'commentId',
+        getCommentIds,
+      );
+  }
+
+  getByColumnId(columnId) {
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .where({
+        columnId,
+      });
+
+    const getCommentIds = this.comments
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'todoId',
+        getTodoIds,
+      );
+
+    return this.commentFiles
+      .select([
+        'id',
+        'commentId',
+        'path',
+        'name',
+        'extension',
+        'size',
+        'mimeType',
+        'encoding',
+      ])
+      .whereIn(
+        'commentId',
+        getCommentIds,
+      );
+  }
+
+  getByBoardIds(boardIds) {
+    const getColumnIds = this.columns
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'boardId',
+        boardIds,
+      );
+
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'columnId',
+        getColumnIds,
+      );
+
+    const getCommentIds = this.comments
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'todoId',
+        getTodoIds,
+      );
+
+    return this.commentFiles
+      .select([
+        'id',
+        'commentId',
+        'path',
+        'name',
+        'extension',
+        'size',
+        'mimeType',
+        'encoding',
+      ])
+      .whereIn(
+        'commentId',
+        getCommentIds,
+      );
+  }
+
   removeById(id) {
     return this.commentFiles
       .where({
         id,
       })
       .del();
-  }
-
-  async getPathById(id) {
-    const response = await this.commentFiles
-      .select([
-        'path',
-      ])
-      .where({
-        id,
-      })
-      .first();
-    return response ? response.path : undefined;
   }
 
   getCommentId(id) {

@@ -1,9 +1,7 @@
-const { BackendError, FileComponent } = require('../../components');
+const { BackendError, FileComponent, TransformerComponent } = require('../../components');
 const {
   UserService,
 } = require('../../services');
-
-const { CDN_DOMAIN } = process.env;
 
 // TODO: tests
 class UserController {
@@ -13,7 +11,7 @@ class UserController {
       throw new BackendError.NotFound('User not found');
     }
 
-    const avatar = user.avatar ? `http://${CDN_DOMAIN}/${user.avatar}` : user.avatar;
+    const avatar = TransformerComponent.transformLink(user.avatar);
 
     return {
       ...user,
@@ -33,7 +31,7 @@ class UserController {
       avatar: path,
     });
 
-    return path;
+    return TransformerComponent.transformLink(path);
   }
 
   async removeAvatar({ userId }) {

@@ -103,6 +103,7 @@ module.exports = {
         preHandler: [
           SchemaValidator.validate(RequestPart.body, 'patchUserBody'),
           CheckMiddleware.isAuthenticated,
+          CheckMiddleware.isUserExist,
           FetchMiddleware.getUserId,
         ],
       },

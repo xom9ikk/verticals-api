@@ -31,14 +31,6 @@ class CheckMiddleware {
     }
   }
 
-  isAuthenticated(req) {
-    return CheckMiddleware._isAuthenticated(req, Transport.rest, BackendError.Unauthorized);
-  }
-
-  isAuthenticatedSocket(req) {
-    return CheckMiddleware._isAuthenticated(req, Transport.socket, SocketError.Unauthorized);
-  }
-
   static async _isAuthenticated(req, type, ErrorInitiator) {
     const token = CheckMiddleware.extractToken(req, type);
     if (!token) {
@@ -58,17 +50,25 @@ class CheckMiddleware {
     req.parsedBearerToken = token;
   }
 
+  isAuthenticated(req) {
+    return CheckMiddleware._isAuthenticated(req, Transport.rest, BackendError.Unauthorized);
+  }
+
+  isAuthenticatedSocket(req) {
+    return CheckMiddleware._isAuthenticated(req, Transport.socket, SocketError.Unauthorized);
+  }
+
   async isUserExist(req) {
-    const { email, username } = req.body;
+    const { email = '', username = '' } = req.body;
     const [isExistEmail, isExistUsername] = await Promise.all([
       ValidatorComponent.isExistEmail(email),
       ValidatorComponent.isExistUsername(username),
     ]);
     if (isExistEmail) {
-      throw new BackendError.Conflict(`User with email ${email} already registered`);
+      throw new BackendError.Conflict('Email already taken');
     }
     if (isExistUsername) {
-      throw new BackendError.Conflict(`User with username ${username} already registered`);
+      throw new BackendError.Conflict('Username already taken');
     }
   }
 }

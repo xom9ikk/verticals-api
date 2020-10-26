@@ -119,7 +119,19 @@ module.exports = {
           BusboyMiddleware.generateFileInfo,
         ],
       },
-      CommentAttachmentAdapter.saveAttachment,
+      CommentAttachmentAdapter.save,
+    );
+    fastify.get(
+      '/',
+      {
+        preHandler: [
+          FormatterMiddleware.castToInteger(RequestPart.query),
+          SchemaValidator.validate(RequestPart.params, 'getCommentAttachmentsQuery'),
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      CommentAttachmentAdapter.getAll,
     );
     fastify.delete(
       '/:attachmentId',
@@ -131,7 +143,7 @@ module.exports = {
           FetchMiddleware.getUserId,
         ],
       },
-      CommentAttachmentAdapter.removeAttachment,
+      CommentAttachmentAdapter.remove,
     );
     done();
   },
