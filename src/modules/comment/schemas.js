@@ -8,7 +8,7 @@ class CommentSchema {
       },
       text: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       replyCommentId: {
@@ -50,7 +50,7 @@ class CommentSchema {
     properties: {
       text: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
     },

@@ -65,7 +65,8 @@ class CommentService extends Database {
       ])
       .where({
         todoId,
-      });
+      })
+      .orderBy('createdAt');
   }
 
   getByColumnId(columnId) {
@@ -89,7 +90,8 @@ class CommentService extends Database {
       .whereIn(
         'todoId',
         getTodoIds,
-      );
+      )
+      .orderBy('createdAt');
   }
 
   getByBoardIds(boardIds) {
@@ -123,7 +125,8 @@ class CommentService extends Database {
       .whereIn(
         'todoId',
         getTodoIds,
-      );
+      )
+      .orderBy('createdAt');
   }
 
   async update(id, todo) {

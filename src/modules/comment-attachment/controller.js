@@ -18,6 +18,8 @@ class CommentAttachmentController {
 
     return {
       ...savedFile,
+      commentId,
+      path: TransformerComponent.transformLink(savedFile.path),
       id: attachmentId,
     };
   }
