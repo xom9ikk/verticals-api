@@ -50,7 +50,7 @@ class TodoService extends Database {
   getByColumnId(columnId) {
     return this.todos
       .select([
-        'id',
+        'todos.id',
         'columnId',
         'title',
         'description',
@@ -59,9 +59,12 @@ class TodoService extends Database {
         'isArchived',
         'isNotificationsEnabled',
       ])
+      .count('comments.id', { as: 'commentsCount' })
+      .leftJoin('comments', 'todos.id', 'comments.todoId')
       .where({
         columnId,
-      });
+      })
+      .groupBy('todos.id');
   }
 
   getByBoardIds(boardIds) {
@@ -75,7 +78,7 @@ class TodoService extends Database {
       );
     return this.todos
       .select([
-        'id',
+        'todos.id',
         'columnId',
         'title',
         'description',
@@ -84,10 +87,13 @@ class TodoService extends Database {
         'isArchived',
         'isNotificationsEnabled',
       ])
+      .count('comments.id', { as: 'commentsCount' })
+      .leftJoin('comments', 'todos.id', 'comments.todoId')
       .whereIn(
         'columnId',
         getColumnIds,
-      );
+      )
+      .groupBy('todos.id');
   }
 
   async update(id, todo) {
