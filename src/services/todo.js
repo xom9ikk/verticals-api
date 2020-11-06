@@ -47,8 +47,8 @@ class TodoService extends Database {
       .first();
   }
 
-  getByColumnId(columnId) {
-    return this.todos
+  async getByColumnId(columnId) {
+    const response = await this.todos
       .select([
         'todos.id',
         'columnId',
@@ -65,9 +65,10 @@ class TodoService extends Database {
         columnId,
       })
       .groupBy('todos.id');
+    return response.map((todo) => ({ ...todo, commentsCount: parseInt(todo.commentsCount) }));
   }
 
-  getByBoardIds(boardIds) {
+  async getByBoardIds(boardIds) {
     const getColumnIds = this.columns
       .select([
         'id',
@@ -76,7 +77,7 @@ class TodoService extends Database {
         'boardId',
         boardIds,
       );
-    return this.todos
+    const response = await this.todos
       .select([
         'todos.id',
         'columnId',
@@ -94,6 +95,7 @@ class TodoService extends Database {
         getColumnIds,
       )
       .groupBy('todos.id');
+    return response.map((todo) => ({ ...todo, commentsCount: parseInt(todo.commentsCount) }));
   }
 
   async update(id, todo) {
