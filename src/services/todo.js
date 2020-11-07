@@ -47,10 +47,10 @@ class TodoService extends Database {
       .first();
   }
 
-  getByColumnId(columnId) {
-    return this.todos
+  async getByColumnId(columnId) {
+    const response = await this.todos
       .select([
-        'id',
+        'todos.id',
         'columnId',
         'title',
         'description',
@@ -59,12 +59,16 @@ class TodoService extends Database {
         'isArchived',
         'isNotificationsEnabled',
       ])
+      .count('comments.id', { as: 'commentsCount' })
+      .leftJoin('comments', 'todos.id', 'comments.todoId')
       .where({
         columnId,
-      });
+      })
+      .groupBy('todos.id');
+    return response.map((todo) => ({ ...todo, commentsCount: parseInt(todo.commentsCount) }));
   }
 
-  getByBoardIds(boardIds) {
+  async getByBoardIds(boardIds) {
     const getColumnIds = this.columns
       .select([
         'id',
@@ -73,9 +77,9 @@ class TodoService extends Database {
         'boardId',
         boardIds,
       );
-    return this.todos
+    const response = await this.todos
       .select([
-        'id',
+        'todos.id',
         'columnId',
         'title',
         'description',
@@ -84,10 +88,26 @@ class TodoService extends Database {
         'isArchived',
         'isNotificationsEnabled',
       ])
+      .countDistinct('comments.id', { as: 'commentsCount' })
+      .sum({
+        imagesCount: knex.raw('case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
+          ['image/jpeg', 'image/png']),
+        attachmentsCount: knex.raw('case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
+          ['image/jpeg', 'image/png']),
+      })
+      .leftJoin('comments', 'comments.todoId', 'todos.id')
+      .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
       .whereIn(
         'columnId',
         getColumnIds,
-      );
+      )
+      .groupBy('todos.id');
+    return response.map((todo) => ({
+      ...todo,
+      commentsCount: parseInt(todo.commentsCount),
+      imagesCount: parseInt(todo.imagesCount),
+      attachmentsCount: parseInt(todo.attachmentsCount),
+    }));
   }
 
   async update(id, todo) {
