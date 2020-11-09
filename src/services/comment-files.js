@@ -27,29 +27,23 @@ class CommentFilesService extends Database {
   }
 
   getByTodoId(todoId) {
-    const getCommentIds = this.comments
+    return this.comments
       .select([
-        'id',
+        'comments.todoId',
+        'commentFiles.id',
+        'commentFiles.commentId',
+        'commentFiles.path',
+        'commentFiles.name',
+        'commentFiles.extension',
+        'commentFiles.size',
+        'commentFiles.mimeType',
+        'commentFiles.encoding',
       ])
+      .rightJoin('commentFiles', 'commentFiles.comment_id', 'comments.id')
       .where({
         todoId,
-      });
-
-    return this.commentFiles
-      .select([
-        'id',
-        'commentId',
-        'path',
-        'name',
-        'extension',
-        'size',
-        'mimeType',
-        'encoding',
-      ])
-      .whereIn(
-        'commentId',
-        getCommentIds,
-      );
+      })
+      .orderBy('comments.createdAt');
   }
 
   getByColumnId(columnId) {
@@ -61,30 +55,24 @@ class CommentFilesService extends Database {
         columnId,
       });
 
-    const getCommentIds = this.comments
+    return this.comments
       .select([
-        'id',
+        'comments.todoId',
+        'commentFiles.id',
+        'commentFiles.commentId',
+        'commentFiles.path',
+        'commentFiles.name',
+        'commentFiles.extension',
+        'commentFiles.size',
+        'commentFiles.mimeType',
+        'commentFiles.encoding',
       ])
+      .rightJoin('commentFiles', 'commentFiles.comment_id', 'comments.id')
       .whereIn(
         'todoId',
         getTodoIds,
-      );
-
-    return this.commentFiles
-      .select([
-        'id',
-        'commentId',
-        'path',
-        'name',
-        'extension',
-        'size',
-        'mimeType',
-        'encoding',
-      ])
-      .whereIn(
-        'commentId',
-        getCommentIds,
-      );
+      )
+      .orderBy('comments.createdAt');
   }
 
   getByBoardIds(boardIds) {
@@ -106,30 +94,24 @@ class CommentFilesService extends Database {
         getColumnIds,
       );
 
-    const getCommentIds = this.comments
+    return this.comments
       .select([
-        'id',
+        'comments.todoId',
+        'commentFiles.id',
+        'commentFiles.commentId',
+        'commentFiles.path',
+        'commentFiles.name',
+        'commentFiles.extension',
+        'commentFiles.size',
+        'commentFiles.mimeType',
+        'commentFiles.encoding',
       ])
+      .rightJoin('commentFiles', 'commentFiles.comment_id', 'comments.id')
       .whereIn(
         'todoId',
         getTodoIds,
-      );
-
-    return this.commentFiles
-      .select([
-        'id',
-        'commentId',
-        'path',
-        'name',
-        'extension',
-        'size',
-        'mimeType',
-        'encoding',
-      ])
-      .whereIn(
-        'commentId',
-        getCommentIds,
-      );
+      )
+      .orderBy('comments.createdAt');
   }
 
   removeById(id) {
