@@ -18,8 +18,11 @@ class CommentLikeController {
 
     const like = { userId, commentId };
 
-    const likeId = await CommentLikesService.create(like);
-    return likeId;
+    await CommentLikesService.create(like);
+    return {
+      userId,
+      commentId,
+    };
   }
 
   async remove({ userId, commentId }) {
@@ -36,7 +39,10 @@ class CommentLikeController {
     }
 
     await CommentLikesService.removeByUserAndCommentId(userId, commentId);
-    return true;
+    return {
+      userId,
+      commentId,
+    };
   }
 }
 
