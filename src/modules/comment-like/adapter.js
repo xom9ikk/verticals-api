@@ -6,18 +6,18 @@ class CommentLikeAdapter {
     const { userId } = req;
     const { commentId } = req.body;
 
-    const like = await CommentLikeController.create({ userId, commentId });
+    await CommentLikeController.create({ userId, commentId });
 
-    return BackendResponse.Created(res, 'Comment was liked successfully', like);
+    return BackendResponse.Created(res, 'Comment was liked successfully');
   }
 
   async remove(req, res) {
     const { userId } = req;
     const { commentId } = req.params;
 
-    const like = await CommentLikeController.remove({ userId, commentId });
+    await CommentLikeController.remove({ userId, commentId });
 
-    return BackendResponse.Success(res, 'Comment was unliked successfully', like);
+    return BackendResponse.Success(res, 'Comment was unliked successfully');
   }
 }
 

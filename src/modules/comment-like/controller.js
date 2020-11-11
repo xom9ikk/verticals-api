@@ -1,5 +1,5 @@
 const { CommentLikesService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components/error');
+const { BackendError } = require('../../components');
 
 // TODO: tests
 class CommentLikeController {
@@ -19,10 +19,8 @@ class CommentLikeController {
     const like = { userId, commentId };
 
     await CommentLikesService.create(like);
-    return {
-      userId,
-      commentId,
-    };
+
+    return commentId;
   }
 
   async remove({ userId, commentId }) {
@@ -39,10 +37,7 @@ class CommentLikeController {
     }
 
     await CommentLikesService.removeByUserAndCommentId(userId, commentId);
-    return {
-      userId,
-      commentId,
-    };
+    return commentId;
   }
 }
 
