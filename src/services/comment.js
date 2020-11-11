@@ -56,17 +56,26 @@ class CommentService extends Database {
   getByTodoId(todoId) {
     return this.comments
       .select([
-        'id',
-        'todoId',
-        'text',
-        'replyCommentId',
-        'updatedAt',
-        'createdAt',
+        'comments.id',
+        'comments.todoId',
+        'comments.text',
+        'comments.replyCommentId',
+        'comments.updatedAt',
+        'comments.createdAt',
+        knex.raw('COALESCE(json_agg(json_build_object('
+          + '\'avatar\', users.avatar,'
+          + '\'username\', users.username,'
+          + '\'name\', users.name,'
+          + '\'surname\', users.surname'
+          + ')) FILTER (WHERE users.id IS NOT NULL), \'[]\') AS liked_users'),
       ])
       .where({
         todoId,
       })
-      .orderBy('createdAt');
+      .leftJoin('commentLikes', 'commentLikes.commentId', 'comments.id')
+      .leftJoin('users', 'users.id', 'commentLikes.userId')
+      .groupBy('comments.id')
+      .orderBy('comments.createdAt');
   }
 
   getByColumnId(columnId) {

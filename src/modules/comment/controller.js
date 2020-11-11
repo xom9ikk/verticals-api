@@ -96,7 +96,6 @@ class CommentController {
       throw new BackendError.Forbidden('This account is not allowed to remove this comment');
     }
 
-    // TODO cascade
     await CommentService.removeById(commentId);
     return true;
   }

@@ -44,6 +44,10 @@ class Database {
   get todoPositions() {
     return knex(tables.todoPositions);
   }
+
+  get commentLikes() {
+    return knex(tables.commentLikes);
+  }
 }
 
 module.exports = {
