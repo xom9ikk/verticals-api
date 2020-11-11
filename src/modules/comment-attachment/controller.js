@@ -1,4 +1,4 @@
-const { BoardAccessService, CommentFilesService } = require('../../services');
+const { BoardAccessService, CommentService, CommentFilesService } = require('../../services');
 const { BackendError, FileComponent, TransformerComponent } = require('../../components');
 
 class CommentAttachmentController {
@@ -11,6 +11,8 @@ class CommentAttachmentController {
 
     const savedFile = await FileComponent.saveFile(FileComponent.folders.comments, file);
 
+    const { todoId } = await CommentService.getById(commentId);
+
     const attachmentId = await CommentFilesService.create({
       ...savedFile,
       commentId,
@@ -21,6 +23,7 @@ class CommentAttachmentController {
       commentId,
       path: TransformerComponent.transformLink(savedFile.path),
       id: attachmentId,
+      todoId,
     };
   }
 

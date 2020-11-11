@@ -1,5 +1,5 @@
 const { CommentService, BoardAccessService } = require('../../services');
-const { BackendError } = require('../../components/error');
+const { BackendError, TransformerComponent } = require('../../components');
 
 class CommentController {
   async create({ userId, comment }) {
@@ -61,7 +61,15 @@ class CommentController {
       comments = await CommentService.getByBoardIds(boardIdsWithAccess);
     }
 
-    return comments;
+    // TODO: refactor
+    const commentsWithTransformedLinks = comments.map((comment) => ({
+      ...comment,
+      likedUsers: comment.likedUsers && comment.likedUsers.map((user) => ({
+        ...user,
+        avatar: TransformerComponent.transformLink(user.avatar),
+      })),
+    }));
+    return commentsWithTransformedLinks;
   }
 
   async update({ userId, commentId, patch }) {
@@ -96,7 +104,6 @@ class CommentController {
       throw new BackendError.Forbidden('This account is not allowed to remove this comment');
     }
 
-    // TODO cascade
     await CommentService.removeById(commentId);
     return true;
   }

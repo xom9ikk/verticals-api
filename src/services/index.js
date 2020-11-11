@@ -9,6 +9,7 @@ const { CommentFilesService } = require('./comment-files');
 const { BoardPositionsService } = require('./board-positions');
 const { ColumnPositionsService } = require('./column-positions');
 const { TodoPositionsService } = require('./todo-positions');
+const { CommentLikesService } = require('./comment-likes');
 
 module.exports = {
   UserService,
@@ -22,4 +23,5 @@ module.exports = {
   BoardPositionsService,
   ColumnPositionsService,
   TodoPositionsService,
+  CommentLikesService,
 };

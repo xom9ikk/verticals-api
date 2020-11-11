@@ -11,5 +11,6 @@ module.exports = {
     boardPositions: 'board_positions',
     columnPositions: 'column_positions',
     todoPositions: 'todo_positions',
+    commentLikes: 'comment_likes',
   },
 };
