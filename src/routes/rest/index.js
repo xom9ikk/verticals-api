@@ -12,6 +12,7 @@ const { todoRouter } = require('../../modules/todo/route');
 const { commentRouter } = require('../../modules/comment/route');
 const { commentAttachmentRouter } = require('../../modules/comment-attachment/route');
 const { commentLikeRouter } = require('../../modules/comment-like/route');
+const { searchRouter } = require('../../modules/search/route');
 
 module.exports = {
   restRouter: (fastify, opts, done) => {
@@ -28,6 +29,7 @@ module.exports = {
     fastify.register(commentRouter, { prefix: '/api/v1/comment' });
     fastify.register(commentAttachmentRouter, { prefix: '/api/v1/comment-attachment' });
     fastify.register(commentLikeRouter, { prefix: '/api/v1/comment-like' });
+    fastify.register(searchRouter, { prefix: '/api/v1/search' });
     fastify.register(swagger);
     fastify.setErrorHandler(errorHandler);
     fastify.setNotFoundHandler(notFoundHandler);

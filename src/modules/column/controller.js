@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax */
+/* eslint-disable */
 const {
   ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService, TodoService,
 } = require('../../services');
@@ -77,9 +77,21 @@ class ColumnController {
     if (!columns.length) {
       return [];
     }
+    if (boardId) {
+      const columnPositions = await ColumnPositionsService.getPositions(boardId);
+      return PositionComponent.orderByPosition(columnPositions, columns);
+    }
 
-    const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    return PositionComponent.orderByPosition(columnPositions, columns);
+    const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
+    let res = [];
+    columnPositions.forEach(({ boardId, order }) => {
+      const columnsForBoard = columns.filter((column) => column.boardId === boardId);
+      res = [
+        ...res,
+        ...PositionComponent.orderByPosition(order, columnsForBoard),
+      ];
+    });
+    return res;
   }
 
   // TODO: write tests for updatePosition

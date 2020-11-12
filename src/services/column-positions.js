@@ -32,6 +32,18 @@ class ColumnPositionsService extends Database {
       .first();
     return response ? response.order : [];
   }
+
+  getPositionsByBoardIds(boardIds) {
+    return this.columnPositions
+      .select([
+        'boardId',
+        'order',
+      ])
+      .whereIn(
+        'boardId',
+        boardIds,
+      );
+  }
 }
 
 module.exports = {
