@@ -15,7 +15,7 @@ exports.up = async (knex) => {
       .inTable('todos')
       .onDelete('CASCADE');
     table
-      .string('text', 4096);
+      .string('text', 16384);
     table
       .integer('reply_comment_id')
       .references('id')
