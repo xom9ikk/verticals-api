@@ -9,7 +9,7 @@ class CommentSchema {
       text: {
         type: 'string',
         minLength: 0,
-        maxLength: 4096,
+        maxLength: 16384,
       },
       replyCommentId: {
         type: 'integer',
@@ -51,7 +51,7 @@ class CommentSchema {
       text: {
         type: 'string',
         minLength: 0,
-        maxLength: 4096,
+        maxLength: 16384,
       },
     },
     required: ['text'],

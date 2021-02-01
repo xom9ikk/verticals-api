@@ -8,27 +8,6 @@ class TodoService extends Database {
     return todoId;
   }
 
-  async getBoardIdByTodoId(id) {
-    const getColumnId = this.todos
-      .select([
-        'columnId',
-      ])
-      .where({
-        id,
-      })
-      .first();
-    const response = await this.columns
-      .select([
-        'boardId',
-      ])
-      .where({
-        id: getColumnId,
-      })
-      .first();
-
-    return response ? response.boardId : undefined;
-  }
-
   getById(id) {
     return this.todos
       .select([

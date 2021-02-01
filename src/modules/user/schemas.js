@@ -32,9 +32,14 @@ class UserSchema {
         pattern: '^[A-Za-z0-9_]+$',
       },
       bio: {
-        type: 'string',
-        minLength: 2,
-        maxLength: 255,
+        oneOf: [
+          {
+            type: 'string',
+            minLength: 2,
+            maxLength: 255,
+          },
+          { type: 'null' },
+        ],
       },
     },
     anyOf: [
