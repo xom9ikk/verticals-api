@@ -29,7 +29,7 @@ class BoardAccessService extends Database {
   }
 
   getByColumnId(userId, columnId) {
-    const boardId = ColumnService.getBoardId(columnId);
+    const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
         'userId',
@@ -43,8 +43,8 @@ class BoardAccessService extends Database {
   }
 
   getByTodoId(userId, todoId) {
-    const columnId = TodoService.getColumnId(todoId);
-    const boardId = ColumnService.getBoardId(columnId);
+    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
         'userId',
@@ -58,9 +58,9 @@ class BoardAccessService extends Database {
   }
 
   getByCommentId(userId, commentId) {
-    const todoId = CommentService.getTodoId(commentId);
-    const columnId = TodoService.getColumnId(todoId);
-    const boardId = ColumnService.getBoardId(columnId);
+    const todoId = CommentService.getTodoIdSubQuery(commentId);
+    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
         'userId',
@@ -74,10 +74,10 @@ class BoardAccessService extends Database {
   }
 
   getByAttachmentId(userId, attachmentId) {
-    const commentId = CommentFilesService.getCommentId(attachmentId);
-    const todoId = CommentService.getTodoId(commentId);
-    const columnId = TodoService.getColumnId(todoId);
-    const boardId = ColumnService.getBoardId(columnId);
+    const commentId = CommentFilesService.getCommentIdSubQuery(attachmentId);
+    const todoId = CommentService.getTodoIdSubQuery(commentId);
+    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
         'userId',

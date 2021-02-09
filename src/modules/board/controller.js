@@ -39,6 +39,7 @@ class BoardController {
 
     const board = await BoardService.getById(boardId);
     const boardPositions = await BoardPositionsService.getPositions(userId);
+
     return {
       ...board,
       position: PositionComponent.getPositionById(boardPositions, board.id),
@@ -54,12 +55,11 @@ class BoardController {
 
     const boards = await BoardService.getByBoardIds(boardIdsWithAccess);
     const boardPositions = await BoardPositionsService.getPositions(userId);
-    console.log(boardPositions);
+
     return {
       entities: boards,
       positions: boardPositions,
     };
-    // return PositionComponent.orderByPosition(boardPositions, boards);
   }
 
   // TODO: write tests for updatePosition

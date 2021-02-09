@@ -95,7 +95,7 @@ class ColumnService extends Database {
     return removedColumn;
   }
 
-  getBoardId(id) {
+  getBoardIdSubQuery(id) {
     return this.columns
       .select([
         'boardId',
@@ -104,6 +104,11 @@ class ColumnService extends Database {
         id,
       })
       .first();
+  }
+
+  async getBoardId(id) {
+    const res = await this.getBoardIdSubQuery(id);
+    return res.boardId;
   }
 }
 

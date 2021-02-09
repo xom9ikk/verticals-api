@@ -118,7 +118,7 @@ class TodoService extends Database {
     return removedTodo;
   }
 
-  getColumnId(id) {
+  getColumnIdSubQuery(id) {
     return this.todos
       .select([
         'columnId',
@@ -127,6 +127,11 @@ class TodoService extends Database {
         id,
       })
       .first();
+  }
+
+  async getColumnId(id) {
+    const res = await this.getColumnIdSubQuery(id);
+    return res.columnId;
   }
 }
 

@@ -122,7 +122,7 @@ class CommentFilesService extends Database {
       .del();
   }
 
-  getCommentId(id) {
+  getCommentIdSubQuery(id) {
     return this.commentFiles
       .select([
         'commentId',
@@ -131,6 +131,11 @@ class CommentFilesService extends Database {
         id,
       })
       .first();
+  }
+
+  async getCommentId(id) {
+    const res = await this.getCommentIdSubQuery(id);
+    return res.commentId;
   }
 }
 

@@ -45,6 +45,7 @@ class ColumnController {
     }
 
     const boardId = await ColumnService.getBoardId(columnId);
+
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
     const column = await ColumnService.getById(columnId);
@@ -72,26 +73,32 @@ class ColumnController {
       throw new BackendError.Forbidden('This account does not have access to any baords');
     }
 
-    const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
 
-    if (!columns.length) {
-      return [];
-    }
     if (boardId) {
+      const columns = await ColumnService.getByBoardIds([boardId]);
       const columnPositions = await ColumnPositionsService.getPositions(boardId);
-      return PositionComponent.orderByPosition(columnPositions, columns);
+      return {
+        entities: columns,
+        positions: {
+          [boardId]: columnPositions,
+        }
+      }
     }
 
+    const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
     const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
-    let res = [];
-    columnPositions.forEach(({ boardId, order }) => {
-      const columnsForBoard = columns.filter((column) => column.boardId === boardId);
-      res = [
-        ...res,
-        ...PositionComponent.orderByPosition(order, columnsForBoard),
-      ];
-    });
-    return res;
+
+    const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => {
+      return {
+        ...acc,
+        [boardId]: order
+      };
+    }, {});
+
+    return {
+      entities: columns,
+      positions: normalizedPositions
+    }
   }
 
   // TODO: write tests for updatePosition
