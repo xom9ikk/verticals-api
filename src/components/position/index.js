@@ -27,18 +27,6 @@ class PositionComponent {
     return newPositions;
   }
 
-  orderByPosition(positions, data) {
-    return data
-      .map((el) => {
-        const currentPosition = this.getPositionById(positions, el.id);
-        return {
-          ...el,
-          position: currentPosition,
-        };
-      })
-      .sort((a, b) => a.position - b.position);
-  }
-
   move(positions, sourcePosition, destinationPosition) {
     const newPositions = [...positions];
     newPositions.splice(

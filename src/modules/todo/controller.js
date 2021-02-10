@@ -79,14 +79,26 @@ class TodoController {
     }
 
     if (!todos.length) {
-      return [];
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     if (columnId) {
       const todoPositions = await TodoPositionsService.getPositions(columnId);
-      return PositionComponent.orderByPosition(todoPositions, todos);
+      return {
+        entities: todos,
+        positions: {
+          [columnId]: todoPositions,
+        },
+      };
     }
 
+    // for boardId
+    // else all with access
+
+    ///
     const columnIdsMap = new Set();
     todos.forEach((todo) => {
       columnIdsMap.add(todo.columnId);
@@ -95,17 +107,28 @@ class TodoController {
 
     const todoPositionsByColumnIds = await TodoPositionsService.getPositionsByColumnIds(columnIds);
 
-    let orderedTodos = [];
+    const normalizedPositions = todoPositionsByColumnIds.reduce((acc, { columnId: id, order }) => ({
+      ...acc,
+      [id]: order,
+    }), {});
 
-    columnIds.forEach((id) => {
-      const todoPositions = todoPositionsByColumnIds.find((el) => el.columnId === id).order;
-      const todosByColumn = todos.filter((todo) => todo.columnId === id);
-      orderedTodos = [
-        ...orderedTodos,
-        ...PositionComponent.orderByPosition(todoPositions, todosByColumn),
-      ];
-    });
-    return orderedTodos;
+    return {
+      entities: todos,
+      positions: normalizedPositions,
+    };
+
+    // let orderedTodos = [];
+
+    // columnIds.forEach((id) => {
+    //   const todoPositions = todoPositionsByColumnIds.find((el) => el.columnId === id).order;
+    //   const todosByColumn = todos.filter((todo) => todo.columnId === id);
+    //   orderedTodos = [
+    //     ...orderedTodos,
+    //     ...PositionComponent.orderByPosition(todoPositions, todosByColumn),
+    //   ];
+    // });
+    // return orderedTodos;
+    ///
   }
 
   // TODO: write tests for updatePosition

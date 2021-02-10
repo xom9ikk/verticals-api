@@ -73,9 +73,9 @@ class ColumnController {
       throw new BackendError.Forbidden('This account does not have access to any baords');
     }
 
+    const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
 
     if (boardId) {
-      const columns = await ColumnService.getByBoardIds([boardId]);
       const columnPositions = await ColumnPositionsService.getPositions(boardId);
       return {
         entities: columns,
@@ -85,7 +85,6 @@ class ColumnController {
       }
     }
 
-    const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
     const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
 
     const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => {
