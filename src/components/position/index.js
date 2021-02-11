@@ -63,6 +63,25 @@ class PositionComponent {
   reverse(ids) {
     return ids.reverse();
   }
+
+  mapEntitiesOnPositions(filteredEntities, positions) {
+    const filteredPositions = {};
+    const topLvlEntityIds = Object.keys(positions);
+    topLvlEntityIds.forEach((topLevelEntityId) => {
+      const todoPositions = positions[topLevelEntityId];
+      todoPositions.forEach((entityId) => {
+        const hasEntity = filteredEntities
+          .findIndex((entity) => entity.id === entityId) !== -1;
+        if (hasEntity) {
+          if (!filteredPositions[topLevelEntityId]) {
+            filteredPositions[topLevelEntityId] = [];
+          }
+          filteredPositions[topLevelEntityId].push(entityId);
+        }
+      });
+    });
+    return filteredPositions;
+  }
 }
 
 module.exports = {
