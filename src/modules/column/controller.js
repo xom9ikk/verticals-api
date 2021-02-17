@@ -165,10 +165,20 @@ class ColumnController {
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
     const todos = await TodoService.getByColumnId(columnId);
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
 
-    const todosToDuplicate = todos.map((todo) => {
+    const orderedTodos = [];
+    todoPositions.map((id) => {
+      const targetTodo = todos.find((todo) => todo.id === id);
+      orderedTodos.push(targetTodo)
+    })
+
+    const todosToDuplicate = orderedTodos.map((todo) => {
       const newTodo = { ...todo, columnId: newColumnId };
       delete newTodo.id;
+      delete newTodo.commentsCount;
+      delete newTodo.imagesCount;
+      delete newTodo.attachmentsCount;
       return newTodo;
     });
 
