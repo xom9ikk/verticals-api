@@ -7,7 +7,7 @@ const {
   BusboyMiddleware,
 } = require('../../middlewares');
 
-const { RequestPart } = require('../../enums');
+const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:

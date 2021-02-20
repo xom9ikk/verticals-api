@@ -1,4 +1,4 @@
-const { Color, TodoStatus } = require('../../enums');
+const { TRASH_BOARD_ID, Color, TodoStatus } = require('../../constants');
 
 class TodoSchema {
   createTodo = {
@@ -27,6 +27,9 @@ class TodoSchema {
         enum: Object.values(Color),
       },
       isArchived: {
+        type: 'boolean',
+      },
+      isRemoved: {
         type: 'boolean',
       },
       isNotificationsEnabled: {
@@ -121,6 +124,9 @@ class TodoSchema {
       isArchived: {
         type: 'boolean',
       },
+      isRemoved: {
+        type: 'boolean',
+      },
       isNotificationsEnabled: {
         type: 'boolean',
       },
@@ -140,6 +146,7 @@ class TodoSchema {
       { required: ['status'] },
       { required: ['color'] },
       { required: ['isArchived'] },
+      { required: ['isRemoved'] },
       { required: ['isNotificationsEnabled'] },
       { required: ['expirationDate'] },
     ],

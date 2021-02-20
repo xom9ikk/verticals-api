@@ -1,4 +1,4 @@
-const { Color } = require('../../enums');
+const { Color } = require('../../constants');
 
 class ColumnSchema {
   createColumn = {

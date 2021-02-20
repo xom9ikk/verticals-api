@@ -4,7 +4,7 @@ const {
   CheckMiddleware,
   FetchMiddleware,
 } = require('../../middlewares');
-const { RequestPart } = require('../../enums');
+const { RequestPart } = require('../../constants');
 
 /**
  * @swagger

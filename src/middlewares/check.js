@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const { Transport } = require('../enums');
+const { Transport } = require('../constants');
 const { BackendError, SocketError, TokenComponent } = require('../components');
 const { ValidatorComponent } = require('../components');
 
