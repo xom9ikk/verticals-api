@@ -11,6 +11,7 @@ class TodoDataGenerator {
       color: faker.random.number({ max: 5 }),
       isArchived: faker.random.boolean(),
       isNotificationsEnabled: faker.random.boolean(),
+      expirationDate: faker.date.past(),
     };
   }
 

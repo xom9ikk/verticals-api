@@ -44,6 +44,8 @@ const { RequestPart } = require('../../enums');
  *        type: boolean
  *      isNotificationsEnabled:
  *        type: boolean
+ *      expirationDate:
+ *        type: date
  *   CreateTodoResponse:
  *     type: object
  *     properties:
@@ -109,6 +111,8 @@ const { RequestPart } = require('../../enums');
  *             type: boolean
  *           isNotificationsEnabled:
  *             type: boolean
+ *           expirationDate:
+ *             type: date
  *       message:
  *         type: string
  * /v1/todo/:todoId:
@@ -210,6 +214,8 @@ const { RequestPart } = require('../../enums');
  *        type: boolean
  *      isNotificationsEnabled:
  *        type: boolean
+ *      expirationDate:
+ *        type: date
  *   UpdateTodoResponse:
  *     type: object
  *     properties:

@@ -16,7 +16,8 @@
   "author": "xom9ik <xom9ik.code@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "ajv": "^6.12.3",
+    "ajv": "^7.1.1",
+    "ajv-formats": "^1.5.1",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.1.0",
     "date-fns": "^2.15.0",

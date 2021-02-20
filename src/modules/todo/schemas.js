@@ -36,6 +36,10 @@ class TodoSchema {
         type: 'integer',
         minimum: 1,
       },
+      expirationDate: {
+        type: 'string',
+        format: 'date-time',
+      },
     },
     required: ['columnId', 'title'],
   }
@@ -120,6 +124,15 @@ class TodoSchema {
       isNotificationsEnabled: {
         type: 'boolean',
       },
+      expirationDate: {
+        oneOf: [
+          {
+            type: 'string',
+            format: 'date-time',
+          },
+          { type: 'null' },
+        ],
+      },
     },
     anyOf: [
       { required: ['title'] },
@@ -128,6 +141,7 @@ class TodoSchema {
       { required: ['color'] },
       { required: ['isArchived'] },
       { required: ['isNotificationsEnabled'] },
+      { required: ['expirationDate'] },
     ],
   }
 

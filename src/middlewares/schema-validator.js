@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle,max-len */
-const ajv = require('ajv');
+const Ajv = require('ajv').default;
+const addFormats = require('ajv-formats');
 const { SocketError } = require('../components/error');
 const { BackendError } = require('../components/error');
 
@@ -15,10 +16,13 @@ const { SearchSchema } = require('../modules/search/schemas');
 
 class SchemaValidator {
   constructor() {
-    this.ajv = ajv({
+    this.ajv = new Ajv({
       allErrors: true,
       removeAdditional: 'all',
+      formats: { date: true, time: true },
     });
+    console.log(addFormats);
+    addFormats(this.ajv);
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
     Object.keys(UserSchema).map((key) => this.ajv.addSchema(UserSchema[key], key));
     Object.keys(BoardSchema).map((key) => this.ajv.addSchema(BoardSchema[key], key));

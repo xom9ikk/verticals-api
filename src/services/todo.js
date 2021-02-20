@@ -19,6 +19,7 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .where({
         id,
@@ -37,6 +38,7 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .count('comments.id', { as: 'commentsCount' })
       .leftJoin('comments', 'todos.id', 'comments.todoId')
@@ -66,6 +68,7 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .countDistinct('comments.id', { as: 'commentsCount' })
       .sum({
@@ -113,6 +116,7 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .del();
     return removedTodo;
