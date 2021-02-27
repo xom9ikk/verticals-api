@@ -4,7 +4,7 @@ class AuthSchema {
     properties: {
       email: {
         type: 'string',
-        lowercase: true,
+        // lowercase: true,
         format: 'email',
         maxLength: 64,
       },
@@ -40,7 +40,7 @@ class AuthSchema {
     properties: {
       email: {
         type: 'string',
-        lowercase: true,
+        // lowercase: true,
         format: 'email',
       },
       username: {

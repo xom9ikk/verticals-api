@@ -21,7 +21,6 @@ class SchemaValidator {
       removeAdditional: 'all',
       formats: { date: true, time: true },
     });
-    console.log(addFormats);
     addFormats(this.ajv);
     Object.keys(AuthSchema).map((key) => this.ajv.addSchema(AuthSchema[key], key));
     Object.keys(UserSchema).map((key) => this.ajv.addSchema(UserSchema[key], key));
