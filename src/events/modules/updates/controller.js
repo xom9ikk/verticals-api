@@ -1,4 +1,4 @@
-const { Operations } = require('../../../enums');
+const { Operations } = require('../../../constants');
 
 class UpdatesController {
   async updateController(data) {

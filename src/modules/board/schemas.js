@@ -1,4 +1,4 @@
-const { CardType, Color } = require('../../enums');
+const { CardType, Color } = require('../../constants');
 
 class BoardSchema {
   createBoard = {

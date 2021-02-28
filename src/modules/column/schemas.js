@@ -1,4 +1,4 @@
-const { Color } = require('../../enums');
+const { Color } = require('../../constants');
 
 class ColumnSchema {
   createColumn = {
@@ -24,6 +24,9 @@ class ColumnSchema {
       },
       isCollapsed: {
         type: 'boolean',
+      },
+      width: {
+        type: 'number',
       },
       belowId: {
         type: 'integer',
@@ -102,6 +105,9 @@ class ColumnSchema {
       isCollapsed: {
         type: 'boolean',
       },
+      width: {
+        type: 'number',
+      },
     },
     anyOf: [
       { required: ['boardId'] },
@@ -109,6 +115,7 @@ class ColumnSchema {
       { required: ['description'] },
       { required: ['color'] },
       { required: ['isCollapsed'] },
+      { required: ['width'] },
     ],
   }
 

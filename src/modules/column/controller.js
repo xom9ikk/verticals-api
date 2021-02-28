@@ -45,6 +45,7 @@ class ColumnController {
     }
 
     const boardId = await ColumnService.getBoardId(columnId);
+
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
 
     const column = await ColumnService.getById(columnId);
@@ -74,24 +75,29 @@ class ColumnController {
 
     const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
 
-    if (!columns.length) {
-      return [];
-    }
     if (boardId) {
       const columnPositions = await ColumnPositionsService.getPositions(boardId);
-      return PositionComponent.orderByPosition(columnPositions, columns);
+      return {
+        entities: columns,
+        positions: {
+          [boardId]: columnPositions,
+        }
+      }
     }
 
     const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
-    let res = [];
-    columnPositions.forEach(({ boardId, order }) => {
-      const columnsForBoard = columns.filter((column) => column.boardId === boardId);
-      res = [
-        ...res,
-        ...PositionComponent.orderByPosition(order, columnsForBoard),
-      ];
-    });
-    return res;
+
+    const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => {
+      return {
+        ...acc,
+        [boardId]: order
+      };
+    }, {});
+
+    return {
+      entities: columns,
+      positions: normalizedPositions
+    }
   }
 
   // TODO: write tests for updatePosition
@@ -159,10 +165,20 @@ class ColumnController {
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
     const todos = await TodoService.getByColumnId(columnId);
+    const todoPositions = await TodoPositionsService.getPositions(columnId);
 
-    const todosToDuplicate = todos.map((todo) => {
+    const orderedTodos = [];
+    todoPositions.map((id) => {
+      const targetTodo = todos.find((todo) => todo.id === id);
+      orderedTodos.push(targetTodo)
+    })
+
+    const todosToDuplicate = orderedTodos.map((todo) => {
       const newTodo = { ...todo, columnId: newColumnId };
       delete newTodo.id;
+      delete newTodo.commentsCount;
+      delete newTodo.imagesCount;
+      delete newTodo.attachmentsCount;
       return newTodo;
     });
 

@@ -29,6 +29,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .where(
         { id },
@@ -45,6 +46,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .whereIn(
         'id',
@@ -61,6 +63,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .whereIn(
         'boardId',
@@ -90,12 +93,13 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .del();
     return removedColumn;
   }
 
-  getBoardId(id) {
+  getBoardIdSubQuery(id) {
     return this.columns
       .select([
         'boardId',
@@ -104,6 +108,11 @@ class ColumnService extends Database {
         id,
       })
       .first();
+  }
+
+  async getBoardId(id) {
+    const res = await this.getBoardIdSubQuery(id);
+    return res.boardId;
   }
 }
 

@@ -4,7 +4,7 @@ class UserSchema {
     properties: {
       email: {
         type: 'string',
-        lowercase: true,
+        // lowercase: true,
         format: 'email',
         maxLength: 64,
       },

@@ -1,9 +1,4 @@
 module.exports = {
-  Operations: {
-    insert: 0,
-    update: 1,
-    delete: 2,
-  },
   RequestPart: {
     body: 'body',
     query: 'query',
@@ -33,5 +28,10 @@ module.exports = {
     doing: 1,
     done: 2,
     canceled: 3,
+  },
+  Operations: {
+    insert: 0,
+    update: 1,
+    delete: 2,
   },
 };

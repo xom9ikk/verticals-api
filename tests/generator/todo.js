@@ -10,7 +10,9 @@ class TodoDataGenerator {
       status: faker.random.number({ max: 2 }),
       color: faker.random.number({ max: 5 }),
       isArchived: faker.random.boolean(),
+      isRemoved: faker.random.boolean(),
       isNotificationsEnabled: faker.random.boolean(),
+      expirationDate: faker.date.past(),
     };
   }
 

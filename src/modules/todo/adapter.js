@@ -10,6 +10,14 @@ class TodoAdapter {
     return BackendResponse.Created(res, 'Todo successfully created', todo);
   }
 
+  async getRemoved(req, res) {
+    const { userId } = req;
+
+    const todos = await TodoController.getRemoved(userId);
+
+    return BackendResponse.Success(res, 'Information about removed todo successfully received', { todos });
+  }
+
   async get(req, res) {
     const { userId } = req;
     const { todoId } = req.params;

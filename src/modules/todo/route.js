@@ -6,7 +6,7 @@ const {
   FetchMiddleware,
 } = require('../../middlewares');
 
-const { RequestPart } = require('../../enums');
+const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
@@ -42,8 +42,12 @@ const { RequestPart } = require('../../enums');
  *        enum: [0, 1, 2, 3, 4, 5, 6]
  *      isArchived:
  *        type: boolean
+ *      isRemoved:
+ *        type: boolean
  *      isNotificationsEnabled:
  *        type: boolean
+ *      expirationDate:
+ *        type: date
  *   CreateTodoResponse:
  *     type: object
  *     properties:
@@ -107,8 +111,12 @@ const { RequestPart } = require('../../enums');
  *             enum: [0, 1, 2, 3, 4, 5, 6]
  *           isArchived:
  *             type: boolean
+ *           isRemoved:
+ *             type: boolean
  *           isNotificationsEnabled:
  *             type: boolean
+ *           expirationDate:
+ *             type: date
  *       message:
  *         type: string
  * /v1/todo/:todoId:
@@ -208,8 +216,12 @@ const { RequestPart } = require('../../enums');
  *        enum: [0, 1, 2, 3, 4, 5, 6]
  *      isArchived:
  *        type: boolean
+ *      isRemoved:
+ *        type: boolean
  *      isNotificationsEnabled:
  *        type: boolean
+ *      expirationDate:
+ *        type: date
  *   UpdateTodoResponse:
  *     type: object
  *     properties:
@@ -302,6 +314,16 @@ module.exports = {
         ],
       },
       TodoAdapter.create,
+    );
+    fastify.get(
+      '/trash',
+      {
+        preHandler: [
+          CheckMiddleware.isAuthenticated,
+          FetchMiddleware.getUserId,
+        ],
+      },
+      TodoAdapter.getRemoved,
     );
     fastify.get(
       '/:todoId',

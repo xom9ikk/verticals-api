@@ -32,6 +32,21 @@ class TodoController {
     return { todoId, position: newPosition };
   }
 
+  async getRemoved(userId) {
+    const boardIdsWithAccess = await BoardAccessService.getAllBoardIdsByUserId(userId);
+
+    if (!boardIdsWithAccess.length) {
+      throw new BackendError.Forbidden('This account does not have access to any boards');
+    }
+
+    const removedTodos = await TodoService.getRemovedByBoardIds(boardIdsWithAccess);
+
+    return {
+      entities: removedTodos,
+      positions: {},
+    };
+  }
+
   async get(userId, todoId) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -79,12 +94,20 @@ class TodoController {
     }
 
     if (!todos.length) {
-      return [];
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     if (columnId) {
       const todoPositions = await TodoPositionsService.getPositions(columnId);
-      return PositionComponent.orderByPosition(todoPositions, todos);
+      return {
+        entities: todos,
+        positions: {
+          [columnId]: todoPositions,
+        },
+      };
     }
 
     const columnIdsMap = new Set();
@@ -95,17 +118,15 @@ class TodoController {
 
     const todoPositionsByColumnIds = await TodoPositionsService.getPositionsByColumnIds(columnIds);
 
-    let orderedTodos = [];
+    const normalizedPositions = todoPositionsByColumnIds.reduce((acc, { columnId: id, order }) => ({
+      ...acc,
+      [id]: order,
+    }), {});
 
-    columnIds.forEach((id) => {
-      const todoPositions = todoPositionsByColumnIds.find((el) => el.columnId === id).order;
-      const todosByColumn = todos.filter((todo) => todo.columnId === id);
-      orderedTodos = [
-        ...orderedTodos,
-        ...PositionComponent.orderByPosition(todoPositions, todosByColumn),
-      ];
-    });
-    return orderedTodos;
+    return {
+      entities: todos,
+      positions: normalizedPositions,
+    };
   }
 
   // TODO: write tests for updatePosition

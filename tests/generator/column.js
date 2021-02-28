@@ -9,6 +9,7 @@ class ColumnDataGenerator {
       description: faker.lorem.sentences(),
       color: faker.random.number({ max: 5 }),
       isCollapsed: faker.random.boolean(),
+      width: 280,
     };
   }
 

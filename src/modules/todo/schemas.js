@@ -1,4 +1,4 @@
-const { Color, TodoStatus } = require('../../enums');
+const { TRASH_BOARD_ID, Color, TodoStatus } = require('../../constants');
 
 class TodoSchema {
   createTodo = {
@@ -29,12 +29,19 @@ class TodoSchema {
       isArchived: {
         type: 'boolean',
       },
+      isRemoved: {
+        type: 'boolean',
+      },
       isNotificationsEnabled: {
         type: 'boolean',
       },
       belowId: {
         type: 'integer',
         minimum: 1,
+      },
+      expirationDate: {
+        type: 'string',
+        format: 'date-time',
       },
     },
     required: ['columnId', 'title'],
@@ -117,8 +124,20 @@ class TodoSchema {
       isArchived: {
         type: 'boolean',
       },
+      isRemoved: {
+        type: 'boolean',
+      },
       isNotificationsEnabled: {
         type: 'boolean',
+      },
+      expirationDate: {
+        oneOf: [
+          {
+            type: 'string',
+            format: 'date-time',
+          },
+          { type: 'null' },
+        ],
       },
     },
     anyOf: [
@@ -127,7 +146,9 @@ class TodoSchema {
       { required: ['status'] },
       { required: ['color'] },
       { required: ['isArchived'] },
+      { required: ['isRemoved'] },
       { required: ['isNotificationsEnabled'] },
+      { required: ['expirationDate'] },
     ],
   }
 

@@ -156,7 +156,7 @@ class CommentService extends Database {
       .del();
   }
 
-  getTodoId(id) {
+  getTodoIdSubQuery(id) {
     return this.comments
       .select([
         'todoId',
@@ -165,6 +165,11 @@ class CommentService extends Database {
         id,
       })
       .first();
+  }
+
+  async getTodoId(id) {
+    const res = await this.getTodoIdSubQuery(id);
+    return res.todoId;
   }
 }
 

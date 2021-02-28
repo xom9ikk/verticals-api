@@ -9,16 +9,13 @@ class FetchMiddleware {
   async getUserId(req) {
     const { parsedBearerToken } = req;
     const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
-
     req.userId = userId;
   }
 
   async getUser(req) {
     const { parsedBearerToken } = req;
     const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
-
-    const user = await UserService.getById(userId);
-    req.user = user;
+    req.user = await UserService.getById(userId);
   }
 }
 

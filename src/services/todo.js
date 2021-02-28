@@ -19,6 +19,7 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .where({
         id,
@@ -37,17 +38,19 @@ class TodoService extends Database {
         'color',
         'isArchived',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .count('comments.id', { as: 'commentsCount' })
       .leftJoin('comments', 'todos.id', 'comments.todoId')
       .where({
         columnId,
+        isRemoved: false,
       })
       .groupBy('todos.id');
     return response.map((todo) => ({ ...todo, commentsCount: parseInt(todo.commentsCount) }));
   }
 
-  async getByBoardIds(boardIds) {
+  async getByBoardIds(boardIds, isRemoved = false) {
     const getColumnIds = this.columns
       .select([
         'id',
@@ -56,17 +59,22 @@ class TodoService extends Database {
         'boardId',
         boardIds,
       );
+    const selectedFields = [
+      'todos.id',
+      'columnId',
+      'title',
+      'description',
+      'status',
+      'color',
+      'isArchived',
+      'isNotificationsEnabled',
+      'expirationDate',
+    ];
+    if (isRemoved) {
+      selectedFields.push('isRemoved');
+    }
     const response = await this.todos
-      .select([
-        'todos.id',
-        'columnId',
-        'title',
-        'description',
-        'status',
-        'color',
-        'isArchived',
-        'isNotificationsEnabled',
-      ])
+      .select(selectedFields)
       .countDistinct('comments.id', { as: 'commentsCount' })
       .sum({
         imagesCount: knex.raw('case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
@@ -80,6 +88,9 @@ class TodoService extends Database {
         'columnId',
         getColumnIds,
       )
+      .andWhere({
+        isRemoved,
+      })
       .groupBy('todos.id');
     return response.map((todo) => ({
       ...todo,
@@ -87,6 +98,10 @@ class TodoService extends Database {
       imagesCount: parseInt(todo.imagesCount),
       attachmentsCount: parseInt(todo.attachmentsCount),
     }));
+  }
+
+  getRemovedByBoardIds(boardIds) {
+    return this.getByBoardIds(boardIds, true);
   }
 
   async update(id, todo) {
@@ -112,13 +127,15 @@ class TodoService extends Database {
         'status',
         'color',
         'isArchived',
+        'isRemoved',
         'isNotificationsEnabled',
+        'expirationDate',
       ])
       .del();
     return removedTodo;
   }
 
-  getColumnId(id) {
+  getColumnIdSubQuery(id) {
     return this.todos
       .select([
         'columnId',
@@ -127,6 +144,11 @@ class TodoService extends Database {
         id,
       })
       .first();
+  }
+
+  async getColumnId(id) {
+    const res = await this.getColumnIdSubQuery(id);
+    return res.columnId;
   }
 }
 
