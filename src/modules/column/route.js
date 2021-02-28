@@ -37,6 +37,8 @@ const { RequestPart } = require('../../constants');
  *        enum: [0, 1, 2, 3, 4, 5, 6]
  *      isCollapsed:
  *        type: boolean
+ *      width:
+ *        type: number
  *   CreateColumnResponse:
  *     type: object
  *     properties:
@@ -97,6 +99,8 @@ const { RequestPart } = require('../../constants');
  *             enum: [0, 1, 2, 3, 4, 5, 6]
  *           isCollapsed:
  *             type: boolean
+ *           width:
+ *             type: number
  *       message:
  *         type: string
  * /v1/column/:columnId:
@@ -189,6 +193,8 @@ const { RequestPart } = require('../../constants');
  *        enum: [0, 1, 2, 3, 4, 5, 6]
  *      isCollapsed:
  *        type: boolean
+ *      width:
+ *        type: number
  *   UpdateColumnResponse:
  *     type: object
  *     properties:

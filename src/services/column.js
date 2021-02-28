@@ -29,6 +29,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .where(
         { id },
@@ -45,6 +46,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .whereIn(
         'id',
@@ -61,6 +63,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .whereIn(
         'boardId',
@@ -90,6 +93,7 @@ class ColumnService extends Database {
         'description',
         'color',
         'isCollapsed',
+        'width',
       ])
       .del();
     return removedColumn;

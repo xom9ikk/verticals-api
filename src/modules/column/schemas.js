@@ -25,6 +25,9 @@ class ColumnSchema {
       isCollapsed: {
         type: 'boolean',
       },
+      width: {
+        type: 'number',
+      },
       belowId: {
         type: 'integer',
         minimum: 1,
@@ -102,6 +105,9 @@ class ColumnSchema {
       isCollapsed: {
         type: 'boolean',
       },
+      width: {
+        type: 'number',
+      },
     },
     anyOf: [
       { required: ['boardId'] },
@@ -109,6 +115,7 @@ class ColumnSchema {
       { required: ['description'] },
       { required: ['color'] },
       { required: ['isCollapsed'] },
+      { required: ['width'] },
     ],
   }
 
