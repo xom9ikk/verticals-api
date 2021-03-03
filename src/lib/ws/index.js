@@ -106,6 +106,9 @@ class WebSocketServer {
           this.errorHandler(connection, req, context, e);
         }));
       connection.on('close', () => this.onClose(context));
+      for (let i = 0; i < 40; i++) {
+        this.send(connection, { channel: 'board', data: `Hi from server___${i}` });
+      }
     } catch (e) {
       this.errorHandler(connection, req, context, e);
     }

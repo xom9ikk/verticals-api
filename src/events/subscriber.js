@@ -12,6 +12,9 @@ class Subscriber {
     this.pgEvent.on(triggers.todoChange, UpdatesController.updateController);
     this.pgEvent.on(triggers.commentChange, UpdatesController.updateController);
     this.pgEvent.on(triggers.commentFilesChange, UpdatesController.updateController);
+    this.pgEvent.on(triggers.boardPositionChange, UpdatesController.updateController);
+    this.pgEvent.on(triggers.columnPositionChange, UpdatesController.updateController);
+    this.pgEvent.on(triggers.todoPositionChange, UpdatesController.updateController);
   }
 
   async unsubscribe() {

@@ -15,7 +15,7 @@ class TodoSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       status: {
@@ -105,7 +105,7 @@ class TodoSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       status: {
