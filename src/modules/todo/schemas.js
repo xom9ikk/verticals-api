@@ -40,8 +40,13 @@ class TodoSchema {
         minimum: 1,
       },
       expirationDate: {
-        type: 'string',
-        format: 'date-time',
+        oneOf: [
+          {
+            type: 'string',
+            format: 'date-time',
+          },
+          { type: 'null' },
+        ],
       },
     },
     required: ['columnId', 'title'],

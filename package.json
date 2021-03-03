@@ -11,7 +11,8 @@
     "lint:fix": "eslint --ext .js ./src --fix",
     "test": "jest --config ./jest.config.js",
     "test:silent": "jest --bail --silent --config ./jest.config.js",
-    "test:watch": "jest --config ./jest.config.js --watch"
+    "test:watch": "jest --config ./jest.config.js --watch",
+    "graph": "npx madge --image graph.svg src/index.js"
   },
   "author": "xom9ik <xom9ik.code@gmail.com>",
   "license": "MIT",
