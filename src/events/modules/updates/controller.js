@@ -14,10 +14,12 @@ class UpdatesController {
         delete object.updatedAt;
         const responseData = {
           operation,
-          ...object,
+          data: {
+            ...object,
+          },
         };
         if (object.expirationDate) {
-          responseData.expirationDate = new Date(object.expirationDate).getTime();
+          responseData.data.expirationDate = new Date(object.expirationDate).getTime();
         }
         const response = {
           channel,
