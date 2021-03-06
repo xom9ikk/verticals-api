@@ -147,7 +147,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column without authorization', async (done) => {
+  it('user can\'t create column without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const boardId = user.getRandomBoardId();
 
@@ -164,7 +164,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column without board id', async (done) => {
+  it('user can\'t create column without board id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -184,7 +184,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column without title', async (done) => {
+  it('user can\'t create column without title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -204,27 +204,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column without position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const column = Generator.Column.getUnique(boardId);
-    delete column.position;
-    const res = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(column);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create column with empty title', async (done) => {
+  it('user can\'t create column with empty title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -246,7 +226,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with long title', async (done) => {
+  it('user can\'t create column with long title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -268,49 +248,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with negative position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const column = Generator.Column.getUnique(boardId);
-    const res = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...column,
-        position: Generator.Column.getNegativePosition(),
-      });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create column with string position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const column = Generator.Column.getUnique(boardId);
-    const res = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...column,
-        position: Generator.Column.getStringPosition(),
-      });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create column with negative color', async (done) => {
+  it('user can\'t create column with negative color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -331,7 +269,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with string color', async (done) => {
+  it('user can\'t create column with string color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -352,7 +290,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with color which is not included in the enum', async (done) => {
+  it('user can\'t create column with color which is not included in the enum', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -374,7 +312,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with negative board id', async (done) => {
+  it('user can\'t create column with negative board id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -396,7 +334,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create column with board id without having access to it', async (done) => {
+  it('user can\'t create column with board id without having access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const { token } = firstUser;
 
@@ -443,12 +381,13 @@ describe('get column by id', () => {
     }));
     expect(res.body.data).toEqual({
       id: columnId,
+      position: expect.any(Number),
       ...column,
     });
 
     done();
   });
-  it('user can`t get column without authorization header', async (done) => {
+  it('user can\'t get column without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -471,7 +410,7 @@ describe('get column by id', () => {
 
     done();
   });
-  it('user can`t access to the column if he does not have access to it', async (done) => {
+  it('user can\'t access to the column if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const firstUserBoardId = firstUser.getRandomBoardId();
 
@@ -496,7 +435,7 @@ describe('get column by id', () => {
 
     done();
   });
-  it('user can`t access to the column by string id', async (done) => {
+  it('user can\'t access to the column by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -555,15 +494,19 @@ describe('get all columns', () => {
     }));
 
     const { columns } = res.body.data;
-    const [{ id: columnIdOne }, { id: columnIdTwo }] = columns;
+    const [{ id: columnIdOne }, { id: columnIdTwo }] = columns.entities;
 
-    expect(columns).toEqual([{
+    expect(columns.entities).toEqual([{
       id: columnIdOne,
       ...columnOne,
     }, {
       id: columnIdTwo,
       ...columnTwo,
     }]);
+    expect(columns.positions).toMatchObject({
+      [firstBoard.id]: [columnIdOne],
+      [secondBoard.id]: [columnIdTwo],
+    });
 
     done();
   });
@@ -599,16 +542,19 @@ describe('get all columns', () => {
     }));
 
     const { columns } = res.body.data;
-    const [{ id: columnIdOne }] = columns;
+    const [{ id: columnIdOne }] = columns.entities;
 
-    expect(columns).toEqual([{
+    expect(columns.entities).toEqual([{
       id: columnIdOne,
       ...columnOne,
     }]);
+    expect(columns.positions).toMatchObject({
+      [firstBoardId]: [columnIdOne],
+    });
 
     done();
   });
-  it('user can`t get all columns if he does not have access to board id', async (done) => {
+  it('user can\'t get all columns if he does not have access to board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
@@ -642,7 +588,7 @@ describe('get all columns', () => {
 
     done();
   });
-  it('user can`t get columns if he has no columns', async (done) => {
+  it('user can\'t get columns if he has no columns', async (done) => {
     const firstUser = await helper.createUser();
     const [firstBoard, secondBoard] = await helper.createBoards({
       token: firstUser.getToken(),
@@ -667,14 +613,19 @@ describe('get all columns', () => {
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
-      data: expect.any(Object),
+      data: {
+        columns: {
+          entities: [],
+          positions: expect.any(Object),
+        },
+      },
     }));
     done();
   });
-  it('user can`t get all columns without authorization header', async (done) => {
+  it('user can\'t get all columns without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -724,7 +675,7 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can`t remove column without authorization header', async (done) => {
+  it('user can\'t remove column without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -747,7 +698,7 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can`t remove column if he does not have access to it', async (done) => {
+  it('user can\'t remove column if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser();
     const [firstBoard, secondBoard] = await helper.createBoards({
       token: firstUser.getToken(),
@@ -780,7 +731,7 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can`t remove column by string id', async (done) => {
+  it('user can\'t remove column by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -837,12 +788,13 @@ describe('update column', () => {
 
     expect(res.body.data).toEqual({
       id: columnId,
+      position: 0,
       ...newColumn,
     });
 
     done();
   });
-  it('user can`t update column without authorization header', async (done) => {
+  it('user can\'t update column without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -866,7 +818,7 @@ describe('update column', () => {
 
     done();
   });
-  it('user can`t update column if he does not have access to it', async (done) => {
+  it('user can\'t update column if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const boardId = firstUser.getRandomBoardId();
 
@@ -892,7 +844,7 @@ describe('update column', () => {
 
     done();
   });
-  it('user can`t update column by string id', async (done) => {
+  it('user can\'t update column by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const boardId = user.getRandomBoardId();
@@ -916,7 +868,7 @@ describe('update column', () => {
 
     done();
   });
-  it('user can`t update column if he does not have access to new board id', async (done) => {
+  it('user can\'t update column if he does not have access to new board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const firstUserBoardId = firstUser.getRandomBoardId();
 

@@ -23,679 +23,80 @@ afterAll(async (done) => {
   done();
 });
 
-describe('create', () => {
-  it('user can successfully create board with all fields', async (done) => {
-    const { token } = await helper.createUser();
+const defaultUser = {
+  boards: [{
+    title: 'default-board-1',
+    columns: [{
+      title: 'default-column-1',
+    }, {
+      title: 'default-column-2',
+    }],
+  }, {
+    title: 'default-board-2',
+    columns: [{
+      title: 'default-column-3',
+    }, {
+      title: 'default-column-4',
+    }, {
+      title: 'default-column-5',
+    }],
+  }, {
+    title: 'default-board-3',
+    columns: [{
+      title: 'default-column-6',
+    }],
+  }, {
+    title: 'default-board-4',
+    columns: [{
+      title: 'default-column-7',
+    }],
+  }],
+};
 
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
+describe('todo title', () => {
+  it('user can successfully search by todo title', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const todo = Generator.Todo.getUnique(columnId);
+    const { body: { data: { todoId } } } = await request()
+      .post(`${routes.todo}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(board);
+      .send(todo);
 
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(expect.objectContaining({
+    const searchRes = await request()
+      .get(`${routes.search}/todo`)
+      .query({ query: todo.title })
+      .set('authorization', `Bearer ${token}`)
+      .send(todo);
+
+    expect(searchRes.statusCode).toEqual(200);
+    expect(searchRes.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        boardId: expect.any(Number),
+        todos: {
+          entities: [{
+            id: todoId,
+            ...todo,
+            expirationDate: expect.any(Number),
+            commentsCount: 0,
+            imagesCount: 0,
+            attachmentsCount: 0,
+          }],
+          positions: {
+            [columnId]: [todoId],
+          },
+        },
+        columns: {
+          entities: expect.any(Array),
+          positions: expect.any(Object),
+        },
+        boards: {
+          entities: expect.any(Array),
+          positions: expect.any(Array),
+        },
       }),
-    }));
-
-    done();
-  });
-  it('user can successfully create board without description', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.description;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.objectContaining({
-        boardId: expect.any(Number),
-      }),
-    }));
-
-    done();
-  });
-  it('user can successfully create board without color', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.color;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.objectContaining({
-        boardId: expect.any(Number),
-      }),
-    }));
-
-    done();
-  });
-  it('user can successfully create board without all non-required fields', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.description;
-    delete board.color;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.objectContaining({
-        boardId: expect.any(Number),
-      }),
-    }));
-
-    done();
-  });
-  it('user can`t create board without authorization', async (done) => {
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(401);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board without title', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.title;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board without card type', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.cardType;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with empty title', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        title: '',
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with long title', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        title: Generator.Board.getLongTitle(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with negative card type', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        cardType: Generator.Board.getNegativeCardType(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with string card type', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        cardType: Generator.Board.getNegativeCardType(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with card type which is not included in the enum', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        cardType: Generator.Board.getInvalidCardType(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with negative color', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        color: Generator.Board.getNegativeColor(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with string color', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        color: Generator.Board.getNegativeColor(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with color which is not included in the enum', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...board,
-        color: Generator.Board.getInvalidColor(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-});
-
-describe('get board by id', () => {
-  it('user can successfully get board by id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .get(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${token}`)
-      .send();
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-    expect(res.body.data).toEqual({
-      id: boardId,
-      position: expect.any(Number),
-      ...board,
-    });
-
-    done();
-  });
-  it('user can`t get board without authorization header', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .get(`${routes.board}/${boardId}`)
-      .send();
-
-    expect(res.statusCode).toEqual(401);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t access to the board if he does not have access to it', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(board);
-
-    const res = await request()
-      .get(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send();
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t access to the board by string id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .get(`${routes.board}/string_${boardId}`)
-      .send();
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-});
-
-describe('get all boards', () => {
-  it('user can successfully get all boards to which he has access', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const boardOne = Generator.Board.getUnique();
-    await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(boardOne);
-
-    const boardTwo = Generator.Board.getUnique();
-    const { body: { data: { boardId: boardIdTwo } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send(boardTwo);
-
-    const boardThree = Generator.Board.getUnique();
-    const { body: { data: { boardId: boardIdThree } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send(boardThree);
-
-    const res = await request()
-      .get(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send();
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    const { boards } = res.body.data;
-
-    expect(boards).toEqual([
-      {
-        id: boardIdTwo,
-        position: expect.any(Number),
-        ...boardTwo,
-      }, {
-        id: boardIdThree,
-        position: expect.any(Number),
-        ...boardThree,
-      },
-    ]);
-
-    done();
-  });
-  it('user can`t get boards if he has no boards', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const boardOne = Generator.Board.getUnique();
-    await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(boardOne);
-
-    const res = await request()
-      .get(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send();
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-    done();
-  });
-  it('user can`t get all boards without authorization header', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .get(`${routes.board}/${boardId}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(401);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-});
-
-describe('remove board', () => {
-  it('user can successfully remove board by id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .delete(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${token}`)
-      .send();
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t remove board without authorization header', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .delete(`${routes.board}/${boardId}`)
-      .send();
-
-    expect(res.statusCode).toEqual(401);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t remove board if he does not have access to it', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(board);
-
-    const res = await request()
-      .delete(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send();
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t remove board by string id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const res = await request()
-      .delete(`${routes.board}/string_${boardId}`)
-      .send();
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-});
-
-describe('update board', () => {
-  it('user can successfully update board by id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const newBoard = Generator.Board.getUnique();
-    const resUpdate = await request()
-      .patch(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${token}`)
-      .send(newBoard);
-
-    const res = await request()
-      .get(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${token}`)
-      .send();
-
-    expect(resUpdate.statusCode).toEqual(200);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    expect(res.body.data).toEqual({
-      id: boardId,
-      position: expect.any(Number),
-      ...newBoard,
-    });
-
-    done();
-  });
-  it('user can`t update board without authorization header', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const newBoard = Generator.Board.getUnique();
-    const res = await request()
-      .patch(`${routes.board}/${boardId}`)
-      .send(newBoard);
-
-    expect(res.statusCode).toEqual(401);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t update board if he does not have access to it', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(board);
-
-    const newBoard = Generator.Board.getUnique();
-    const res = await request()
-      .patch(`${routes.board}/${boardId}`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send(newBoard);
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t update board by string id', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    const { body: { data: { boardId } } } = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    const newBoard = Generator.Board.getUnique();
-    const res = await request()
-      .patch(`${routes.board}/string_${boardId}`)
-      .send(newBoard);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
     }));
 
     done();

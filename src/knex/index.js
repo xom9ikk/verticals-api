@@ -28,7 +28,7 @@ class Knex {
       this
         .knex
         .destroy()
-        .catch(global.logger ? global.error : console.error)
+        .catch(global.logger ? global.logger.error : console.error)
         .finally(resolve);
     });
     return this.knex;

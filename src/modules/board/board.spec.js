@@ -89,6 +89,7 @@ describe('create', () => {
     const board = Generator.Board.getUnique();
     delete board.description;
     delete board.color;
+    delete board.cardType;
     const res = await request()
       .post(`${routes.board}/`)
       .set('authorization', `Bearer ${token}`)
@@ -104,7 +105,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board without authorization', async (done) => {
+  it('user can\'t create board without authorization', async (done) => {
     const board = Generator.Board.getUnique();
     const res = await request()
       .post(`${routes.board}/`)
@@ -118,7 +119,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board without title', async (done) => {
+  it('user can\'t create board without title', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -136,25 +137,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board without card type', async (done) => {
-    const { token } = await helper.createUser();
-
-    const board = Generator.Board.getUnique();
-    delete board.cardType;
-    const res = await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(board);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create board with empty title', async (done) => {
+  it('user can\'t create board with empty title', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -174,7 +157,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with long title', async (done) => {
+  it('user can\'t create board with long title', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -194,7 +177,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with negative card type', async (done) => {
+  it('user can\'t create board with negative card type', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -214,7 +197,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with string card type', async (done) => {
+  it('user can\'t create board with string card type', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -234,7 +217,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with card type which is not included in the enum', async (done) => {
+  it('user can\'t create board with card type which is not included in the enum', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -254,7 +237,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with negative color', async (done) => {
+  it('user can\'t create board with negative color', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -274,7 +257,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with string color', async (done) => {
+  it('user can\'t create board with string color', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -294,7 +277,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create board with color which is not included in the enum', async (done) => {
+  it('user can\'t create board with color which is not included in the enum', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -344,7 +327,7 @@ describe('get board by id', () => {
 
     done();
   });
-  it('user can`t get board without authorization header', async (done) => {
+  it('user can\'t get board without authorization header', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -365,7 +348,7 @@ describe('get board by id', () => {
 
     done();
   });
-  it('user can`t access to the board if he does not have access to it', async (done) => {
+  it('user can\'t access to the board if he does not have access to it', async (done) => {
     const { token: tokenFirst } = await helper.createUser();
     const { token: tokenSecond } = await helper.createUser();
 
@@ -388,7 +371,7 @@ describe('get board by id', () => {
 
     done();
   });
-  it('user can`t access to the board by string id', async (done) => {
+  it('user can\'t access to the board by string id', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -447,43 +430,23 @@ describe('get all boards', () => {
 
     const { boards } = res.body.data;
 
-    expect(boards).toEqual([
-      {
-        id: boardIdTwo,
-        position: expect.any(Number),
-        ...boardTwo,
-      }, {
-        id: boardIdThree,
-        position: expect.any(Number),
-        ...boardThree,
-      },
-    ]);
+    expect(boards).toEqual({
+      entities: [
+        expect.any(Object),
+        {
+          id: boardIdTwo,
+          ...boardTwo,
+        }, {
+          id: boardIdThree,
+          ...boardThree,
+        },
+      ],
+      positions: [expect.any(Number), boardIdTwo, boardIdThree],
+    });
 
     done();
   });
-  it('user can`t get boards if he has no boards', async (done) => {
-    const { token: tokenFirst } = await helper.createUser();
-    const { token: tokenSecond } = await helper.createUser();
-
-    const boardOne = Generator.Board.getUnique();
-    await request()
-      .post(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenFirst}`)
-      .send(boardOne);
-
-    const res = await request()
-      .get(`${routes.board}/`)
-      .set('authorization', `Bearer ${tokenSecond}`)
-      .send();
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-    done();
-  });
-  it('user can`t get all boards without authorization header', async (done) => {
+  it('user can\'t get all boards without authorization header', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -529,7 +492,7 @@ describe('remove board', () => {
 
     done();
   });
-  it('user can`t remove board without authorization header', async (done) => {
+  it('user can\'t remove board without authorization header', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -550,7 +513,7 @@ describe('remove board', () => {
 
     done();
   });
-  it('user can`t remove board if he does not have access to it', async (done) => {
+  it('user can\'t remove board if he does not have access to it', async (done) => {
     const { token: tokenFirst } = await helper.createUser();
     const { token: tokenSecond } = await helper.createUser();
 
@@ -573,7 +536,7 @@ describe('remove board', () => {
 
     done();
   });
-  it('user can`t remove board by string id', async (done) => {
+  it('user can\'t remove board by string id', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -632,7 +595,7 @@ describe('update board', () => {
 
     done();
   });
-  it('user can`t update board without authorization header', async (done) => {
+  it('user can\'t update board without authorization header', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
@@ -654,7 +617,7 @@ describe('update board', () => {
 
     done();
   });
-  it('user can`t update board if he does not have access to it', async (done) => {
+  it('user can\'t update board if he does not have access to it', async (done) => {
     const { token: tokenFirst } = await helper.createUser();
     const { token: tokenSecond } = await helper.createUser();
 
@@ -678,7 +641,7 @@ describe('update board', () => {
 
     done();
   });
-  it('user can`t update board by string id', async (done) => {
+  it('user can\'t update board by string id', async (done) => {
     const { token } = await helper.createUser();
 
     const board = Generator.Board.getUnique();
