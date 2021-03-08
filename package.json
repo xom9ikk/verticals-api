@@ -12,6 +12,7 @@
     "test": "jest --config ./jest.config.js",
     "test:silent": "jest --bail --silent --config ./jest.config.js",
     "test:watch": "jest --config ./jest.config.js --watch",
+    "test:stryker": "npx stryker run",
     "graph": "npx madge --image graph.svg src/index.js"
   },
   "author": "Max Romanyuta <xom9ik.code@gmail.com>",
@@ -52,6 +53,8 @@
     "ws": "^7.3.1"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^4.5.0",
+    "@stryker-mutator/jest-runner": "^4.5.0",
     "babel-eslint": "^10.1.0",
     "cz-conventional-changelog": "^3.2.0",
     "eslint": "^7.4.0",
