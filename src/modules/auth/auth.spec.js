@@ -38,7 +38,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with a non-unique username', async (done) => {
+  it('user can\'t register with a non-unique username', async (done) => {
     const firstUser = Generator.User.getUnique();
     const secondUser = Generator.User.getUnique();
 
@@ -60,7 +60,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with a non-unique email', async (done) => {
+  it('user can\'t register with a non-unique email', async (done) => {
     const firstUser = Generator.User.getUnique();
     const secondUser = Generator.User.getUnique();
     await request()
@@ -81,7 +81,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without email', async (done) => {
+  it('user can\'t register without email', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.email;
     const res = await request()
@@ -98,7 +98,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without password', async (done) => {
+  it('user can\'t register without password', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.password;
     const res = await request()
@@ -115,7 +115,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without name', async (done) => {
+  it('user can\'t register without name', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.name;
     const res = await request()
@@ -132,7 +132,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without surname', async (done) => {
+  it('user can\'t register without surname', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.surname;
     const res = await request()
@@ -149,7 +149,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without username', async (done) => {
+  it('user can\'t register without username', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.username;
     const res = await request()
@@ -166,7 +166,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register without username', async (done) => {
+  it('user can\'t register without username', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     delete uniqueUser.username;
     const res = await request()
@@ -183,7 +183,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with invalid email', async (done) => {
+  it('user can\'t register with invalid email', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -200,7 +200,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with long email', async (done) => {
+  it('user can\'t register with long email', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -217,7 +217,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with long username', async (done) => {
+  it('user can\'t register with long username', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -234,7 +234,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with short username', async (done) => {
+  it('user can\'t register with short username', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -251,7 +251,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with long name', async (done) => {
+  it('user can\'t register with long name', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -268,7 +268,7 @@ describe('registration', () => {
 
     done();
   });
-  it('user can`t register with short name', async (done) => {
+  it('user can\'t register with short name', async (done) => {
     const uniqueUser = Generator.User.getUnique();
     const res = await request()
       .post(`${routes.auth}/register`)
@@ -334,7 +334,7 @@ describe('login', () => {
 
     done();
   });
-  it('user can`t login without username and email', async (done) => {
+  it('user can\'t login without username and email', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -355,7 +355,7 @@ describe('login', () => {
 
     done();
   });
-  it('user can`t login only with email without password', async (done) => {
+  it('user can\'t login only with email without password', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -374,7 +374,7 @@ describe('login', () => {
 
     done();
   });
-  it('user can`t login only with username without password', async (done) => {
+  it('user can\'t login only with username without password', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -393,7 +393,7 @@ describe('login', () => {
 
     done();
   });
-  it('user can`t login only with invalid password', async (done) => {
+  it('user can\'t login only with invalid password', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -479,7 +479,7 @@ describe('refresh token', () => {
 
     done();
   });
-  it('user can`t refresh tokens with invalid refresh token', async (done) => {
+  it('user can\'t refresh tokens with invalid refresh token', async (done) => {
     const res = await request()
       .post(`${routes.auth}/refresh`)
       .send({
@@ -494,7 +494,7 @@ describe('refresh token', () => {
 
     done();
   });
-  it('user can`t refresh tokens without refresh token', async (done) => {
+  it('user can\'t refresh tokens without refresh token', async (done) => {
     const res = await request()
       .post(`${routes.auth}/refresh`)
       .send();
@@ -535,7 +535,7 @@ describe('logout ', () => {
 
     done();
   });
-  it('user can`t logout with empty authorization headers', async (done) => {
+  it('user can\'t logout with empty authorization headers', async (done) => {
     const res = await request()
       .post(`${routes.auth}/logout`)
       .send();
@@ -548,7 +548,7 @@ describe('logout ', () => {
 
     done();
   });
-  it('user can`t logout with authorization headers without Bearer', async (done) => {
+  it('user can\'t logout with authorization headers without Bearer', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -573,7 +573,7 @@ describe('logout ', () => {
 
     done();
   });
-  it('user can`t logout with invalid authorization headers', async (done) => {
+  it('user can\'t logout with invalid authorization headers', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)
@@ -598,7 +598,7 @@ describe('logout ', () => {
 
     done();
   });
-  it('user can`t logout with expired authorization headers', async (done) => {
+  it('user can\'t logout with expired authorization headers', async (done) => {
     const { token } = await Generator.Auth.getExpiredTokenPair(1);
     const res = await request()
       .post(`${routes.auth}/logout`)
@@ -613,7 +613,7 @@ describe('logout ', () => {
 
     done();
   });
-  it('user can`t refresh token after logout', async (done) => {
+  it('user can\'t refresh token after logout', async (done) => {
     const user = Generator.User.getUnique();
     await request()
       .post(`${routes.auth}/register`)

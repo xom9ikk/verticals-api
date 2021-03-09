@@ -10,7 +10,7 @@ class CommentDataGenerator {
   }
 
   static getLongText() {
-    return ''.padStart(4097, 'longtext');
+    return ''.padStart(16385, 'longtext');
   }
 
   static getNegativeTodoId() {

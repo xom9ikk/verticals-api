@@ -221,7 +221,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create comment without authorization', async (done) => {
+  it('user can\'t create comment without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const todoId = user.getRandomTodoId();
 
@@ -238,29 +238,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create comment with empty text', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const todoId = user.getRandomTodoId();
-
-    const comment = Generator.Comment.getUnique(todoId);
-    const res = await request()
-      .post(`${routes.comment}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...comment,
-        text: '',
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create comment with long text', async (done) => {
+  it('user can\'t create comment with long text', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -282,7 +260,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create comment with negative column id', async (done) => {
+  it('user can\'t create comment with negative column id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -304,7 +282,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create comment with column id without having access to it', async (done) => {
+  it('user can\'t create comment with column id without having access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const { token } = firstUser;
 
@@ -354,13 +332,13 @@ describe('get comment by id', () => {
       id: commentId,
       ...comment,
       replyCommentId: null,
-      updatedAt: null,
-      attachedFiles: [],
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     });
 
     done();
   });
-  it('user can`t get comment without authorization header', async (done) => {
+  it('user can\'t get comment without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -383,7 +361,7 @@ describe('get comment by id', () => {
 
     done();
   });
-  it('user can`t access to the comment if he does not have access to it', async (done) => {
+  it('user can\'t access to the comment if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const firstUserTodoId = firstUser.getRandomTodoId();
 
@@ -408,7 +386,7 @@ describe('get comment by id', () => {
 
     done();
   });
-  it('user can`t access to the comment by string id', async (done) => {
+  it('user can\'t access to the comment by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -477,12 +455,14 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      updatedAt: null,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     }, {
       id: commentIdTwo,
       ...commentTwo,
       replyCommentId: null,
-      updatedAt: null,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     }]);
 
     done();
@@ -527,7 +507,8 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      updatedAt: null,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     }]);
 
     done();
@@ -573,7 +554,8 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      updatedAt: null,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     }]);
 
     done();
@@ -619,12 +601,14 @@ describe('get all comments', () => {
       id: commentIdOne,
       ...commentOne,
       replyCommentId: null,
-      updatedAt: null,
+      likedUsers: [],
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     }]);
 
     done();
   });
-  it('user can`t get all comments if he does not have access to board id', async (done) => {
+  it('user can\'t get all comments if he does not have access to board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoIdFirstUser = firstUser.getRandomTodoId();
 
@@ -658,7 +642,7 @@ describe('get all comments', () => {
 
     done();
   });
-  it('user can`t get all comments if he does not have access to column id', async (done) => {
+  it('user can\'t get all comments if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoIdFirstUser = firstUser.getRandomTodoId();
 
@@ -692,7 +676,7 @@ describe('get all comments', () => {
 
     done();
   });
-  it('user can`t get all comments if he does not have access to todo id', async (done) => {
+  it('user can\'t get all comments if he does not have access to todo id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoIdFirstUser = firstUser.getRandomTodoId();
 
@@ -726,7 +710,7 @@ describe('get all comments', () => {
 
     done();
   });
-  it('user can`t get comments if he has no comments', async (done) => {
+  it('user can\'t get comments if he has no comments', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const [firstTodoId, secondTodoId] = firstUser.getTodoIds();
     const secondUser = await helper.createUser();
@@ -748,14 +732,16 @@ describe('get all comments', () => {
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
-      data: expect.any(Object),
+      data: {
+        comments: [],
+      },
     }));
     done();
   });
-  it('user can`t get all comments without authorization header', async (done) => {
+  it('user can\'t get all comments without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -805,7 +791,7 @@ describe('remove comment', () => {
 
     done();
   });
-  it('user can`t remove comment without authorization header', async (done) => {
+  it('user can\'t remove comment without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -828,7 +814,7 @@ describe('remove comment', () => {
 
     done();
   });
-  it('user can`t remove comment if he does not have access to it', async (done) => {
+  it('user can\'t remove comment if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoId = firstUser.getRandomTodoId();
 
@@ -853,7 +839,7 @@ describe('remove comment', () => {
 
     done();
   });
-  it('user can`t remove comment by string id', async (done) => {
+  it('user can\'t remove comment by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -912,13 +898,13 @@ describe('update comment', () => {
       id: commentId,
       ...newComment,
       replyCommentId: null,
-      updatedAt: expect.any(Date),
-      attachedFiles: [],
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     });
 
     done();
   });
-  it('user can`t update comment without authorization header', async (done) => {
+  it('user can\'t update comment without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
@@ -942,7 +928,7 @@ describe('update comment', () => {
 
     done();
   });
-  it('user can`t update comment if he does not have access to it', async (done) => {
+  it('user can\'t update comment if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoId = firstUser.getRandomTodoId();
 
@@ -968,7 +954,7 @@ describe('update comment', () => {
 
     done();
   });
-  it('user can`t update comment by string id', async (done) => {
+  it('user can\'t update comment by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const todoId = user.getRandomTodoId();

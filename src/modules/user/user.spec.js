@@ -29,7 +29,7 @@ describe('me', () => {
       .send(user);
     const { token } = resRegister.body.data;
     const res = await request()
-      .get(`${routes.auth}/me`)
+      .get(`${routes.user}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -59,7 +59,7 @@ describe('me', () => {
       });
     const { token } = resLogin.body.data;
     const res = await request()
-      .get(`${routes.auth}/me`)
+      .get(`${routes.user}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -69,6 +69,8 @@ describe('me', () => {
       data: expect.any(Object),
     }));
     expect(res.body.data).toEqual({
+      avatar: null,
+      bio: null,
       email: user.email,
       name: user.name,
       surname: user.surname,
@@ -77,10 +79,10 @@ describe('me', () => {
 
     done();
   });
-  it('user can`t get information about himself with invalid token', async (done) => {
+  it('user can\'t get information about himself with invalid token', async (done) => {
     const token = Generator.Auth.getInvalidToken();
     const res = await request()
-      .get(`${routes.auth}/me`)
+      .get(`${routes.user}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -92,13 +94,13 @@ describe('me', () => {
 
     done();
   });
-  it('user can`t get information about himself with invalid signature token', async (done) => {
+  it('user can\'t get information about himself with invalid signature token', async (done) => {
     const { token } = await Generator.Auth.getTokenPairWithInvalidSignature({
       userId: 1,
       ip: 'test.test.test.test',
     });
     const res = await request()
-      .get(`${routes.auth}/me`)
+      .get(`${routes.user}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -110,10 +112,10 @@ describe('me', () => {
 
     done();
   });
-  it('user can`t get information about himself with expired token', async (done) => {
+  it('user can\'t get information about himself with expired token', async (done) => {
     const { token } = await Generator.Auth.getExpiredTokenPair(1);
     const res = await request()
-      .get(`${routes.auth}/me`)
+      .get(`${routes.user}/me`)
       .set('authorization', `Bearer ${token}`)
       .send();
 

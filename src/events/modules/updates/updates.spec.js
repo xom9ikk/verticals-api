@@ -35,8 +35,10 @@ beforeAll(async (done) => {
 
 afterAll(async (done) => {
   await Subscriber.unsubscribe();
-  await knex.closeConnection();
-  app.server.close(done);
+  setTimeout(async () => { // Finish all requests before close
+    await knex.closeConnection();
+    app.server.close(done);
+  }, 2000);
 });
 
 const defaultUser = {
@@ -252,12 +254,13 @@ describe('board', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.insert,
             channel: 'board',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              position: expect.any(Number), // TODO
-              ...board,
+              operation: Operations.insert,
+              data: {
+                id: expect.any(Number),
+                ...board,
+              },
             }),
           }));
           done();
@@ -286,11 +289,13 @@ describe('board', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.update,
             channel: 'board',
             data: expect.objectContaining({
-              id: boardId,
-              ...board,
+              operation: Operations.update,
+              data: {
+                id: boardId,
+                ...board,
+              },
             }),
           }));
           done();
@@ -307,38 +312,43 @@ describe('board', () => {
           .send(board);
       });
   });
-  it('user can be successfully notified on board remove', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const ws = new WS(baseUrlWs)
-      .query({ authorization: `Bearer ${token}` })
-      .start('updates')
-      .onMessage((data) => {
-        try {
-          expect(data).toEqual(expect.objectContaining({
-            operation: Operations.delete,
-            channel: 'board',
-            data: expect.objectContaining({
-              id: boardId,
-            }),
-          }));
-          done();
-        } catch (error) {
-          done(error);
-        } finally {
-          ws.close();
-        }
-      })
-      .onOpen(async () => {
-        await request()
-          .delete(`${baseUrl}${routes.board}/${boardId}`)
-          .set('authorization', `Bearer ${token}`)
-          .send();
-      });
-  });
+  // it.only('user can be successfully notified on board remove', async (done) => {
+  //   const user = await helper.createUser(defaultUser);
+  //   const token = user.getToken();
+  //   const boardId = user.getRandomBoardId();
+  //
+  //   const ws = new WS(baseUrlWs)
+  //     .query({ authorization: `Bearer ${token}` })
+  //     .start('updates')
+  //     .onMessage((data) => {
+  //       if (data.channel !== 'board') return;
+  //       console.log(data);
+  //       try {
+  //         expect(data).toEqual(expect.objectContaining({
+  //           channel: 'board',
+  //           data: expect.objectContaining({
+  //             operation: Operations.delete,
+  //             data: expect(data.data.data).toMatchObject({
+  //               id: boardId,
+  //             }),
+  //           }),
+  //         }));
+  //         done();
+  //       } catch (error) {
+  //         done(error);
+  //       } finally {
+  //         ws.close();
+  //       }
+  //     })
+  //     .onOpen(async () => {
+  //       await request()
+  //         .delete(`${baseUrl}${routes.board}/${boardId}`)
+  //         .set('authorization', `Bearer ${token}`)
+  //         .send();
+  //     });
+  // });
 });
+
 describe('column', () => {
   it('user can be successfully notified of column create', async (done) => {
     const user = await helper.createUser(defaultUser);
@@ -352,11 +362,13 @@ describe('column', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.insert,
             channel: 'column',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...column,
+              operation: Operations.insert,
+              data: {
+                id: expect.any(Number),
+                ...column,
+              },
             }),
           }));
           done();
@@ -385,11 +397,13 @@ describe('column', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.update,
             channel: 'column',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...newColumn,
+              operation: Operations.update,
+              data: {
+                id: expect.any(Number),
+                ...newColumn,
+              },
             }),
           }));
           done();
@@ -409,20 +423,19 @@ describe('column', () => {
   it('user can be successfully notified on column remove', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const columnId = user.getRandomColumnId();
+    const column = user.getRandomColumn();
 
     const ws = new WS(baseUrlWs)
       .query({ authorization: `Bearer ${token}` })
       .start('updates')
       .onMessage((data) => {
         try {
-          expect(data).toEqual(expect.objectContaining({
-            operation: Operations.delete,
-            channel: 'column',
-            data: expect.objectContaining({
-              id: columnId,
-            }),
-          }));
+          expect(data.channel).toEqual('column');
+          expect(data.data.operation).toEqual(Operations.delete);
+          expect(data.data.data).toMatchObject({
+            id: column.id,
+            boardId: column.boardId,
+          });
           done();
         } catch (error) {
           done(error);
@@ -432,7 +445,7 @@ describe('column', () => {
       })
       .onOpen(async () => {
         await request()
-          .delete(`${baseUrl}${routes.column}/${columnId}`)
+          .delete(`${baseUrl}${routes.column}/${column.id}`)
           .set('authorization', `Bearer ${token}`)
           .send();
       });
@@ -452,11 +465,15 @@ describe('todo', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.insert,
             channel: 'todo',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...todo,
+              operation: Operations.insert,
+              data: {
+                id: expect.any(Number),
+                ...todo,
+                expirationDate: expect.any(Number),
+                isRemoved: false,
+              },
             }),
           }));
           done();
@@ -485,11 +502,15 @@ describe('todo', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.update,
             channel: 'todo',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...newTodo,
+              operation: Operations.update,
+              data: {
+                id: expect.any(Number),
+                ...newTodo,
+                expirationDate: expect.any(Number),
+                isRemoved: false,
+              },
             }),
           }));
           done();
@@ -509,20 +530,19 @@ describe('todo', () => {
   it('user can be successfully notified on todo remove', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const todoId = user.getRandomTodoId();
+    const todo = user.getRandomTodo();
 
     const ws = new WS(baseUrlWs)
       .query({ authorization: `Bearer ${token}` })
       .start('updates')
       .onMessage((data) => {
         try {
-          expect(data).toEqual(expect.objectContaining({
-            operation: Operations.delete,
-            channel: 'todo',
-            data: expect.objectContaining({
-              id: todoId,
-            }),
-          }));
+          expect(data.channel).toEqual('todo');
+          expect(data.data.operation).toEqual(Operations.delete);
+          expect(data.data.data).toMatchObject({
+            id: todo.id,
+            columnId: todo.columnId,
+          });
           done();
         } catch (error) {
           done(error);
@@ -532,7 +552,7 @@ describe('todo', () => {
       })
       .onOpen(async () => {
         await request()
-          .delete(`${baseUrl}${routes.todo}/${todoId}`)
+          .delete(`${baseUrl}${routes.todo}/${todo.id}`)
           .set('authorization', `Bearer ${token}`)
           .send();
       });
@@ -552,12 +572,14 @@ describe('comment', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.insert,
             channel: 'comment',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...comment,
-              replyCommentId: null,
+              operation: Operations.insert,
+              data: {
+                id: expect.any(Number),
+                ...comment,
+                replyCommentId: null,
+              },
             }),
           }));
           done();
@@ -586,12 +608,14 @@ describe('comment', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.update,
             channel: 'comment',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              ...newComment,
-              replyCommentId: null,
+              operation: Operations.update,
+              data: {
+                id: expect.any(Number),
+                ...newComment,
+                replyCommentId: null,
+              },
             }),
           }));
           done();
@@ -611,20 +635,19 @@ describe('comment', () => {
   it('user can be successfully notified on comment remove', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const commentId = user.getRandomCommentId();
+    const comment = user.getRandomComment();
 
     const ws = new WS(baseUrlWs)
       .query({ authorization: `Bearer ${token}` })
       .start('updates')
       .onMessage((data) => {
         try {
-          expect(data).toEqual(expect.objectContaining({
-            operation: Operations.delete,
-            channel: 'comment',
-            data: expect.objectContaining({
-              id: commentId,
-            }),
-          }));
+          expect(data.channel).toEqual('comment');
+          expect(data.data.operation).toEqual(Operations.delete);
+          expect(data.data.data).toMatchObject({
+            id: comment.id,
+            todoId: comment.todoId,
+          });
           done();
         } catch (error) {
           done(error);
@@ -634,7 +657,7 @@ describe('comment', () => {
       })
       .onOpen(async () => {
         await request()
-          .delete(`${baseUrl}${routes.comment}/${commentId}`)
+          .delete(`${baseUrl}${routes.comment}/${comment.id}`)
           .set('authorization', `Bearer ${token}`)
           .send();
       });
@@ -653,17 +676,19 @@ describe('commentFile', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.insert,
             channel: 'comment_files',
             data: expect.objectContaining({
-              id: expect.any(Number),
-              commentId,
-              path: expect.any(String),
-              name: expect.any(String),
-              extension: expect.any(String),
-              size: expect.any(Number),
-              mimeType: expect.any(String),
-              encoding: expect.any(String),
+              operation: Operations.insert,
+              data: {
+                id: expect.any(Number),
+                commentId,
+                path: expect.any(String),
+                name: expect.any(String),
+                extension: expect.any(String),
+                size: expect.any(Number),
+                mimeType: expect.any(String),
+                encoding: expect.any(String),
+              },
             }),
           }));
           done();
@@ -698,17 +723,19 @@ describe('commentFile', () => {
       .onMessage((data) => {
         try {
           expect(data).toEqual(expect.objectContaining({
-            operation: Operations.delete,
             channel: 'comment_files',
             data: expect.objectContaining({
-              id: commentFileId,
-              commentId,
-              path: expect.any(String),
-              name: expect.any(String),
-              extension: expect.any(String),
-              size: expect.any(Number),
-              mimeType: expect.any(String),
-              encoding: expect.any(String),
+              operation: Operations.delete,
+              data: {
+                id: commentFileId,
+                commentId,
+                path: expect.any(String),
+                name: expect.any(String),
+                extension: expect.any(String),
+                size: expect.any(Number),
+                mimeType: expect.any(String),
+                encoding: expect.any(String),
+              },
             }),
           }));
           done();

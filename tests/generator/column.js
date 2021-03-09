@@ -5,7 +5,6 @@ class ColumnDataGenerator {
     return {
       boardId,
       title: faker.lorem.words(),
-      position: faker.random.number({ min: 0 }),
       description: faker.lorem.sentences(),
       color: faker.random.number({ max: 5 }),
       isCollapsed: faker.random.boolean(),
@@ -15,14 +14,6 @@ class ColumnDataGenerator {
 
   static getLongTitle() {
     return ''.padStart(256, 'longtitle');
-  }
-
-  static getNegativePosition() {
-    return faker.random.number({ max: -100 });
-  }
-
-  static getStringPosition() {
-    return faker.random.number({ min: 0 }).toString();
   }
 
   static getNegativeColor() {

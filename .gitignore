@@ -7,3 +7,6 @@
 /uploads*
 .env
 .env.production
+
+# stryker temp files
+.stryker-tmp

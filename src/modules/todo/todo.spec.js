@@ -211,7 +211,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo without authorization', async (done) => {
+  it('user can\'t create todo without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const columnId = user.getRandomColumnId();
 
@@ -228,7 +228,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo without title', async (done) => {
+  it('user can\'t create todo without title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -248,27 +248,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo without position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const columnId = user.getRandomColumnId();
-
-    const todo = Generator.Todo.getUnique(columnId);
-    delete todo.position;
-    const res = await request()
-      .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(todo);
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create todo without column id', async (done) => {
+  it('user can\'t create todo without column id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -288,7 +268,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with empty title', async (done) => {
+  it('user can\'t create todo with empty title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -310,7 +290,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with long title', async (done) => {
+  it('user can\'t create todo with long title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -332,49 +312,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with negative position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const columnId = user.getRandomColumnId();
-
-    const todo = Generator.Todo.getUnique(columnId);
-    const res = await request()
-      .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...todo,
-        position: Generator.Todo.getNegativePosition(),
-      });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create todo with string position', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const columnId = user.getRandomColumnId();
-
-    const todo = Generator.Todo.getUnique(columnId);
-    const res = await request()
-      .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...todo,
-        position: Generator.Todo.getStringPosition(),
-      });
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can`t create todo with negative color', async (done) => {
+  it('user can\'t create todo with negative color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -395,7 +333,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with string color', async (done) => {
+  it('user can\'t create todo with string color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -416,7 +354,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with color which is not included in the enum', async (done) => {
+  it('user can\'t create todo with color which is not included in the enum', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -438,7 +376,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with negative column id', async (done) => {
+  it('user can\'t create todo with negative column id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -460,7 +398,7 @@ describe('create', () => {
 
     done();
   });
-  it('user can`t create todo with column id without having access to it', async (done) => {
+  it('user can\'t create todo with column id without having access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const { token } = firstUser;
 
@@ -508,11 +446,13 @@ describe('get todo by id', () => {
     expect(res.body.data).toEqual({
       id: todoId,
       ...todo,
+      expirationDate: expect.any(Number),
+      position: expect.any(Number),
     });
 
     done();
   });
-  it('user can`t get todo without authorization header', async (done) => {
+  it('user can\'t get todo without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -535,7 +475,7 @@ describe('get todo by id', () => {
 
     done();
   });
-  it('user can`t access to the todo if he does not have access to it', async (done) => {
+  it('user can\'t access to the todo if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const firstUserColumnId = firstUser.getRandomColumnId();
 
@@ -560,7 +500,7 @@ describe('get todo by id', () => {
 
     done();
   });
-  it('user can`t access to the todo by string id', async (done) => {
+  it('user can\'t access to the todo by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -623,15 +563,29 @@ describe('get all todos', () => {
     }));
 
     const { todos } = res.body.data;
-    const [{ id: todoIdOne }, { id: todoIdTwo }] = todos;
+    const [{ id: todoIdOne }, { id: todoIdTwo }] = todos.entities;
 
-    expect(todos).toEqual([{
-      id: todoIdOne,
-      ...todoOne,
-    }, {
-      id: todoIdTwo,
-      ...todoTwo,
-    }]);
+    expect(todos).toEqual({
+      entities: [{
+        id: todoIdOne,
+        ...todoOne,
+        attachmentsCount: 0,
+        commentsCount: 0,
+        imagesCount: 0,
+        expirationDate: expect.any(Number),
+      }, {
+        id: todoIdTwo,
+        ...todoTwo,
+        attachmentsCount: 0,
+        commentsCount: 0,
+        imagesCount: 0,
+        expirationDate: expect.any(Number),
+      }],
+      positions: {
+        [firstColumnId]: [todoIdOne],
+        [secondColumnId]: [todoIdTwo],
+      },
+    });
 
     done();
   });
@@ -669,12 +623,21 @@ describe('get all todos', () => {
     }));
 
     const { todos } = res.body.data;
-    const [{ id: todoIdOne }] = todos;
+    const [{ id: todoIdOne }] = todos.entities;
 
-    expect(todos).toEqual([{
-      id: todoIdOne,
-      ...todoOne,
-    }]);
+    expect(todos).toEqual({
+      entities: [{
+        id: todoIdOne,
+        ...todoOne,
+        attachmentsCount: 0,
+        commentsCount: 0,
+        imagesCount: 0,
+        expirationDate: expect.any(Number),
+      }],
+      positions: {
+        [columnIdFromFirstBoard]: [todoIdOne],
+      },
+    });
 
     done();
   });
@@ -712,16 +675,25 @@ describe('get all todos', () => {
     }));
 
     const { todos } = res.body.data;
-    const [{ id: todoIdOne }] = todos;
+    const [{ id: todoIdOne }] = todos.entities;
 
-    expect(todos).toEqual([{
-      id: todoIdOne,
-      ...todoOne,
-    }]);
+    expect(todos).toEqual({
+      entities: [{
+        id: todoIdOne,
+        ...todoOne,
+        attachmentsCount: 0,
+        commentsCount: 0,
+        imagesCount: 0,
+        expirationDate: expect.any(Number),
+      }],
+      positions: {
+        [columnIdFromFirstBoard]: [todoIdOne],
+      },
+    });
 
     done();
   });
-  it('user can`t get all todos if he does not have access to board id', async (done) => {
+  it('user can\'t get all todos if he does not have access to board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
@@ -757,7 +729,7 @@ describe('get all todos', () => {
 
     done();
   });
-  it('user can`t get all todos if he does not have access to column id', async (done) => {
+  it('user can\'t get all todos if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
@@ -793,7 +765,7 @@ describe('get all todos', () => {
 
     done();
   });
-  it('user can`t get todos if he has no todos', async (done) => {
+  it('user can\'t get todos if he has no todos', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const [firstColumnId, secondColumnId] = firstUser.getColumnIds();
     const secondUser = await helper.createUser();
@@ -815,14 +787,19 @@ describe('get all todos', () => {
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
-      data: expect.any(Object),
+      data: {
+        todos: {
+          entities: [],
+          positions: {},
+        },
+      },
     }));
     done();
   });
-  it('user can`t get all todos without authorization header', async (done) => {
+  it('user can\'t get all todos without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -872,7 +849,7 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can`t remove todo without authorization header', async (done) => {
+  it('user can\'t remove todo without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -895,7 +872,7 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can`t remove todo if he does not have access to it', async (done) => {
+  it('user can\'t remove todo if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const columnId = firstUser.getRandomColumnId();
 
@@ -920,7 +897,7 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can`t remove todo by string id', async (done) => {
+  it('user can\'t remove todo by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -974,15 +951,16 @@ describe('update todo', () => {
       message: expect.any(String),
       data: expect.any(Object),
     }));
-
     expect(res.body.data).toEqual({
       id: todoId,
       ...newTodo,
+      expirationDate: expect.any(Number),
+      position: expect.any(Number),
     });
 
     done();
   });
-  it('user can`t update todo without authorization header', async (done) => {
+  it('user can\'t update todo without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -1006,7 +984,7 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can`t update todo if he does not have access to it', async (done) => {
+  it('user can\'t update todo if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const columnId = firstUser.getRandomColumnId();
 
@@ -1032,7 +1010,7 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can`t update todo by string id', async (done) => {
+  it('user can\'t update todo by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const columnId = user.getRandomColumnId();
@@ -1056,20 +1034,19 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can`t update todo if he does not have access to new column id', async (done) => {
+  it('user can\'t update todo if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const firstUserColumnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
-    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+    const columnIdWithoutAccessForFirstUser = secondUser.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(firstUserColumnId);
+    const todo = Generator.Todo.getUnique(columnIdWithoutAccessForFirstUser);
     const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(todo);
 
-    const newTodo = Generator.Todo.getUnique(columnIdWithoutAccess);
+    const newTodo = Generator.Todo.getUnique(columnIdWithoutAccessForFirstUser);
     const res = await request()
       .patch(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)

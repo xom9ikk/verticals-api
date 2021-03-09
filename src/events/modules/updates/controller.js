@@ -12,16 +12,21 @@ class UpdatesController {
         const channel = c.replace('_change', '');
         delete object.createdAt;
         delete object.updatedAt;
-        const response = {
+        const responseData = {
           operation,
+          data: {
+            ...object,
+          },
+        };
+        if (object.expirationDate) {
+          responseData.data.expirationDate = new Date(object.expirationDate).getTime();
+        }
+        const response = {
           channel,
-          data: object,
+          data: responseData,
         };
         logger.info(`response: ${JSON.stringify(response)}`);
-        wss.broadcast(
-          response,
-          (context) => userIds.includes(context.userId),
-        );
+        wss.broadcast(response, (context) => userIds.includes(context.userId));
       }
     } catch (e) {
       logger.error(e);

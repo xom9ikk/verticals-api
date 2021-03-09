@@ -243,7 +243,8 @@ describe('upload attachment', () => {
     expect(resAttach.statusCode).toEqual(201);
 
     const res = await request()
-      .get(`${routes.comment}/${comment.id}`)
+      .get(`${routes.commentAttachment}`)
+      .query({ commentId: comment.id })
       .set('authorization', `Bearer ${token}`)
       .send();
     expect(res.statusCode).toEqual(200);
@@ -251,20 +252,15 @@ describe('upload attachment', () => {
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        id: expect.any(Number),
-        todoId: expect.any(Number),
-        text: expect.any(String),
-        replyCommentId: null,
-        updatedAt: expect.any(Date),
-        attachedFiles: expect.arrayContaining([{
+        attachments: [{
           ...resAttach.body.data,
-        }]),
+        }],
       }),
     }));
 
     done();
   });
-  it('user can`t attach file to comment without comment id', async (done) => {
+  it('user can\'t attach file to comment without comment id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
 
@@ -277,7 +273,7 @@ describe('upload attachment', () => {
 
     done();
   });
-  it('user can`t attach file to comment without access', async (done) => {
+  it('user can\'t attach file to comment without access', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
 
     const secondUser = await helper.createUser(defaultUser);
@@ -292,7 +288,7 @@ describe('upload attachment', () => {
 
     done();
   });
-  it('user can`t attach file to comment without field in form', async (done) => {
+  it('user can\'t attach file to comment without field in form', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const commentId = user.getRandomCommentId();
@@ -306,7 +302,7 @@ describe('upload attachment', () => {
 
     done();
   });
-  it('user can`t attach file to comment without authorization', async (done) => {
+  it('user can\'t attach file to comment without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const commentId = user.getRandomCommentId();
 
@@ -348,7 +344,7 @@ describe('remove attachment', () => {
 
     done();
   });
-  it('user can`t remove attached file from comment without attachment id', async (done) => {
+  it('user can\'t remove attached file from comment without attachment id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const commentId = user.getRandomCommentId();
@@ -367,7 +363,7 @@ describe('remove attachment', () => {
 
     done();
   });
-  it('user can`t remove attached file from comment without access', async (done) => {
+  it('user can\'t remove attached file from comment without access', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
 
     const secondUser = await helper.createUser(defaultUser);
@@ -388,7 +384,7 @@ describe('remove attachment', () => {
 
     done();
   });
-  it('user can`t remove attached file from comment without authorization', async (done) => {
+  it('user can\'t remove attached file from comment without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const commentId = user.getRandomCommentId();

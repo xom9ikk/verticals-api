@@ -15,7 +15,7 @@ class TodoSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       status: {
@@ -40,8 +40,13 @@ class TodoSchema {
         minimum: 1,
       },
       expirationDate: {
-        type: 'string',
-        format: 'date-time',
+        oneOf: [
+          {
+            type: 'string',
+            format: 'date-time',
+          },
+          { type: 'null' },
+        ],
       },
     },
     required: ['columnId', 'title'],
@@ -105,7 +110,7 @@ class TodoSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       status: {

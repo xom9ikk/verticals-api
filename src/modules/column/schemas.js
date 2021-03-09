@@ -15,7 +15,7 @@ class ColumnSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       color: {
@@ -90,7 +90,7 @@ class ColumnSchema {
       },
       description: {
         type: 'string',
-        minLength: 1,
+        minLength: 0,
         maxLength: 4096,
       },
       color: {
