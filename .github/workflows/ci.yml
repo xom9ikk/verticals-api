@@ -46,6 +46,10 @@ jobs:
         working-directory: ${{ env.APP_NAME }}
         run: npm run test
 
+      - name: Setup .env
+        working-directory: ${{ env.APP_NAME }}
+        run: echo ${{ secrets.ENV_FILE }} >> .env.production
+
       - name: Copy repo ✍️
         uses: appleboy/scp-action@master
         with:
