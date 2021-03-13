@@ -34,21 +34,21 @@ jobs:
         with:
           path: ${{ env.APP_NAME }}
 
-      - name: Install 🔧
-        working-directory: ${{ env.APP_NAME }}
-        run: npm install
-
-      - name: Lint 🧐
-        working-directory: ${{ env.APP_NAME }}
-        run: npm run lint
-
-      - name: Test 🚨
-        working-directory: ${{ env.APP_NAME }}
-        run: npm run test
+#      - name: Install 🔧
+#        working-directory: ${{ env.APP_NAME }}
+#        run: npm install
+#
+#      - name: Lint 🧐
+#        working-directory: ${{ env.APP_NAME }}
+#        run: npm run lint
+#
+#      - name: Test 🚨
+#        working-directory: ${{ env.APP_NAME }}
+#        run: npm run test
 
       - name: Setup .env
         working-directory: ${{ env.APP_NAME }}
-        run: echo ${{ secrets.ENV_FILE }} >> .env.production
+        run: echo "${{ secrets.ENV_FILE }}" >> .env.production
 
       - name: Copy repo ✍️
         uses: appleboy/scp-action@master
