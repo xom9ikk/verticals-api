@@ -1,0 +1,52 @@
+name: ci-action
+
+env:
+  APP_NAME: "verticals-backend"
+  PATH_TO_APPS: "~/apps"
+
+on:
+  push:
+    branches: [ ci ]
+
+jobs:
+  delivery_code:
+    name: Test and felivery code to server
+    runs-on: ubuntu-16.04
+
+    steps:
+      - name: Clone repo ⚓️
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.APP_NAME }}
+
+      - name: Install 🔧
+        working-directory: ${{ env.APP_NAME }}
+        run: npm install
+
+      - name: Lint 🧐
+        working-directory: ${{ env.APP_NAME }}
+        run: npm run lint
+
+      - name: Test 🚨
+        working-directory: ${{ env.APP_NAME }}
+        run: npm run test
+
+      - name: Copy repo ✍️
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: ${{ env.APP_NAME }}
+          target: ${{ env.PATH_TO_APPS }}
+
+      - name: Run rebuild script 😎
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd ${{ env.PATH_TO_APPS }}/${{ env.APP_NAME }}
+            chmod +x ./rebuild.sh
+            nohup ./rebuild.sh > nohup.out 2> nohup.err < /dev/null &
