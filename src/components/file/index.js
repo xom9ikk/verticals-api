@@ -51,24 +51,26 @@ class FileComponent {
 
   saveFile(pathToFolder, data) {
     return new Promise((resolve, reject) => {
-      const relativePathToFolder = FileComponent.generateRelativePath(pathToFolder);
       const {
         fileName, mimeType, encoding, size, file,
       } = data;
 
       const extension = mime.extension(mimeType) || 'jpeg';
 
-      const relativePathToFile = path.join(
-        relativePathToFolder,
-        `${path.basename(`${uuidV4()}`)}.${extension}`,
-      );
+      const pathToFile = path.join(pathToFolder, `${path.basename(`${uuidV4()}`)}.${extension}`);
+      const relativePathToFile = FileComponent.generateRelativePath(pathToFile);
+
+      // const relativePathToFile = path.join(
+      //   relativePathToFolder,
+      //   `${path.basename(`${uuidV4()}`)}.${extension}`,
+      // );
 
       const fullPath = path.resolve(relativePathToFile);
 
       const stream = file.pipe(fs.createWriteStream(fullPath));
 
       stream.on('finish', () => resolve({
-        path: relativePathToFile,
+        path: pathToFile,
         extension,
         name: fileName,
         mimeType,
