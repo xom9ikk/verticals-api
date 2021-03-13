@@ -18,6 +18,8 @@ jobs:
         image: postgres:11.5
         env:
           POSTGRES_DB: verticals_test
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner123
         ports:
           - 5432:5432
         options: >-
