@@ -60,11 +60,6 @@ class FileComponent {
       const pathToFile = path.join(pathToFolder, `${path.basename(`${uuidV4()}`)}.${extension}`);
       const relativePathToFile = FileComponent.generateRelativePath(pathToFile);
 
-      // const relativePathToFile = path.join(
-      //   relativePathToFolder,
-      //   `${path.basename(`${uuidV4()}`)}.${extension}`,
-      // );
-
       const fullPath = path.resolve(relativePathToFile);
 
       const stream = file.pipe(fs.createWriteStream(fullPath));
