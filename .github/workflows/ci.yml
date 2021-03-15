@@ -1,0 +1,71 @@
+name: ci-action
+
+env:
+  APP_NAME: "verticals-backend"
+  PATH_TO_APPS: "~/apps"
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  delivery_code:
+    name: Test and delivery code to server
+    runs-on: ubuntu-16.04
+
+    services:
+      postgres:
+        image: postgres:11.5
+        env:
+          POSTGRES_DB: verticals_test
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner123
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Clone repo ⚓️
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.APP_NAME }}
+
+      - name: Install 🔧
+        working-directory: ${{ env.APP_NAME }}
+        run: npm install
+
+      - name: Lint 🧐
+        working-directory: ${{ env.APP_NAME }}
+        run: npm run lint
+
+      - name: Test 🚨
+        working-directory: ${{ env.APP_NAME }}
+        run: npm run test
+
+      - name: Setup .env
+        working-directory: ${{ env.APP_NAME }}
+        run: echo "${{ secrets.ENV_FILE }}" >> .env.production
+
+      - name: Copy repo ✍️
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: ${{ env.APP_NAME }}
+          target: ${{ env.PATH_TO_APPS }}
+
+      - name: Run rebuild script 😎
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd ${{ env.PATH_TO_APPS }}/${{ env.APP_NAME }}
+            chmod +x ./rebuild.sh
+            nohup ./rebuild.sh > nohup.out 2> nohup.err < /dev/null &

@@ -6,7 +6,7 @@ ARG NODE_ENV='development'
 
 ENV NODE_ENV=$NODE_ENV
 
-ENV NODE_OPTIONS="--max-old-space-size=6000"
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 COPY / /app
 

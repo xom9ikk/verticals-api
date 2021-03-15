@@ -12,8 +12,8 @@ const {
 class FileComponent {
   constructor() {
     this.folders = {
-      comments: FileComponent.generateRelativePath(FOLDER_COMMENTS),
-      avatars: FileComponent.generateRelativePath(FOLDER_AVATARS),
+      comments: FOLDER_COMMENTS,
+      avatars: FOLDER_AVATARS,
     };
   }
 
@@ -24,17 +24,19 @@ class FileComponent {
   createFolders() {
     const folderKeys = Object.keys(this.folders);
     folderKeys.forEach((key) => {
-      const absolutePathToFolder = path.resolve(this.folders[key]);
+      const relativePath = FileComponent.generateRelativePath(this.folders[key]);
+      const absolutePathToFolder = path.resolve(relativePath);
       this.createFolder(absolutePathToFolder);
     });
   }
 
-  createFolder(pathToFolder) {
-    fs.mkdirSync(pathToFolder, { recursive: true });
+  createFolder(absolutePathToFolder) {
+    fs.mkdirSync(absolutePathToFolder, { recursive: true });
   }
 
-  removeFile(relativePathToFile) {
-    if (!relativePathToFile) return;
+  removeFile(pathPathToFile) {
+    if (!pathPathToFile) return;
+    const relativePathToFile = FileComponent.generateRelativePath(pathPathToFile);
     return new Promise((resolve, reject) => {
       const fullPath = path.resolve(relativePathToFile);
 
@@ -47,7 +49,7 @@ class FileComponent {
     });
   }
 
-  saveFile(relativePathToFolder, data) {
+  saveFile(pathToFolder, data) {
     return new Promise((resolve, reject) => {
       const {
         fileName, mimeType, encoding, size, file,
@@ -55,17 +57,15 @@ class FileComponent {
 
       const extension = mime.extension(mimeType) || 'jpeg';
 
-      const relativePathToFile = path.join(
-        relativePathToFolder,
-        `${path.basename(`${uuidV4()}`)}.${extension}`,
-      );
+      const pathToFile = path.join(pathToFolder, `${path.basename(`${uuidV4()}`)}.${extension}`);
+      const relativePathToFile = FileComponent.generateRelativePath(pathToFile);
 
       const fullPath = path.resolve(relativePathToFile);
 
       const stream = file.pipe(fs.createWriteStream(fullPath));
 
       stream.on('finish', () => resolve({
-        path: relativePathToFile,
+        path: pathToFile,
         extension,
         name: fileName,
         mimeType,
