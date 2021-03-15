@@ -1,4 +1,4 @@
-const { TRASH_BOARD_ID, Color, TodoStatus } = require('../../constants');
+const { Color, TodoStatus } = require('../../constants');
 
 class TodoSchema {
   createTodo = {

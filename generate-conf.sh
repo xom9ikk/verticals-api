@@ -1,4 +1,11 @@
 sudo certbot certonly --standalone -d $1 --staple-ocsp -m xom9ik.code@gmail.com --agree-tos
+
+# add this to http {} in /etc/nginx/nginx.conf
+# limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;
+# limit_req_zone $binary_remote_addr zone=req_limit_per_ip:10m rate=50r/s;
+# limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip_verticals_backend:10m;
+# limit_req_zone $binary_remote_addr zone=req_limit_per_ip_verticals_backend:10m rate=50r/s;
+
 echo "server {
         server_name $1;
         client_max_body_size 10M;
