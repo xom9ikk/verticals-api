@@ -1,6 +1,7 @@
 const { PositionComponent } = require('../../components');
 const { TodoController } = require('../todo/controller');
 const { ColumnController } = require('../column/controller');
+const { HeadingController } = require('../heading/controller');
 const { BoardController } = require('../board/controller');
 
 // TODO: tests
@@ -8,6 +9,7 @@ class SearchController {
   async searchInTodo({ userId, query }) {
     const todos = await TodoController.getAll(userId);
     const columns = await ColumnController.getAll(userId);
+    const headings = await HeadingController.getAll(userId);
     const boards = await BoardController.getAll(userId);
 
     // todos
@@ -21,8 +23,17 @@ class SearchController {
       filteredTodoEntities, todos.positions,
     );
 
+    // headings
+    const todoHeadingIds = filteredTodoEntities.map((todo) => todo.headingId);
+    const filteredHeadingEntities = headings.entities
+      .filter((heading) => todoHeadingIds.includes(heading.id));
+
+    const filteredHeadingPositions = PositionComponent.mapEntitiesOnPositions(
+      filteredHeadingEntities, headings.positions,
+    );
+
     // columns
-    const todoColumnIds = filteredTodoEntities.map((todo) => todo.columnId);
+    const todoColumnIds = filteredHeadingEntities.map((todo) => todo.columnId);
     const filteredColumnEntities = columns.entities
       .filter((column) => todoColumnIds.includes(column.id));
 
@@ -47,6 +58,10 @@ class SearchController {
       todos: {
         entities: filteredTodoEntities,
         positions: filteredTodoPositions,
+      },
+      headings: {
+        entities: filteredHeadingEntities,
+        positions: filteredHeadingPositions,
       },
       columns: {
         entities: filteredColumnEntities,

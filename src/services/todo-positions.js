@@ -1,47 +1,47 @@
 const { Database } = require('../database');
 
 class TodoPositionsService extends Database {
-  async create(columnId, order) {
+  async create(headingId, order) {
     const [response] = await this.todoPositions
       .insert({
-        columnId,
+        headingId,
         order,
       })
-      .returning(['columnId', 'order']);
+      .returning(['headingId', 'order']);
     return response;
   }
 
-  async updatePositions(columnId, order) {
+  async updatePositions(headingId, order) {
     const [response] = await this.todoPositions
       .where({
-        columnId,
+        headingId,
       })
       .update({ order })
-      .returning(['columnId', 'order']);
+      .returning(['headingId', 'order']);
     return response;
   }
 
-  async getPositions(columnId) {
+  async getPositions(headingId) {
     const response = await this.todoPositions
       .select([
         'order',
       ])
       .where({
-        columnId,
+        headingId,
       })
       .first();
     return response ? response.order : [];
   }
 
-  getPositionsByColumnIds(columnIds) {
+  getPositionsByHeadingIds(headingIds) {
     return this.todoPositions
       .select([
-        'columnId',
+        'headingId',
         'order',
       ])
       .whereIn(
-        'columnId',
-        columnIds,
+        'headingId',
+        headingIds,
       );
   }
 }

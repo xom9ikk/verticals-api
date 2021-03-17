@@ -1,6 +1,9 @@
-const { TodoService, BoardAccessService, TodoPositionsService } = require('../../services');
+const {
+  TodoService, HeadingService, BoardAccessService, TodoPositionsService,
+} = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
+const { HeadingType } = require('../../constants');
 
 class TodoController {
   async create(userId, { belowId, ...todo }) {
@@ -12,22 +15,22 @@ class TodoController {
       }
     }
 
-    const { columnId } = todo;
-    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
+    const { headingId } = todo;
+    const isAccess = await BoardAccessService.getByHeadingId(userId, headingId);
 
     if (!isAccess) {
-      throw new BackendError.Forbidden('This account is not allowed to create todo for this column');
+      throw new BackendError.Forbidden('This account is not allowed to create todo for this heading');
     }
 
     const todoId = await TodoService.create(todo);
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
 
     const {
       newPosition,
       newPositions,
     } = PositionComponent.insert(todoPositions, todoId, belowId);
 
-    await TodoPositionsService.updatePositions(columnId, newPositions);
+    await TodoPositionsService.updatePositions(headingId, newPositions);
 
     return { todoId, position: newPosition };
   }
@@ -54,8 +57,8 @@ class TodoController {
       throw new BackendError.Forbidden('This account is not allowed to receive this todo');
     }
 
-    const columnId = await TodoService.getColumnId(todoId);
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const headingId = await TodoService.getHeadingId(todoId);
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
 
     const todo = await TodoService.getById(todoId);
 
@@ -73,6 +76,7 @@ class TodoController {
       if (!isAccessToBoard) {
         throw new BackendError.Forbidden('This account is not allowed to receive todos for this board');
       }
+
       boardIdsWithAccess = [boardId];
     } else {
       boardIdsWithAccess = await BoardAccessService.getAllBoardIdsByUserId(userId);
@@ -100,25 +104,34 @@ class TodoController {
       };
     }
 
+    let headings;
     if (columnId) {
-      const todoPositions = await TodoPositionsService.getPositions(columnId);
-      return {
-        entities: todos,
-        positions: {
-          [columnId]: todoPositions,
-        },
-      };
+      // TODO
+      headings = await HeadingService.getByColumnId(columnId);
+      // const todoPositions = await TodoPositionsService.getPositionsByHeadingIds(headingIds);
+      // return {
+      //   entities: todos,
+      //   positions: {
+      //     [columnId]: todoPositions,
+      //   },
+      // };
+    } else {
+      headings = await HeadingService.getByBoardIds(boardIdsWithAccess);
     }
 
-    const columnIdsMap = new Set();
-    todos.forEach((todo) => {
-      columnIdsMap.add(todo.columnId);
+    console.log('headings', columnId, headings);
+
+    const headingIdsMap = new Set();
+
+    // TODO
+    headings.forEach((heading) => {
+      headingIdsMap.add(heading.id);
     });
-    const columnIds = [...columnIdsMap];
+    const headingIds = [...headingIdsMap];
 
-    const todoPositionsByColumnIds = await TodoPositionsService.getPositionsByColumnIds(columnIds);
+    const todoPositionsByHeadingIds = await TodoPositionsService.getPositionsByHeadingIds(headingIds);
 
-    const normalizedPositions = todoPositionsByColumnIds.reduce((acc, { columnId: id, order }) => ({
+    const normalizedPositions = todoPositionsByHeadingIds.reduce((acc, { headingId: id, order }) => ({
       ...acc,
       [id]: order,
     }), {});
@@ -131,24 +144,26 @@ class TodoController {
 
   // TODO: write tests for updatePosition
   async updatePosition({
-    userId, columnId, sourcePosition, destinationPosition, targetColumnId,
+    userId, headingId, sourcePosition, destinationPosition, targetHeadingId,
   }) {
-    const isAccessToSourceColumn = await BoardAccessService.getByColumnId(userId, columnId);
+    const isAccessToSourceHeading = await BoardAccessService.getByHeadingId(userId, headingId);
 
-    if (!isAccessToSourceColumn) {
-      throw new BackendError.Forbidden('This account does not have access to source column');
+    if (!isAccessToSourceHeading) {
+      throw new BackendError.Forbidden('This account does not have access to source heading');
     }
 
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
 
-    if (targetColumnId) {
-      const isAccessToTargetColumn = await BoardAccessService.getByColumnId(userId, targetColumnId);
+    if (targetHeadingId) {
+      const isAccessToTargetHeading = await BoardAccessService.getByHeadingId(
+        userId, targetHeadingId,
+      );
 
-      if (!isAccessToTargetColumn) {
-        throw new BackendError.Forbidden('This account does not have access to target column');
+      if (!isAccessToTargetHeading) {
+        throw new BackendError.Forbidden('This account does not have access to target heading');
       }
 
-      const targetTodoPositions = await TodoPositionsService.getPositions(targetColumnId);
+      const targetTodoPositions = await TodoPositionsService.getPositions(targetHeadingId);
 
       if (!PositionComponent.isValidSource(todoPositions, sourcePosition)
         || !PositionComponent.isValidDestination(targetTodoPositions, destinationPosition)) {
@@ -156,16 +171,16 @@ class TodoController {
       }
 
       const todoId = todoPositions[sourcePosition];
-      await TodoService.update(todoId, { columnId: targetColumnId });
+      await TodoService.update(todoId, { headingId: targetHeadingId });
       const newTargetTodoPositions = PositionComponent.insertInPosition(
         targetTodoPositions, destinationPosition, todoId,
       );
-      await TodoPositionsService.updatePositions(targetColumnId, newTargetTodoPositions);
+      await TodoPositionsService.updatePositions(targetHeadingId, newTargetTodoPositions);
 
       const newSourceTodoPositions = PositionComponent.removeByPosition(
         todoPositions, sourcePosition,
       );
-      await TodoPositionsService.updatePositions(columnId, newSourceTodoPositions);
+      await TodoPositionsService.updatePositions(headingId, newSourceTodoPositions);
     } else {
       if (!PositionComponent.isValidSource(todoPositions, sourcePosition, destinationPosition)) {
         throw new BackendError.BadRequest('Invalid source or destination position');
@@ -175,7 +190,7 @@ class TodoController {
         todoPositions, sourcePosition, destinationPosition,
       );
 
-      await TodoPositionsService.updatePositions(columnId, newTodoPositions);
+      await TodoPositionsService.updatePositions(headingId, newTodoPositions);
     }
 
     return destinationPosition;
@@ -188,12 +203,12 @@ class TodoController {
       throw new BackendError.Forbidden('This account is not allowed to edit this todo');
     }
 
-    const { columnId: newColumnId } = patch;
+    const { headingId: newHeadingId } = patch;
 
-    if (newColumnId) {
-      const isAccessToNewColumn = await BoardAccessService.getByColumnId(userId, newColumnId);
-      if (!isAccessToNewColumn) {
-        throw new BackendError.Forbidden('This account is not allowed to set this columnId for this todo');
+    if (newHeadingId) {
+      const isAccessToNewHeading = await BoardAccessService.getByHeadingId(userId, newHeadingId);
+      if (!isAccessToNewHeading) {
+        throw new BackendError.Forbidden('This account is not allowed to set this headingId for this todo');
       }
     }
 
@@ -228,6 +243,87 @@ class TodoController {
     };
   }
 
+  // TODO: write tests
+  async switchArchived({ userId, todoId }) {
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to switch archived this todo');
+    }
+
+    const headingId = await TodoService.getHeadingId(todoId);
+    const heading = await HeadingService.getById(headingId);
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
+    const sourcePosition = PositionComponent.getPositionById(todoPositions, todoId);
+    const columnId = await HeadingService.getColumnId(headingId);
+
+    let targetHeadingId;
+    if (heading.type === HeadingType.archived) {
+      targetHeadingId = await HeadingService.getDefaultIdByColumnId(columnId);
+    } else {
+      targetHeadingId = await HeadingService.getArchivedIdByColumnId(columnId);
+    }
+
+    if (!targetHeadingId) {
+      throw new BackendError.BadRequest('Todo is not in any of the heading type');
+    }
+
+    const destinationPosition = 0;
+
+    await this.updatePosition({
+      userId,
+      headingId,
+      sourcePosition,
+      destinationPosition,
+      targetHeadingId,
+    });
+
+    return true;
+  }
+
+  // TODO: write tests
+  async switchRemoved({ userId, todoId }) {
+    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
+
+    if (!isAccess) {
+      throw new BackendError.Forbidden('This account is not allowed to switch removed this todo');
+    }
+
+    const headingId = await TodoService.getHeadingId(todoId);
+    const heading = await HeadingService.getById(headingId);
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
+    const sourcePosition = PositionComponent.getPositionById(todoPositions, todoId);
+    const columnId = await HeadingService.getColumnId(headingId);
+
+    let targetHeadingId;
+    if (heading.type === HeadingType.removed) {
+      targetHeadingId = await HeadingService.getDefaultIdByColumnId(columnId);
+    } else {
+      targetHeadingId = await HeadingService.getRemovedIdByColumnId(columnId);
+    }
+
+    if (!targetHeadingId) {
+      throw new BackendError.BadRequest('Todo is not in any of the heading type');
+    }
+
+    const destinationPosition = 0;
+
+    console.log(userId,
+      headingId,
+      sourcePosition,
+      destinationPosition,
+      targetHeadingId);
+    await this.updatePosition({
+      userId,
+      headingId,
+      sourcePosition,
+      destinationPosition,
+      targetHeadingId,
+    });
+
+    return true;
+  }
+
   async remove({ userId, todoId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -236,10 +332,10 @@ class TodoController {
     }
 
     const removedTodo = await TodoService.removeById(todoId);
-    const { id: removedId, columnId } = removedTodo;
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const { id: removedId, headingId } = removedTodo;
+    const todoPositions = await TodoPositionsService.getPositions(headingId);
     const newPositions = PositionComponent.removeById(todoPositions, removedId);
-    await TodoPositionsService.updatePositions(columnId, newPositions);
+    await TodoPositionsService.updatePositions(headingId, newPositions);
 
     return true;
   }

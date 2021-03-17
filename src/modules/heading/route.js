@@ -1,4 +1,4 @@
-const { TodoAdapter } = require('./adapter');
+const { HeadingAdapter } = require('./adapter');
 const {
   SchemaValidator,
   CheckMiddleware,
@@ -20,45 +20,40 @@ const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
- *   CreateTodoRequest:
+ *   CreateHeadingRequest:
  *    type: object
  *    required:
- *      - columnId
+ *      - boardId
  *      - title
  *    properties:
- *      columnId:
+ *      boardId:
  *        type: integer
  *      title:
  *        type: string
- *      position:
- *        type: integer
  *      description:
  *        type: string
- *      status:
- *        type: integer
- *        enum: [0, 1, 2, 3]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isNotificationsEnabled:
+ *      isCollapsed:
  *        type: boolean
- *      expirationDate:
- *        type: date
- *   CreateTodoResponse:
+ *      width:
+ *        type: number
+ *   CreateHeadingResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           todoId:
+ *           headingId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/todo:
+ * /v1/heading:
  *   post:
  *     tags:
- *       - Todo
- *     description: Create new todo
+ *       - Heading
+ *     description: Create new heading
  *     produces:
  *       - application/json
  *     parameters:
@@ -70,12 +65,12 @@ const { RequestPart } = require('../../constants');
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/CreateTodoRequest'
+ *          $ref: '#/definitions/CreateHeadingRequest'
  *     responses:
  *       200:
- *         description: "Todo successfully created"
+ *         description: "Heading successfully created"
  *         schema:
- *          $ref: '#/definitions/CreateTodoResponse'
+ *          $ref: '#/definitions/CreateHeadingResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -85,13 +80,13 @@ const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
- *   GetTodoResponse:
+ *   GetHeadingResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           columnId:
+ *           boardId:
  *             type: integer
  *           title:
  *             type: string
@@ -99,23 +94,20 @@ const { RequestPart } = require('../../constants');
  *             type: integer
  *           description:
  *             type: string
- *           status:
- *             type: integer
- *             enum: [0, 1, 2, 3]
  *           color:
  *             type: integer
  *             enum: [0, 1, 2, 3, 4, 5, 6]
- *           isNotificationsEnabled:
+ *           isCollapsed:
  *             type: boolean
- *           expirationDate:
- *             type: date
+ *           width:
+ *             type: number
  *       message:
  *         type: string
- * /v1/todo/:todoId:
+ * /v1/heading/:headingId:
  *   get:
  *     tags:
- *       - Todo
- *     description: Get todo info by id
+ *       - Heading
+ *     description: Get heading info by id
  *     produces:
  *       - application/json
  *     parameters:
@@ -124,14 +116,14 @@ const { RequestPart } = require('../../constants');
  *         type: string
  *         required: true
  *       - in: path
- *         name: todoId
+ *         name: headingId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Todo information successfully received"
+ *         description: "Heading information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetTodoResponse'
+ *          $ref: '#/definitions/GetHeadingResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -141,28 +133,26 @@ const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
- *   GetAllTodosRequest:
+ *   GetAllHeadingsRequest:
  *    type: object
  *    properties:
  *      boardId:
  *        type: integer
- *      columnId:
- *        type: integer
- *   GetAllTodosResponse:
+ *   GetAllHeadingsResponse:
  *     type: object
  *     properties:
  *       data:
  *         type: object
  *         properties:
- *           todoId:
+ *           headingId:
  *             type: integer
  *       message:
  *         type: string
- * /v1/todo:
+ * /v1/heading:
  *   get:
  *     tags:
- *       - Todo
- *     description: Get all todos to which you have access
+ *       - Heading
+ *     description: Get all headings to which you have access
  *     produces:
  *       - application/json
  *     parameters:
@@ -174,12 +164,12 @@ const { RequestPart } = require('../../constants');
  *         in: query
  *         required: false
  *         schema:
- *          $ref: '#/definitions/GetAllTodosRequest'
+ *          $ref: '#/definitions/GetAllHeadingsRequest'
  *     responses:
  *       200:
- *         description: "Todos information successfully received"
+ *         description: "Headings information successfully received"
  *         schema:
- *          $ref: '#/definitions/GetAllTodosResponse'
+ *          $ref: '#/definitions/GetAllHeadingsResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -189,37 +179,32 @@ const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
- *   UpdateTodoRequest:
+ *   UpdateHeadingRequest:
  *    type: object
  *    properties:
- *      columnId:
+ *      boardId:
  *        type: integer
  *      title:
  *        type: string
- *      position:
- *        type: integer
  *      description:
  *        type: string
- *      status:
- *        type: integer
- *        enum: [0, 1, 2, 3]
  *      color:
  *        type: integer
  *        enum: [0, 1, 2, 3, 4, 5, 6]
- *      isNotificationsEnabled:
+ *      isCollapsed:
  *        type: boolean
- *      expirationDate:
- *        type: date
- *   UpdateTodoResponse:
+ *      width:
+ *        type: number
+ *   UpdateHeadingResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/todo/:todoId:
+ * /v1/heading/:headingId:
  *   patch:
  *     tags:
- *       - Todo
- *     description: Update todo
+ *       - Heading
+ *     description: Update heading
  *     produces:
  *       - application/json
  *     parameters:
@@ -231,20 +216,20 @@ const { RequestPart } = require('../../constants');
  *         in: body
  *         required: true
  *         schema:
- *          $ref: '#/definitions/UpdateTodoRequest'
+ *          $ref: '#/definitions/UpdateHeadingRequest'
  *       - in: path
- *         name: todoId
+ *         name: headingId
  *         type: integer
  *         required: true
  *     responses:
  *       200:
- *         description: "Todo successfully updated"
+ *         description: "Heading successfully updated"
  *         schema:
- *          $ref: '#/definitions/UpdateTodoResponse'
+ *          $ref: '#/definitions/UpdateHeadingResponse'
  *       403:
- *         description: "This account is not allowed to edit this todo"
+ *         description: "This account is not allowed to edit this heading"
  *         schema:
- *          $ref: '#/definitions/UpdateTodoResponse'
+ *          $ref: '#/definitions/UpdateHeadingResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -254,16 +239,16 @@ const { RequestPart } = require('../../constants');
 /**
  * @swagger
  * definitions:
- *   DeleteTodoResponse:
+ *   DeleteHeadingResponse:
  *     type: object
  *     properties:
  *       message:
  *         type: string
- * /v1/todo/:todoId:
+ * /v1/heading/:headingId:
  *   delete:
  *     tags:
- *       - Todo
- *     description: Delete todo
+ *       - Heading
+ *     description: Delete heading
  *     produces:
  *       - application/json
  *     parameters:
@@ -272,18 +257,18 @@ const { RequestPart } = require('../../constants');
  *        type: string
  *        required: true
  *      - in: path
- *        name: todoId
+ *        name: headingId
  *        type: integer
  *        required: true
  *     responses:
  *       200:
- *         description: "Todo successfully deleted"
+ *         description: "Heading successfully deleted"
  *         schema:
- *          $ref: '#/definitions/DeleteTodoResponse'
+ *          $ref: '#/definitions/DeleteHeadingResponse'
  *       403:
- *         description: "This account is not allowed to delete this todo"
+ *         description: "This account is not allowed to delete this heading"
  *         schema:
- *          $ref: '#/definitions/DeleteTodoResponse'
+ *          $ref: '#/definitions/DeleteHeadingResponse'
  *       422:
  *         description: "Field [field] in request do not match expected"
  *         schema:
@@ -291,120 +276,88 @@ const { RequestPart } = require('../../constants');
  */
 
 module.exports = {
-  todoRouter: (fastify, opts, done) => {
+  headingRouter: (fastify, opts, done) => {
     fastify.post(
       '/',
       {
         preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'createTodo'),
+          SchemaValidator.validate(RequestPart.body, 'createHeading'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.create,
+      HeadingAdapter.create,
     );
     fastify.get(
-      '/trash',
-      {
-        preHandler: [
-          CheckMiddleware.isAuthenticated,
-          FetchMiddleware.getUserId,
-        ],
-      },
-      TodoAdapter.getRemoved,
-    );
-    fastify.get(
-      '/:todoId',
+      '/:headingId',
       {
         preHandler: [
           FormatterMiddleware.castToInteger(RequestPart.params),
-          SchemaValidator.validate(RequestPart.params, 'getTodo'),
+          SchemaValidator.validate(RequestPart.params, 'getHeading'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.get,
+      HeadingAdapter.get,
     );
     fastify.get(
       '/',
       {
         preHandler: [
-          FormatterMiddleware.castToInteger(RequestPart.query),
-          SchemaValidator.validate(RequestPart.query, 'getTodosQuery'),
+          FormatterMiddleware.castToInteger(RequestPart.params),
+          SchemaValidator.validate(RequestPart.params, 'getHeadingsQuery'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.getAll,
+      HeadingAdapter.getAll,
     );
     fastify.patch(
       '/position',
       {
         preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'patchTodoPositionBody'),
+          SchemaValidator.validate(RequestPart.body, 'patchHeadingPositionBody'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.updatePosition,
+      HeadingAdapter.updatePosition,
     );
     fastify.patch(
-      '/:todoId',
+      '/:headingId',
       {
         preHandler: [
           FormatterMiddleware.castToInteger(RequestPart.params),
-          SchemaValidator.validate(RequestPart.body, 'patchTodoBody'),
-          SchemaValidator.validate(RequestPart.params, 'patchTodoParams'),
+          SchemaValidator.validate(RequestPart.body, 'patchHeadingBody'),
+          SchemaValidator.validate(RequestPart.params, 'patchHeadingParams'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.update,
+      HeadingAdapter.update,
     );
     fastify.post(
       '/duplicate',
       {
         preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'duplicateTodo'),
+          SchemaValidator.validate(RequestPart.body, 'duplicateHeading'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.duplicate,
-    );
-    fastify.post(
-      '/switch-archived',
-      {
-        preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'switchArchived'),
-          CheckMiddleware.isAuthenticated,
-          FetchMiddleware.getUserId,
-        ],
-      },
-      TodoAdapter.switchArchived,
-    );
-    fastify.post(
-      '/switch-removed',
-      {
-        preHandler: [
-          SchemaValidator.validate(RequestPart.body, 'switchRemoved'),
-          CheckMiddleware.isAuthenticated,
-          FetchMiddleware.getUserId,
-        ],
-      },
-      TodoAdapter.switchRemoved,
+      HeadingAdapter.duplicate,
     );
     fastify.delete(
-      '/:todoId',
+      '/:headingId',
       {
         preHandler: [
           FormatterMiddleware.castToInteger(RequestPart.params),
-          SchemaValidator.validate(RequestPart.params, 'deleteTodoParams'),
+          SchemaValidator.validate(RequestPart.params, 'deleteHeadingParams'),
           CheckMiddleware.isAuthenticated,
           FetchMiddleware.getUserId,
         ],
       },
-      TodoAdapter.remove,
+      HeadingAdapter.remove,
     );
     done();
   },

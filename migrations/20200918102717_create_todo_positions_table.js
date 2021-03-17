@@ -5,11 +5,11 @@ const tableName = tables.todoPositions;
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
     table
-      .integer('column_id')
+      .integer('heading_id')
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('columns')
+      .inTable('headings')
       .onDelete('CASCADE');
     table
       .specificType('order', 'integer ARRAY');

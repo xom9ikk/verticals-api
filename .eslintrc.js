@@ -11,6 +11,7 @@ module.exports = {
     'jest',
   ],
   rules: {
+    'max-len': ['error', { code: 120 }],
     radix: 0,
     'class-methods-use-this': 0,
     'consistent-return': 0,

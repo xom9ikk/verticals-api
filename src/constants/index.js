@@ -34,4 +34,10 @@ module.exports = {
     update: 1,
     delete: 2,
   },
+  HeadingType: {
+    default: 0,
+    archived: 1,
+    removed: 2,
+    custom: 3,
+  },
 };

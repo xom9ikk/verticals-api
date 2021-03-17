@@ -1,35 +1,18 @@
 const { tables } = require('../src/database/tables');
 
-const tableName = tables.todos;
+const tableName = tables.headingPositions;
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
     table
-      .increments('id')
-      .primary();
-    table
-      .integer('heading_id')
+      .integer('column_id')
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('headings')
+      .inTable('columns')
       .onDelete('CASCADE');
     table
-      .string('title')
-      .notNullable();
-    table
-      .string('description', 4096);
-    table
-      .integer('status')
-      .defaultTo(0);
-    table
-      .integer('color');
-    table
-      .boolean('is_archived')
-      .defaultTo(false);
-    table
-      .boolean('is_notifications_enabled')
-      .defaultTo(true);
+      .specificType('order', 'integer ARRAY');
     table
       .timestamps(false, true);
   });

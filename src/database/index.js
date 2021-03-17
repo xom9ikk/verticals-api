@@ -21,6 +21,10 @@ class Database {
     return knex(tables.columns);
   }
 
+  get headings() {
+    return knex(tables.headings);
+  }
+
   get todos() {
     return knex(tables.todos);
   }
@@ -39,6 +43,10 @@ class Database {
 
   get columnPositions() {
     return knex(tables.columnPositions);
+  }
+
+  get headingPositions() {
+    return knex(tables.headingPositions);
   }
 
   get todoPositions() {

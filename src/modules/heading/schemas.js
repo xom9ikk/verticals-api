@@ -1,10 +1,10 @@
-const { Color, TodoStatus } = require('../../constants');
+const { Color } = require('../../constants');
 
-class TodoSchema {
-  createTodo = {
+class HeadingSchema {
+  createHeading = {
     type: 'object',
     properties: {
-      headingId: {
+      columnId: {
         type: 'integer',
         minimum: 1,
       },
@@ -18,52 +18,31 @@ class TodoSchema {
         minLength: 0,
         maxLength: 4096,
       },
-      status: {
-        type: 'number',
-        enum: Object.values(TodoStatus),
-      },
       color: {
         type: 'number',
         enum: Object.values(Color),
       },
-      isNotificationsEnabled: {
+      isCollapsed: {
         type: 'boolean',
       },
-      belowId: {
-        type: 'integer',
-        minimum: 1,
-      },
-      expirationDate: {
-        oneOf: [
-          {
-            type: 'string',
-            format: 'date-time',
-          },
-          { type: 'null' },
-        ],
-      },
     },
-    required: ['headingId', 'title'],
+    required: ['columnId', 'title'],
   }
 
-  getTodo = {
+  getHeading = {
     type: 'object',
     properties: {
-      todoId: {
+      headingId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    required: ['headingId'],
   }
 
-  getTodosQuery = {
+  getHeadingsQuery = {
     type: 'object',
     properties: {
-      boardId: {
-        type: 'integer',
-        minimum: 1,
-      },
       columnId: {
         type: 'integer',
         minimum: 1,
@@ -71,10 +50,10 @@ class TodoSchema {
     },
   }
 
-  patchTodoPositionBody = {
+  patchHeadingPositionBody = {
     type: 'object',
     properties: {
-      headingId: {
+      columnId: {
         type: 'integer',
         minimum: 1,
       },
@@ -86,17 +65,21 @@ class TodoSchema {
         type: 'integer',
         minimum: 0,
       },
-      targetHeadingId: {
+      targetColumnId: {
+        type: 'integer',
+        minimum: 0,
+      },
+    },
+    required: ['columnId', 'sourcePosition', 'destinationPosition'],
+  }
+
+  patchHeadingBody = {
+    type: 'object',
+    properties: {
+      columnId: {
         type: 'integer',
         minimum: 1,
       },
-    },
-    required: ['headingId', 'sourcePosition', 'destinationPosition'],
-  }
-
-  patchTodoBody = {
-    type: 'object',
-    properties: {
       title: {
         type: 'string',
         minLength: 1,
@@ -107,10 +90,6 @@ class TodoSchema {
         minLength: 0,
         maxLength: 4096,
       },
-      status: {
-        type: 'number',
-        enum: Object.values(TodoStatus),
-      },
       color: {
         oneOf: [
           {
@@ -120,85 +99,53 @@ class TodoSchema {
           { type: 'null' },
         ],
       },
-      isNotificationsEnabled: {
+      isCollapsed: {
         type: 'boolean',
-      },
-      expirationDate: {
-        oneOf: [
-          {
-            type: 'string',
-            format: 'date-time',
-          },
-          { type: 'null' },
-        ],
       },
     },
     anyOf: [
+      { required: ['columnId'] },
       { required: ['title'] },
       { required: ['description'] },
-      { required: ['status'] },
       { required: ['color'] },
-      { required: ['isNotificationsEnabled'] },
-      { required: ['expirationDate'] },
+      { required: ['isCollapsed'] },
     ],
   }
 
-  patchTodoParams = {
+  patchHeadingParams = {
     type: 'object',
     properties: {
-      todoId: {
+      headingId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    required: ['headingId'],
   }
 
-  duplicateTodo = {
+  duplicateHeading = {
     type: 'object',
     properties: {
-      todoId: {
+      headingId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    required: ['headingId'],
   }
 
-  deleteTodoParams = {
+  deleteHeadingParams = {
     type: 'object',
     properties: {
-      todoId: {
+      headingId: {
         type: 'integer',
         minimum: 1,
       },
     },
-    required: ['todoId'],
-  }
-
-  switchArchived = {
-    type: 'object',
-    properties: {
-      todoId: {
-        type: 'integer',
-        minimum: 1,
-      },
-    },
-    required: ['todoId'],
-  }
-
-  switchRemoved = {
-    type: 'object',
-    properties: {
-      todoId: {
-        type: 'integer',
-        minimum: 1,
-      },
-    },
-    required: ['todoId'],
+    required: ['headingId'],
   }
 }
 
 module.exports = {
-  TodoSchema: new TodoSchema(),
+  HeadingSchema: new HeadingSchema(),
 };

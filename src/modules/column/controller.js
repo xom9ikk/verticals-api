@@ -1,10 +1,14 @@
-/* eslint-disable */
+/* eslint-disable no-restricted-syntax */
 const {
-  ColumnService, BoardAccessService, ColumnPositionsService, TodoPositionsService, TodoService,
+  BoardAccessService,
+  ColumnService, HeadingService, TodoService,
+  ColumnPositionsService, HeadingPositionsService, TodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
+const { HeadingController } = require('../heading/controller');
 const { TodoController } = require('../todo/controller');
+const { HeadingType } = require('../../constants');
 
 class ColumnController {
   async create(userId, { belowId, ...column }) {
@@ -25,7 +29,26 @@ class ColumnController {
 
     const columnId = await ColumnService.create(column);
     const columnPositions = await ColumnPositionsService.getPositions(boardId);
-    await TodoPositionsService.create(columnId, []);
+
+    await HeadingPositionsService.create(columnId, []);
+    await HeadingController.create(userId, {
+      columnId,
+      title: 'Default heading',
+      type: HeadingType.default,
+    });
+    const archivedHeadingId = await HeadingService.create({
+      columnId,
+      title: 'Archived heading',
+      type: HeadingType.archived,
+    });
+    await TodoPositionsService.create(archivedHeadingId, []);
+
+    const removedHeadingId = await HeadingService.create({
+      columnId,
+      title: 'Removed heading',
+      type: HeadingType.removed,
+    });
+    await TodoPositionsService.create(removedHeadingId, []);
 
     const {
       newPosition,
@@ -81,23 +104,21 @@ class ColumnController {
         entities: columns,
         positions: {
           [boardId]: columnPositions,
-        }
-      }
+        },
+      };
     }
 
     const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
 
-    const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => {
-      return {
-        ...acc,
-        [boardId]: order
-      };
-    }, {});
+    const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => ({
+      ...acc,
+      [boardId]: order,
+    }), {});
 
     return {
       entities: columns,
-      positions: normalizedPositions
-    }
+      positions: normalizedPositions,
+    };
   }
 
   // TODO: write tests for updatePosition
@@ -164,35 +185,55 @@ class ColumnController {
       position,
     } = await this.create(userId, { belowId: columnId, ...columnToDuplicate });
 
-    const todos = await TodoService.getByColumnId(columnId);
-    const todoPositions = await TodoPositionsService.getPositions(columnId);
+    const headings = await HeadingService.getByColumnId(columnId);
+    const headingPositions = await HeadingPositionsService.getPositions(columnId);
 
-    const orderedTodos = [];
-    todoPositions.map((id) => {
-      const targetTodo = todos.find((todo) => todo.id === id);
-      orderedTodos.push(targetTodo)
-    })
-
-    const todosToDuplicate = orderedTodos.map((todo) => {
-      const newTodo = { ...todo, columnId: newColumnId };
-      delete newTodo.id;
-      delete newTodo.commentsCount;
-      delete newTodo.imagesCount;
-      delete newTodo.attachmentsCount;
-      return newTodo;
+    const orderedHeadings = [];
+    headingPositions.forEach((id) => {
+      const targetHeading = headings.find((heading) => heading.id === id);
+      orderedHeadings.push(targetHeading);
     });
+    const archivedHeading = await HeadingService.getArchivedByColumnId(columnId);
+    const removedHeading = await HeadingService.getRemovedByColumnId(columnId);
 
-    for await (const todo of todosToDuplicate) {
-      await TodoController.create(userId, todo);
+    orderedHeadings.push(archivedHeading);
+    orderedHeadings.push(removedHeading);
+
+    const headingsToDuplicate = orderedHeadings.map((heading) => ({
+      ...heading,
+      columnId: newColumnId,
+    }));
+
+    for await (const heading of headingsToDuplicate) {
+      const headingId = heading.id;
+      delete heading.id;
+
+      let newHeadingId;
+      if (heading.type === HeadingType.custom) {
+        const newHeading = await HeadingController.create(userId, heading);
+        newHeadingId = newHeading.headingId;
+      } else if (heading.type === HeadingType.default) {
+        newHeadingId = await HeadingService.getDefaultIdByColumnId(newColumnId);
+      } else if (heading.type === HeadingType.archived) {
+        newHeadingId = await HeadingService.getArchivedIdByColumnId(newColumnId);
+      } else if (heading.type === HeadingType.removed) {
+        newHeadingId = await HeadingService.getRemovedIdByColumnId(newColumnId);
+      }
+
+      await HeadingController.duplicate({
+        userId,
+        headingId,
+        newHeadingId,
+      });
     }
 
-    const duplicatedTodos = await TodoController.getAll(userId, undefined, newColumnId);
+    // const duplicatedHeadings = await HeadingController.getAll(userId, undefined, newColumnId);
 
     return {
       ...columnToDuplicate,
       columnId: newColumnId,
       position,
-      todos: duplicatedTodos,
+      // headings: duplicatedHeadings,
     };
   }
 
