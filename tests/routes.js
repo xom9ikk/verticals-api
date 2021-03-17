@@ -3,6 +3,7 @@ const routes = {
   user: '/api/v1/user',
   board: '/api/v1/board',
   column: '/api/v1/column',
+  heading: '/api/v1/heading',
   todo: '/api/v1/todo',
   comment: '/api/v1/comment',
   commentLike: '/api/v1/comment-like',

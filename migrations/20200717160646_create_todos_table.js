@@ -25,9 +25,6 @@ exports.up = async (knex) => {
     table
       .integer('color');
     table
-      .boolean('is_archived')
-      .defaultTo(false);
-    table
       .boolean('is_notifications_enabled')
       .defaultTo(true);
     table

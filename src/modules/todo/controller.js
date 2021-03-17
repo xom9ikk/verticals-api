@@ -106,24 +106,13 @@ class TodoController {
 
     let headings;
     if (columnId) {
-      // TODO
       headings = await HeadingService.getByColumnId(columnId);
-      // const todoPositions = await TodoPositionsService.getPositionsByHeadingIds(headingIds);
-      // return {
-      //   entities: todos,
-      //   positions: {
-      //     [columnId]: todoPositions,
-      //   },
-      // };
     } else {
       headings = await HeadingService.getByBoardIds(boardIdsWithAccess);
     }
 
-    console.log('headings', columnId, headings);
-
     const headingIdsMap = new Set();
 
-    // TODO
     headings.forEach((heading) => {
       headingIdsMap.add(heading.id);
     });

@@ -1,3 +1,4 @@
+const { HeadingType } = require('../../constants');
 const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
@@ -26,135 +27,175 @@ afterAll(async (done) => {
 const defaultUser = {
   boards: [{
     title: 'default-board-1',
+    columns: [{
+      title: 'default-column-1',
+    }, {
+      title: 'default-column-2',
+    }],
   }, {
     title: 'default-board-2',
+    columns: [{
+      title: 'default-column-3',
+    }, {
+      title: 'default-column-4',
+    }, {
+      title: 'default-column-5',
+    }],
   }, {
     title: 'default-board-3',
+    columns: [{
+      title: 'default-column-6',
+    }],
   }, {
     title: 'default-board-4',
+    columns: [{
+      title: 'default-column-7',
+    }],
   }],
 };
 
 describe('create', () => {
-  it('user can successfully create column with all fields', async (done) => {
+  it('user can successfully create heading with all fields', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        columnId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create column without description', async (done) => {
+  it('user can successfully create heading without description', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.description;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.description;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        columnId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create column without color', async (done) => {
+  it('user can successfully create heading without status', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.color;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.status;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        columnId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create column without is collapsed', async (done) => {
+  it('user can successfully create heading without color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.isCollapsed;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.color;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        columnId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create column without all non-required fields', async (done) => {
+  it('user can successfully create heading without is notifications enabled', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.description;
-    delete column.color;
-    delete column.isCollapsed;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.isNotificationsEnabled;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        columnId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can\'t create column without authorization', async (done) => {
+  it('user can successfully create heading without all non-required fields', async (done) => {
     const user = await helper.createUser(defaultUser);
-    const boardId = user.getRandomBoardId();
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.description;
+    delete heading.status;
+    delete heading.color;
     const res = await request()
-      .post(`${routes.column}/`)
-      .send(column);
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(heading);
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.objectContaining({
+        headingId: expect.any(Number),
+      }),
+    }));
+
+    done();
+  });
+  it('user can\'t create heading without authorization', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const columnId = user.getRandomColumnId();
+
+    const heading = Generator.Heading.getUnique(columnId);
+    const res = await request()
+      .post(`${routes.heading}/`)
+      .send(heading);
 
     expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
@@ -164,17 +205,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column without board id', async (done) => {
+  it('user can\'t create heading without title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.boardId;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.title;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -184,17 +225,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column without title', async (done) => {
+  it('user can\'t create heading without column id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    delete column.title;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.columnId;
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -204,17 +245,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with empty title', async (done) => {
+  it('user can\'t create heading with empty title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...column,
+        ...heading,
         title: '',
       });
 
@@ -226,18 +267,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with long title', async (done) => {
+  it('user can\'t create heading with long title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...column,
-        title: Generator.Column.getLongTitle(),
+        ...heading,
+        title: Generator.Heading.getLongTitle(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -248,18 +289,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with negative color', async (done) => {
+  it('user can\'t create heading with negative color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...column,
-        color: Generator.Column.getNegativeColor(),
+        ...heading,
+        color: Generator.Heading.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -269,18 +310,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with string color', async (done) => {
+  it('user can\'t create heading with string color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...column,
-        color: Generator.Column.getNegativeColor(),
+        ...heading,
+        color: Generator.Heading.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -290,40 +331,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with color which is not included in the enum', async (done) => {
+  it('user can\'t create heading with color which is not included in the enum', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...column,
-        color: Generator.Column.getInvalidColor(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can\'t create column with negative board id', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const column = Generator.Column.getUnique(boardId);
-    const res = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...column,
-        boardId: Generator.Column.getNegativeBoardId(),
+        ...heading,
+        color: Generator.Heading.getInvalidColor(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -334,18 +353,40 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create column with board id without having access to it', async (done) => {
+  it('user can\'t create heading with negative column id', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const heading = Generator.Heading.getUnique(columnId);
+    const res = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...heading,
+        columnId: Generator.Heading.getNegativeColumnId(),
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t create heading with column id without having access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const { token } = firstUser;
 
     const secondUser = await helper.createUser(defaultUser);
-    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardIdWithoutAccess);
+    const heading = Generator.Heading.getUnique(columnIdWithoutAccess);
     const res = await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({
@@ -357,20 +398,20 @@ describe('create', () => {
   });
 });
 
-describe('get column by id', () => {
-  it('user can successfully get column by id', async (done) => {
+describe('get heading by id', () => {
+  it('user can successfully get heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.column}/${columnId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -380,26 +421,27 @@ describe('get column by id', () => {
       data: expect.any(Object),
     }));
     expect(res.body.data).toEqual({
-      id: columnId,
+      id: headingId,
+      ...heading,
+      type: HeadingType.custom,
       position: expect.any(Number),
-      ...column,
     });
 
     done();
   });
-  it('user can\'t get column without authorization header', async (done) => {
+  it('user can\'t get heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.column}/${columnId}`)
+      .get(`${routes.heading}/${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -410,20 +452,20 @@ describe('get column by id', () => {
 
     done();
   });
-  it('user can\'t access to the column if he does not have access to it', async (done) => {
+  it('user can\'t access to the heading if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const firstUserBoardId = firstUser.getRandomBoardId();
+    const firstUserColumnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const column = Generator.Column.getUnique(firstUserBoardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(firstUserColumnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.column}/${columnId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -435,19 +477,19 @@ describe('get column by id', () => {
 
     done();
   });
-  it('user can\'t access to the column by string id', async (done) => {
+  it('user can\'t access to the heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.column}/string_${columnId}`)
+      .get(`${routes.heading}/string_${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -460,30 +502,34 @@ describe('get column by id', () => {
   });
 });
 
-describe('get all columns', () => {
-  it('user can successfully gets all columns to which he has access', async (done) => {
-    const firstUser = await helper.createUser(defaultUser);
-    const token = firstUser.getToken();
-    const [firstBoard, secondBoard] = await helper.createBoards({
-      token,
-      boards: defaultUser.boards,
-    });
-    await helper.createUser(defaultUser);
+describe('get all headings', () => {
+  it('user can successfully gets all headings to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const [firstColumnId, secondColumnId] = user.getColumnIds();
+    const token = user.getToken();
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserColumnId = secondUser.getRandomColumnId();
 
-    const columnOne = Generator.Column.getUnique(firstBoard.id);
+    const secondUserHeading = Generator.Heading.getUnique(secondUserColumnId);
     await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send(columnOne);
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .send(secondUserHeading);
 
-    const columnTwo = Generator.Column.getUnique(secondBoard.id);
+    const headingOne = Generator.Heading.getUnique(firstColumnId);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(columnTwo);
+      .send(headingOne);
+
+    const headingTwo = Generator.Heading.getUnique(secondColumnId);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.column}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -493,44 +539,56 @@ describe('get all columns', () => {
       data: expect.any(Object),
     }));
 
-    const { columns } = res.body.data;
-    const [{ id: columnIdOne }, { id: columnIdTwo }] = columns.entities;
+    const { headings } = res.body.data;
 
-    expect(columns.entities).toEqual([{
-      id: columnIdOne,
-      ...columnOne,
-    }, {
-      id: columnIdTwo,
-      ...columnTwo,
-    }]);
-    expect(columns.positions).toMatchObject({
-      [firstBoard.id]: [columnIdOne],
-      [secondBoard.id]: [columnIdTwo],
-    });
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        }, {
+          id: expect.any(Number),
+          ...headingTwo,
+          type: HeadingType.custom,
+        },
+      ]),
+    );
+
+    expect(Object.keys(headings.positions)).toHaveLength(7); // 7 columns create for default user
+    expect(Object.keys(headings.positions[firstColumnId])).toHaveLength(2); // 1 default and 1 custom
+    expect(Object.keys(headings.positions[secondColumnId])).toHaveLength(2); // 1 default and 1 custom
 
     done();
   });
-  it('user can successfully gets all columns to which he has access by board id', async (done) => {
-    const firstUser = await helper.createUser(defaultUser);
-    const token = firstUser.getToken();
-    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+  it('user can successfully gets all headings to which he has access by board id', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstBoardId, secondBoardId] = user.getBoardIds();
+    const columnIdFromFirstBoard = user.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = user.getRandomColumnIdFromBoard(secondBoardId);
 
     await helper.createUser(defaultUser);
 
-    const columnOne = Generator.Column.getUnique(firstBoardId);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(columnOne);
+      .send(headingOne);
 
-    const columnTwo = Generator.Column.getUnique(secondBoardId);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(columnTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.column}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: firstBoardId })
       .send();
@@ -541,41 +599,107 @@ describe('get all columns', () => {
       data: expect.any(Object),
     }));
 
-    const { columns } = res.body.data;
-    const [{ id: columnIdOne }] = columns.entities;
+    const { headings } = res.body.data;
 
-    expect(columns.entities).toEqual([{
-      id: columnIdOne,
-      ...columnOne,
-    }]);
-    expect(columns.positions).toMatchObject({
-      [firstBoardId]: [columnIdOne],
-    });
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        },
+      ]),
+    );
+
+    expect(Object.keys(headings.positions)).toHaveLength(2); // 2 columns create for default user in board
+    expect(Object.keys(headings.positions[columnIdFromFirstBoard])).toHaveLength(2); // 1 default and 1 custom in column
 
     done();
   });
-  it('user can\'t get all columns if he does not have access to board id', async (done) => {
+  it('user can successfully gets all headings to which he has access by column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
 
-    const secondUser = await helper.createUser(defaultUser);
-    const [boardIdWithoutAccess] = secondUser.getBoardIds();
+    await helper.createUser(defaultUser);
 
-    const columnOne = Generator.Column.getUnique(firstBoardId);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(columnOne);
+      .send(headingOne);
 
-    const columnTwo = Generator.Column.getUnique(secondBoardId);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(columnTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.column}/`)
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: columnIdFromFirstBoard })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { headings } = res.body.data;
+    const [{ id: headingIdDefault }, _, { id: headingIdCustom }] = headings.entities;
+
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        },
+      ]),
+    );
+    expect(headings.positions[columnIdFromFirstBoard])
+      .toEqual(expect.arrayContaining([headingIdDefault, headingIdCustom]));
+
+    done();
+  });
+  it('user can\'t get all headings if he does not have access to board id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
+
+    const secondUser = await helper.createUser(defaultUser);
+    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(headingOne);
+
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(headingTwo);
+
+    const res = await request()
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: boardIdWithoutAccess })
       .send();
@@ -588,28 +712,61 @@ describe('get all columns', () => {
 
     done();
   });
-  it('user can\'t get columns if he has no columns', async (done) => {
-    const firstUser = await helper.createUser();
-    const [firstBoard, secondBoard] = await helper.createBoards({
-      token: firstUser.getToken(),
-      boards: defaultUser.boards,
-    });
-    const secondUser = await helper.createUser();
+  it('user can\'t get all headings if he does not have access to column id', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const token = firstUser.getToken();
+    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
 
-    const columnOne = Generator.Column.getUnique(firstBoard.id);
-    await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(columnOne);
+    const secondUser = await helper.createUser(defaultUser);
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
-    const columnTwo = Generator.Column.getUnique(secondBoard.id);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(columnTwo);
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(headingOne);
+
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.column}/`)
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: columnIdWithoutAccess })
+      .send();
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t get headings if he has no headings', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const [firstColumnId, secondColumnId] = firstUser.getColumnIds();
+    const secondUser = await helper.createUser();
+
+    const headingOne = Generator.Heading.getUnique(firstColumnId);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .send(headingOne);
+
+    const headingTwo = Generator.Heading.getUnique(secondColumnId);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
+      .send(headingTwo);
+
+    const res = await request()
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -617,27 +774,27 @@ describe('get all columns', () => {
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: {
-        columns: {
+        headings: {
           entities: [],
-          positions: expect.any(Object),
+          positions: {},
         },
       },
     }));
     done();
   });
-  it('user can\'t get all columns without authorization header', async (done) => {
+  it('user can\'t get all headings without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
+    const heading = Generator.Heading.getUnique(columnId);
     await request()
-      .post(`${routes.column}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.column}/`)
+      .get(`${routes.heading}/`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -650,20 +807,20 @@ describe('get all columns', () => {
   });
 });
 
-describe('remove column', () => {
-  it('user can successfully remove column by id', async (done) => {
+describe('remove heading', () => {
+  it('user can successfully remove heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.column}/${columnId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -675,19 +832,19 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can\'t remove column without authorization header', async (done) => {
+  it('user can\'t remove heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.column}/${columnId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -698,28 +855,20 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can\'t remove column if he does not have access to it', async (done) => {
-    const firstUser = await helper.createUser();
-    const [firstBoard, secondBoard] = await helper.createBoards({
-      token: firstUser.getToken(),
-      boards: defaultUser.boards,
-    });
+  it('user can\'t remove heading if he does not have access to it', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const columnId = firstUser.getRandomColumnId();
+
     const secondUser = await helper.createUser();
 
-    const columnOne = Generator.Column.getUnique(firstBoard.id);
-    await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(columnOne);
-
-    const columnTwo = Generator.Column.getUnique(secondBoard.id);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(columnTwo);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.column}/${columnId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -731,19 +880,19 @@ describe('remove column', () => {
 
     done();
   });
-  it('user can\'t remove column by string id', async (done) => {
+  it('user can\'t remove heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.column}/string_${columnId}`)
+      .delete(`${routes.heading}/string_${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -756,26 +905,26 @@ describe('remove column', () => {
   });
 });
 
-describe('update column', () => {
-  it('user can successfully update column by id', async (done) => {
+describe('update heading', () => {
+  it('user can successfully update heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
-    const newColumn = Generator.Column.getUnique(boardId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const resUpdate = await request()
-      .patch(`${routes.column}/${columnId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
-      .send(newColumn);
+      .send(newHeading);
 
     const res = await request()
-      .get(`${routes.column}/${columnId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -785,30 +934,30 @@ describe('update column', () => {
       message: expect.any(String),
       data: expect.any(Object),
     }));
-
     expect(res.body.data).toEqual({
-      id: columnId,
-      position: 0,
-      ...newColumn,
+      id: headingId,
+      ...newHeading,
+      type: HeadingType.custom,
+      position: expect.any(Number),
     });
 
     done();
   });
-  it('user can\'t update column without authorization header', async (done) => {
+  it('user can\'t update heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
-    const newColumn = Generator.Column.getUnique(boardId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .patch(`${routes.column}/${columnId}`)
-      .send(newColumn);
+      .patch(`${routes.heading}/${headingId}`)
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
@@ -818,23 +967,23 @@ describe('update column', () => {
 
     done();
   });
-  it('user can\'t update column if he does not have access to it', async (done) => {
+  it('user can\'t update heading if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const boardId = firstUser.getRandomBoardId();
+    const columnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(column);
+      .send(heading);
 
-    const newColumn = Generator.Column.getUnique();
+    const newHeading = Generator.Heading.getUnique();
     const res = await request()
-      .patch(`${routes.column}/${columnId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
-      .send(newColumn);
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({
@@ -844,21 +993,21 @@ describe('update column', () => {
 
     done();
   });
-  it('user can\'t update column by string id', async (done) => {
+  it('user can\'t update heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const boardId = user.getRandomBoardId();
+    const columnId = user.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(boardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(column);
+      .send(heading);
 
-    const newColumn = Generator.Column.getUnique(boardId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .patch(`${routes.column}/string_${columnId}`)
-      .send(newColumn);
+      .patch(`${routes.heading}/string_${headingId}`)
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -868,24 +1017,23 @@ describe('update column', () => {
 
     done();
   });
-  it('user can\'t update column if he does not have access to new board id', async (done) => {
+  it('user can\'t update heading if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const firstUserBoardId = firstUser.getRandomBoardId();
 
     const secondUser = await helper.createUser(defaultUser);
-    const boardIdWithoutAccess = secondUser.getRandomBoardId();
+    const columnIdWithoutAccessForFirstUser = secondUser.getRandomColumnId();
 
-    const column = Generator.Column.getUnique(firstUserBoardId);
-    const { body: { data: { columnId } } } = await request()
-      .post(`${routes.column}/`)
-      .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(column);
+    const heading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .send(heading);
 
-    const newColumn = Generator.Column.getUnique(boardIdWithoutAccess);
+    const newHeading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);
     const res = await request()
-      .patch(`${routes.column}/${columnId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(newColumn);
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({

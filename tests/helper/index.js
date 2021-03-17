@@ -3,6 +3,7 @@ const { Generator } = require('../generator');
 const { User } = require('./entities/user');
 const { Board } = require('./entities/board');
 const { Column } = require('./entities/column');
+const { Heading } = require('./entities/heading');
 const { Todo } = require('./entities/todo');
 const { routes } = require('../routes');
 
@@ -47,7 +48,7 @@ class Helper {
       const { boardId } = res.body.data;
       if (res.statusCode !== 201) {
         this._logError('createBoards', res);
-        return this.createColumns({
+        return this.createBoards({
           token, boards,
         });
       }
@@ -82,11 +83,11 @@ class Helper {
         });
       }
       const { columnId } = res.body.data;
-      let todos = [];
-      if (column.todos) {
-        todos = await this.createTodos({
+      let headings = [];
+      if (column.headings) {
+        headings = await this.createHeadings({
           token,
-          todos: column.todos,
+          headings: column.headings,
           columnId,
         });
       }
@@ -94,24 +95,57 @@ class Helper {
       resColumns.push(new Column(
         columnId,
         boardId,
-        todos,
+        headings,
       ));
     }
     return resColumns;
   }
 
+  async createHeadings({
+    token, headings, columnId,
+  }) {
+    const resHeadings = [];
+    for await (const heading of headings) {
+      const headingData = Generator.Heading.getUnique(columnId);
+      const mergedData = this._mergeObject(headingData, heading);
+      const res = await this._post(`${routes.heading}/`, mergedData, token);
+      if (res.statusCode !== 201) {
+        this._logError('createHeadings', res);
+        return this.createHeadings({
+          token, headings, columnId,
+        });
+      }
+      const { headingId } = res.body.data;
+      let todos = [];
+      if (heading.todos) {
+        todos = await this.createTodos({
+          token,
+          todos: heading.todos,
+          headingId,
+        });
+      }
+
+      resHeadings.push(new Heading(
+        headingId,
+        columnId,
+        todos,
+      ));
+    }
+    return resHeadings;
+  }
+
   async createTodos({
-    token, todos, columnId,
+    token, todos, headingId,
   }) {
     const resTodos = [];
     for await (const todo of todos) {
-      const todoData = Generator.Todo.getUnique(columnId);
+      const todoData = Generator.Todo.getUnique(headingId);
       const mergedData = this._mergeObject(todoData, todo);
       const res = await this._post(`${routes.todo}/`, mergedData, token);
       if (res.statusCode !== 201) {
         this._logError('createTodos', res);
         return this.createTodos({
-          token, todos, columnId,
+          token, todos, headingId,
         });
       }
       const { todoId } = res.body.data;
@@ -125,7 +159,7 @@ class Helper {
       }
       resTodos.push(new Todo(
         todoId,
-        columnId,
+        headingId,
         comments,
       ));
     }

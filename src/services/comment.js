@@ -17,12 +17,20 @@ class CommentService extends Database {
         id,
       })
       .first();
-    const getColumnId = this.todos
+    const getHeadingId = this.todos
+      .select([
+        'headingId',
+      ])
+      .where({
+        id: getTodoId,
+      })
+      .first();
+    const getColumnId = this.headings
       .select([
         'columnId',
       ])
       .where({
-        id: getTodoId,
+        id: getHeadingId,
       })
       .first();
     const response = await this.columns
@@ -79,13 +87,21 @@ class CommentService extends Database {
   }
 
   getByColumnId(columnId) {
-    const getTodoIds = this.todos
+    const getHeadingIds = this.headings
       .select([
         'id',
       ])
       .where({
         columnId,
       });
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'headingId',
+        getHeadingIds,
+      );
 
     return this.comments
       .select([
@@ -112,14 +128,22 @@ class CommentService extends Database {
         'boardId',
         boardIds,
       );
-
-    const getTodoIds = this.todos
+    const getHeadingIds = this.headings
       .select([
         'id',
       ])
       .whereIn(
         'columnId',
         getColumnIds,
+      );
+
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'headingId',
+        getHeadingIds,
       );
 
     return this.comments
