@@ -1,6 +1,6 @@
 const { tables } = require('../src/database/tables');
 
-const tableName = tables.todos;
+const tableName = tables.headings;
 
 exports.up = async (knex) => {
   await knex.schema.createTable(tableName, (table) => {
@@ -8,11 +8,11 @@ exports.up = async (knex) => {
       .increments('id')
       .primary();
     table
-      .integer('heading_id')
+      .integer('column_id')
       .unsigned()
       .notNullable()
       .references('id')
-      .inTable('headings')
+      .inTable('columns')
       .onDelete('CASCADE');
     table
       .string('title')
@@ -20,13 +20,13 @@ exports.up = async (knex) => {
     table
       .string('description', 4096);
     table
-      .integer('status')
-      .defaultTo(0);
-    table
       .integer('color');
     table
-      .boolean('is_notifications_enabled')
-      .defaultTo(true);
+      .boolean('is_collapsed')
+      .defaultTo(false);
+    table
+      .integer('type')
+      .notNullable();
     table
       .timestamps(false, true);
   });

@@ -47,13 +47,21 @@ class CommentFilesService extends Database {
   }
 
   getByColumnId(columnId) {
-    const getTodoIds = this.todos
+    const getHeadingIds = this.headings
       .select([
         'id',
       ])
       .where({
         columnId,
       });
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'headingId',
+        getHeadingIds,
+      );
 
     return this.comments
       .select([
@@ -85,13 +93,22 @@ class CommentFilesService extends Database {
         boardIds,
       );
 
-    const getTodoIds = this.todos
+    const getHeadingIds = this.headings
       .select([
         'id',
       ])
       .whereIn(
         'columnId',
         getColumnIds,
+      );
+
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'headingId',
+        getHeadingIds,
       );
 
     return this.comments

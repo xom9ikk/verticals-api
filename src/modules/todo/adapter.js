@@ -39,15 +39,15 @@ class TodoAdapter {
   async updatePosition(req, res) {
     const { userId } = req;
     const {
-      columnId, sourcePosition, destinationPosition, targetColumnId,
+      headingId, sourcePosition, destinationPosition, targetHeadingId,
     } = req.body;
 
     await TodoController.updatePosition({
       userId,
-      columnId,
+      headingId,
       sourcePosition,
       destinationPosition,
-      targetColumnId,
+      targetHeadingId,
     });
 
     return BackendResponse.Success(res, 'Todo position successfully updated');
@@ -73,6 +73,24 @@ class TodoAdapter {
     const todo = await TodoController.duplicate({ userId, todoId });
 
     return BackendResponse.Success(res, 'Todo successfully duplicated', todo);
+  }
+
+  async switchArchived(req, res) {
+    const { userId } = req;
+    const { todoId } = req.body;
+
+    const todo = await TodoController.switchArchived({ userId, todoId });
+
+    return BackendResponse.Success(res, 'Switch archived for todo successfully', todo);
+  }
+
+  async switchRemoved(req, res) {
+    const { userId } = req;
+    const { todoId } = req.body;
+
+    const todo = await TodoController.switchRemoved({ userId, todoId });
+
+    return BackendResponse.Success(res, 'Switch removed for todo successfully', todo);
   }
 
   async remove(req, res) {

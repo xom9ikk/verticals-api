@@ -25,7 +25,7 @@ class RoutesHandler {
     if (error.code === 'FST_ERR_CTP_INVALID_MEDIA_TYPE') {
       return new BackendResponse(res, 415, 'Invalid Media Type');
     }
-    // console.log('==============eee', error);
+    console.log(error);
     logger.error(error);
     return new BackendResponse(res, 500, 'Internal');// && process.exit(1);
   }

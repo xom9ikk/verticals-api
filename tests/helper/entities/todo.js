@@ -1,9 +1,9 @@
 const faker = require('faker');
 
 class Todo {
-  constructor(id, columnId, comments) {
+  constructor(id, headingId, comments) {
     this.id = id;
-    this.columnId = columnId;
+    this.headingId = headingId;
     this.comments = comments;
   }
 

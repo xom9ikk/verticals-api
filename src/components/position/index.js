@@ -48,6 +48,9 @@ class PositionComponent {
   }
 
   static isValid(ids, availableSize, ...positions) {
+    console.log('ids', ids);
+    console.log('availableSize', availableSize);
+    console.log('positions', positions);
     const indexes = [...Array(availableSize).keys()].map((i) => i);
     return positions.every((position) => indexes.includes(position));
   }

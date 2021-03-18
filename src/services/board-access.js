@@ -1,4 +1,5 @@
 const { ColumnService } = require('./column');
+const { HeadingService } = require('./heading');
 const { TodoService } = require('./todo');
 const { CommentService } = require('./comment');
 const { CommentFilesService } = require('./comment-files');
@@ -42,8 +43,24 @@ class BoardAccessService extends Database {
       .first();
   }
 
+  getByHeadingId(userId, headingId) {
+    const columnId = HeadingService.getColumnIdSubQuery(headingId);
+    const boardId = ColumnService.getBoardIdSubQuery(columnId);
+    return this.boardsAccess
+      .select([
+        'userId',
+        'boardId',
+      ])
+      .where({
+        boardId,
+        userId,
+      })
+      .first();
+  }
+
   getByTodoId(userId, todoId) {
-    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const headingId = TodoService.getHeadingIdSubQuery(todoId);
+    const columnId = HeadingService.getColumnIdSubQuery(headingId);
     const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
@@ -59,7 +76,8 @@ class BoardAccessService extends Database {
 
   getByCommentId(userId, commentId) {
     const todoId = CommentService.getTodoIdSubQuery(commentId);
-    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const headingId = TodoService.getHeadingIdSubQuery(todoId);
+    const columnId = HeadingService.getColumnIdSubQuery(headingId);
     const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([
@@ -76,7 +94,8 @@ class BoardAccessService extends Database {
   getByAttachmentId(userId, attachmentId) {
     const commentId = CommentFilesService.getCommentIdSubQuery(attachmentId);
     const todoId = CommentService.getTodoIdSubQuery(commentId);
-    const columnId = TodoService.getColumnIdSubQuery(todoId);
+    const headingId = TodoService.getHeadingIdSubQuery(todoId);
+    const columnId = HeadingService.getColumnIdSubQuery(headingId);
     const boardId = ColumnService.getBoardIdSubQuery(columnId);
     return this.boardsAccess
       .select([

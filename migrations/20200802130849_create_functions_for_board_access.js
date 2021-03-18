@@ -33,17 +33,33 @@ exports.up = async (knex) => {
   `);
 
   await knex.raw(`
-    CREATE FUNCTION get_user_ids_by_todo_id(integer)
+    CREATE FUNCTION get_user_ids_by_heading_id(integer)
       RETURNS integer[] AS
     $$
     DECLARE
         columnId integer;
     BEGIN
         columnId := (SELECT column_id
-                    FROM todos
+                    FROM headings
                     WHERE id = $1
                     LIMIT 1);
         RETURN get_user_ids_by_column_id(columnId);
+    END;
+    $$ LANGUAGE plpgsql;
+  `);
+
+  await knex.raw(`
+    CREATE FUNCTION get_user_ids_by_todo_id(integer)
+      RETURNS integer[] AS
+    $$
+    DECLARE
+        headingId integer;
+    BEGIN
+        headingId := (SELECT heading_id
+                    FROM todos
+                    WHERE id = $1
+                    LIMIT 1);
+        RETURN get_user_ids_by_heading_id(headingId);
     END;
     $$ LANGUAGE plpgsql;
   `);
@@ -84,6 +100,7 @@ exports.up = async (knex) => {
 exports.down = async (knex) => {
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_board_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_column_id;');
+  await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_heading_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_todo_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_comment_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_comment_file_id;');

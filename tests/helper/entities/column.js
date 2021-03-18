@@ -1,19 +1,19 @@
 const faker = require('faker');
 
 class Column {
-  constructor(id, boardId, todos) {
+  constructor(id, boardId, headings) {
     this.id = id;
     this.boardId = boardId;
-    this.todos = todos;
+    this.headings = headings;
   }
 
-  getRandomTodo() {
-    const randomIndex = faker.random.number({ max: this.todos.length - 1 });
-    return this.todos[randomIndex];
+  getRandomHeading() {
+    const randomIndex = faker.random.number({ max: this.headings.length - 1 });
+    return this.headings[randomIndex];
   }
 
-  getRandomTodoId() {
-    return this.getRandomTodo().id;
+  getRandomHeadingId() {
+    return this.getRandomHeading().id;
   }
 }
 

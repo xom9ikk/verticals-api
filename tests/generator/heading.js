@@ -1,15 +1,13 @@
 const faker = require('faker');
 
-class TodoDataGenerator {
-  static getUnique(headingId) {
+class HeadingDataGenerator {
+  static getUnique(columnId) {
     return {
-      headingId,
+      columnId,
       title: faker.lorem.words(),
       description: faker.lorem.sentences(),
-      status: faker.random.number({ max: 2 }),
       color: faker.random.number({ max: 5 }),
-      isNotificationsEnabled: faker.random.boolean(),
-      expirationDate: faker.date.past(),
+      isCollapsed: faker.random.boolean(),
     };
   }
 
@@ -29,11 +27,11 @@ class TodoDataGenerator {
     return faker.random.number({ min: 6, max: 10 }).toString();
   }
 
-  static getNegativeHeadingId() {
+  static getNegativeColumnId() {
     return faker.random.number({ max: -100 });
   }
 }
 
 module.exports = {
-  TodoDataGenerator,
+  HeadingDataGenerator,
 };

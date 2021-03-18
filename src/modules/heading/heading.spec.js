@@ -1,3 +1,4 @@
+const { HeadingType } = require('../../constants');
 const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
@@ -28,230 +29,173 @@ const defaultUser = {
     title: 'default-board-1',
     columns: [{
       title: 'default-column-1',
-      headings: [{
-        title: 'default-heading-1',
-      }, {
-        title: 'default-heading-2',
-      }],
     }, {
       title: 'default-column-2',
-      headings: [{
-        title: 'default-heading-3',
-      }, {
-        title: 'default-heading-4',
-      }, {
-        title: 'default-heading-5',
-      }],
     }],
   }, {
     title: 'default-board-2',
     columns: [{
       title: 'default-column-3',
-      headings: [{
-        title: 'default-heading-6',
-      }, {
-        title: 'default-heading-7',
-      }, {
-        title: 'default-heading-8',
-      }],
     }, {
       title: 'default-column-4',
-      headings: [{
-        title: 'default-heading-9',
-      }, {
-        title: 'default-heading-10',
-      }, {
-        title: 'default-heading-11',
-      }],
+    }, {
+      title: 'default-column-5',
     }],
   }, {
     title: 'default-board-3',
     columns: [{
-      title: 'default-column-5',
-      headings: [{
-        title: 'default-heading-12',
-      }, {
-        title: 'default-heading-13',
-      }, {
-        title: 'default-heading-14',
-      }],
-    }, {
       title: 'default-column-6',
-      headings: [{
-        title: 'default-heading-15',
-      }, {
-        title: 'default-heading-16',
-      }, {
-        title: 'default-heading-17',
-      }],
     }],
   }, {
     title: 'default-board-4',
     columns: [{
       title: 'default-column-7',
-      headings: [{
-        title: 'default-heading-18',
-      }, {
-        title: 'default-heading-19',
-      }, {
-        title: 'default-heading-20',
-      }],
-    }, {
-      title: 'default-column-8',
-      headings: [{
-        title: 'default-heading-21',
-      }, {
-        title: 'default-heading-22',
-      }, {
-        title: 'default-heading-23',
-      }],
     }],
   }],
 };
 
 describe('create', () => {
-  it('user can successfully create todo with all fields', async (done) => {
+  it('user can successfully create heading with all fields', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create todo without description', async (done) => {
+  it('user can successfully create heading without description', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.description;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.description;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create todo without status', async (done) => {
+  it('user can successfully create heading without status', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.status;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.status;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create todo without color', async (done) => {
+  it('user can successfully create heading without color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.color;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.color;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create todo without is notifications enabled', async (done) => {
+  it('user can successfully create heading without is notifications enabled', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.isNotificationsEnabled;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.isNotificationsEnabled;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can successfully create todo without all non-required fields', async (done) => {
+  it('user can successfully create heading without all non-required fields', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.description;
-    delete todo.status;
-    delete todo.color;
-    delete todo.isNotificationsEnabled;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.description;
+    delete heading.status;
+    delete heading.color;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.objectContaining({
-        todoId: expect.any(Number),
+        headingId: expect.any(Number),
       }),
     }));
 
     done();
   });
-  it('user can\'t create todo without authorization', async (done) => {
+  it('user can\'t create heading without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
-      .send(todo);
+      .post(`${routes.heading}/`)
+      .send(heading);
 
     expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
@@ -261,17 +205,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo without title', async (done) => {
+  it('user can\'t create heading without title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.title;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.title;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -281,17 +225,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo without heading id', async (done) => {
+  it('user can\'t create heading without column id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    delete todo.headingId;
+    const heading = Generator.Heading.getUnique(columnId);
+    delete heading.columnId;
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -301,17 +245,17 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with empty title', async (done) => {
+  it('user can\'t create heading with empty title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...todo,
+        ...heading,
         title: '',
       });
 
@@ -323,18 +267,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with long title', async (done) => {
+  it('user can\'t create heading with long title', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...todo,
-        title: Generator.Todo.getLongTitle(),
+        ...heading,
+        title: Generator.Heading.getLongTitle(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -345,18 +289,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with negative color', async (done) => {
+  it('user can\'t create heading with negative color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...todo,
-        color: Generator.Todo.getNegativeColor(),
+        ...heading,
+        color: Generator.Heading.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -366,18 +310,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with string color', async (done) => {
+  it('user can\'t create heading with string color', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...todo,
-        color: Generator.Todo.getNegativeColor(),
+        ...heading,
+        color: Generator.Heading.getNegativeColor(),
       });
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -387,40 +331,18 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with color which is not included in the enum', async (done) => {
+  it('user can\'t create heading with color which is not included in the enum', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        ...todo,
-        color: Generator.Todo.getInvalidColor(),
-      });
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-
-    done();
-  });
-  it('user can\'t create todo with negative heading id', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
-
-    const todo = Generator.Todo.getUnique(headingId);
-    const res = await request()
-      .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        ...todo,
-        headingId: Generator.Todo.getNegativeHeadingId(),
+        ...heading,
+        color: Generator.Heading.getInvalidColor(),
       });
 
     expect(res.statusCode).toEqual(400);
@@ -431,18 +353,40 @@ describe('create', () => {
 
     done();
   });
-  it('user can\'t create todo with heading id without having access to it', async (done) => {
+  it('user can\'t create heading with negative column id', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const heading = Generator.Heading.getUnique(columnId);
+    const res = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...heading,
+        columnId: Generator.Heading.getNegativeColumnId(),
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t create heading with column id without having access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const { token } = firstUser;
 
     const secondUser = await helper.createUser(defaultUser);
-    const headingIdWithoutAccess = secondUser.getRandomHeadingId();
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingIdWithoutAccess);
+    const heading = Generator.Heading.getUnique(columnIdWithoutAccess);
     const res = await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({
@@ -454,20 +398,20 @@ describe('create', () => {
   });
 });
 
-describe('get todo by id', () => {
-  it('user can successfully get todo by id', async (done) => {
+describe('get heading by id', () => {
+  it('user can successfully get heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.todo}/${todoId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -477,27 +421,27 @@ describe('get todo by id', () => {
       data: expect.any(Object),
     }));
     expect(res.body.data).toEqual({
-      id: todoId,
-      ...todo,
-      expirationDate: expect.any(Number),
+      id: headingId,
+      ...heading,
+      type: HeadingType.custom,
       position: expect.any(Number),
     });
 
     done();
   });
-  it('user can\'t get todo without authorization header', async (done) => {
+  it('user can\'t get heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.todo}/${todoId}`)
+      .get(`${routes.heading}/${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -508,20 +452,20 @@ describe('get todo by id', () => {
 
     done();
   });
-  it('user can\'t access to the todo if he does not have access to it', async (done) => {
+  it('user can\'t access to the heading if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const firstUserHeadingId = firstUser.getRandomHeadingId();
+    const firstUserColumnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const todo = Generator.Todo.getUnique(firstUserHeadingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(firstUserColumnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.todo}/${todoId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -533,19 +477,19 @@ describe('get todo by id', () => {
 
     done();
   });
-  it('user can\'t access to the todo by string id', async (done) => {
+  it('user can\'t access to the heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.todo}/string_${todoId}`)
+      .get(`${routes.heading}/string_${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -558,34 +502,34 @@ describe('get todo by id', () => {
   });
 });
 
-describe('get all todos', () => {
-  it('user can successfully gets all todos to which he has access', async (done) => {
+describe('get all headings', () => {
+  it('user can successfully gets all headings to which he has access', async (done) => {
     const user = await helper.createUser(defaultUser);
-    const [firstHeadingId, secondHeadingId] = user.getHeadingIds();
+    const [firstColumnId, secondColumnId] = user.getColumnIds();
     const token = user.getToken();
     const secondUser = await helper.createUser(defaultUser);
-    const secondUserHeadingId = secondUser.getRandomHeadingId();
+    const secondUserColumnId = secondUser.getRandomColumnId();
 
-    const secondUserTodo = Generator.Todo.getUnique(secondUserHeadingId);
+    const secondUserHeading = Generator.Heading.getUnique(secondUserColumnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
-      .send(secondUserTodo);
+      .send(secondUserHeading);
 
-    const todoOne = Generator.Todo.getUnique(firstHeadingId);
+    const headingOne = Generator.Heading.getUnique(firstColumnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(secondHeadingId);
+    const headingTwo = Generator.Heading.getUnique(secondColumnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -595,54 +539,56 @@ describe('get all todos', () => {
       data: expect.any(Object),
     }));
 
-    const { todos } = res.body.data;
+    const { headings } = res.body.data;
 
-    expect(todos.entities).toEqual(
-      expect.arrayContaining([{
-        id: expect.any(Number),
-        ...todoOne,
-        attachmentsCount: 0,
-        commentsCount: 0,
-        imagesCount: 0,
-        expirationDate: expect.any(Number),
-      }, {
-        id: expect.any(Number),
-        ...todoTwo,
-        attachmentsCount: 0,
-        commentsCount: 0,
-        imagesCount: 0,
-        expirationDate: expect.any(Number),
-      }]),
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        }, {
+          id: expect.any(Number),
+          ...headingTwo,
+          type: HeadingType.custom,
+        },
+      ]),
     );
 
-    expect(Object.keys(todos.positions[firstHeadingId])).toHaveLength(1);
-    expect(Object.keys(todos.positions[secondHeadingId])).toHaveLength(1);
+    expect(Object.keys(headings.positions)).toHaveLength(7); // 7 columns create for default user
+    expect(Object.keys(headings.positions[firstColumnId])).toHaveLength(2); // 1 default and 1 custom
+    expect(Object.keys(headings.positions[secondColumnId])).toHaveLength(2); // 1 default and 1 custom
 
     done();
   });
-  it('user can successfully gets all todos to which he has access by board id', async (done) => {
-    const firstUser = await helper.createUser(defaultUser);
-    const token = firstUser.getToken();
-    const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
-    const headingIdFromFirstBoard = firstUser.getRandomHeadingIdFromBoard(firstBoardId);
-    const headingIdFromSecondBoard = firstUser.getRandomHeadingIdFromBoard(secondBoardId);
+  it('user can successfully gets all headings to which he has access by board id', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstBoardId, secondBoardId] = user.getBoardIds();
+    const columnIdFromFirstBoard = user.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = user.getRandomColumnIdFromBoard(secondBoardId);
 
     await helper.createUser(defaultUser);
 
-    const todoOne = Generator.Todo.getUnique(headingIdFromFirstBoard);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(headingIdFromSecondBoard);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: firstBoardId })
       .send();
@@ -653,48 +599,51 @@ describe('get all todos', () => {
       data: expect.any(Object),
     }));
 
-    const { todos } = res.body.data;
+    const { headings } = res.body.data;
 
-    expect(todos.entities).toEqual(
-      expect.arrayContaining([{
-        id: expect.any(Number),
-        ...todoOne,
-        attachmentsCount: 0,
-        commentsCount: 0,
-        imagesCount: 0,
-        expirationDate: expect.any(Number),
-      }]),
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        },
+      ]),
     );
 
-    expect(Object.keys(todos.positions[headingIdFromFirstBoard])).toHaveLength(1);
+    expect(Object.keys(headings.positions)).toHaveLength(2); // 2 columns create for default user in board
+    expect(Object.keys(headings.positions[columnIdFromFirstBoard])).toHaveLength(2); // 1 default and 1 custom in column
 
     done();
   });
-  it('user can successfully gets all todos to which he has access by column id', async (done) => {
+  it('user can successfully gets all headings to which he has access by column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
-    const headingIdFromSecondBoard = firstUser.getRandomHeadingIdFromBoard(secondBoardId);
-    const columnFromFirstBoard = firstUser.getRandomColumnFromBoard(firstBoardId);
-    const columnIdFromFirstBoard = columnFromFirstBoard.id;
-    const headingIdFromFirstBoard = columnFromFirstBoard.getRandomHeadingId();
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
 
     await helper.createUser(defaultUser);
 
-    const todoOne = Generator.Todo.getUnique(headingIdFromFirstBoard);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(headingIdFromSecondBoard);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ columnId: columnIdFromFirstBoard })
       .send();
@@ -705,47 +654,52 @@ describe('get all todos', () => {
       data: expect.any(Object),
     }));
 
-    const { todos } = res.body.data;
+    const { headings } = res.body.data;
+    const [{ id: headingIdDefault }, _, { id: headingIdCustom }] = headings.entities;
 
-    expect(todos.entities).toEqual(
-      expect.arrayContaining([{
-        id: expect.any(Number),
-        ...todoOne,
-        attachmentsCount: 0,
-        commentsCount: 0,
-        imagesCount: 0,
-        expirationDate: expect.any(Number),
-      }]),
+    expect(headings.entities).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: HeadingType.default,
+        }),
+        expect.objectContaining({
+          type: HeadingType.archived,
+        }), {
+          id: expect.any(Number),
+          ...headingOne,
+          type: HeadingType.custom,
+        },
+      ]),
     );
-
-    expect(Object.keys(todos.positions[headingIdFromFirstBoard])).toHaveLength(1);
+    expect(headings.positions[columnIdFromFirstBoard])
+      .toEqual(expect.arrayContaining([headingIdDefault, headingIdCustom]));
 
     done();
   });
-  it('user can\'t get all todos if he does not have access to board id', async (done) => {
+  it('user can\'t get all headings if he does not have access to board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
-    const headingIdFromFirstBoard = firstUser.getRandomHeadingIdFromBoard(firstBoardId);
-    const headingIdFromSecondBoard = firstUser.getRandomHeadingIdFromBoard(secondBoardId);
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
 
     const secondUser = await helper.createUser(defaultUser);
     const boardIdWithoutAccess = secondUser.getRandomBoardId();
 
-    const todoOne = Generator.Todo.getUnique(headingIdFromFirstBoard);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(headingIdFromSecondBoard);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ boardId: boardIdWithoutAccess })
       .send();
@@ -758,30 +712,30 @@ describe('get all todos', () => {
 
     done();
   });
-  it('user can\'t get all todos if he does not have access to column id', async (done) => {
+  it('user can\'t get all headings if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const token = firstUser.getToken();
     const [firstBoardId, secondBoardId] = firstUser.getBoardIds();
-    const headingIdFromFirstBoard = firstUser.getRandomHeadingIdFromBoard(firstBoardId);
-    const headingIdFromSecondBoard = firstUser.getRandomHeadingIdFromBoard(secondBoardId);
+    const columnIdFromFirstBoard = firstUser.getRandomColumnIdFromBoard(firstBoardId);
+    const columnIdFromSecondBoard = firstUser.getRandomColumnIdFromBoard(secondBoardId);
 
     const secondUser = await helper.createUser(defaultUser);
     const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
-    const todoOne = Generator.Todo.getUnique(headingIdFromFirstBoard);
+    const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(headingIdFromSecondBoard);
+    const headingTwo = Generator.Heading.getUnique(columnIdFromSecondBoard);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .query({ columnId: columnIdWithoutAccess })
       .send();
@@ -794,25 +748,25 @@ describe('get all todos', () => {
 
     done();
   });
-  it('user can\'t get todos if he has no todos', async (done) => {
+  it('user can\'t get headings if he has no headings', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const [firstHeadingId, secondHeadingId] = firstUser.getHeadingIds();
+    const [firstColumnId, secondColumnId] = firstUser.getColumnIds();
     const secondUser = await helper.createUser();
 
-    const todoOne = Generator.Todo.getUnique(firstHeadingId);
+    const headingOne = Generator.Heading.getUnique(firstColumnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(todoOne);
+      .send(headingOne);
 
-    const todoTwo = Generator.Todo.getUnique(secondHeadingId);
+    const headingTwo = Generator.Heading.getUnique(secondColumnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(todoTwo);
+      .send(headingTwo);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -820,7 +774,7 @@ describe('get all todos', () => {
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: {
-        todos: {
+        headings: {
           entities: [],
           positions: {},
         },
@@ -828,19 +782,19 @@ describe('get all todos', () => {
     }));
     done();
   });
-  it('user can\'t get all todos without authorization header', async (done) => {
+  it('user can\'t get all headings without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
+    const heading = Generator.Heading.getUnique(columnId);
     await request()
-      .post(`${routes.todo}/`)
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .get(`${routes.todo}/`)
+      .get(`${routes.heading}/`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -853,20 +807,20 @@ describe('get all todos', () => {
   });
 });
 
-describe('remove todo', () => {
-  it('user can successfully remove todo by id', async (done) => {
+describe('remove heading', () => {
+  it('user can successfully remove heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.todo}/${todoId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -878,19 +832,19 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can\'t remove todo without authorization header', async (done) => {
+  it('user can\'t remove heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.todo}/${todoId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(401);
@@ -901,20 +855,20 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can\'t remove todo if he does not have access to it', async (done) => {
+  it('user can\'t remove heading if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const headingId = firstUser.getRandomHeadingId();
+    const columnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.todo}/${todoId}`)
+      .delete(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send();
 
@@ -926,19 +880,19 @@ describe('remove todo', () => {
 
     done();
   });
-  it('user can\'t remove todo by string id', async (done) => {
+  it('user can\'t remove heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
     const res = await request()
-      .delete(`${routes.todo}/string_${todoId}`)
+      .delete(`${routes.heading}/string_${headingId}`)
       .send();
 
     expect(res.statusCode).toEqual(400);
@@ -951,26 +905,26 @@ describe('remove todo', () => {
   });
 });
 
-describe('update todo', () => {
-  it('user can successfully update todo by id', async (done) => {
+describe('update heading', () => {
+  it('user can successfully update heading by id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
-    const newTodo = Generator.Todo.getUnique(headingId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const resUpdate = await request()
-      .patch(`${routes.todo}/${todoId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
-      .send(newTodo);
+      .send(newHeading);
 
     const res = await request()
-      .get(`${routes.todo}/${todoId}`)
+      .get(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
@@ -981,29 +935,29 @@ describe('update todo', () => {
       data: expect.any(Object),
     }));
     expect(res.body.data).toEqual({
-      id: todoId,
-      ...newTodo,
-      expirationDate: expect.any(Number),
+      id: headingId,
+      ...newHeading,
+      type: HeadingType.custom,
       position: expect.any(Number),
     });
 
     done();
   });
-  it('user can\'t update todo without authorization header', async (done) => {
+  it('user can\'t update heading without authorization header', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
-    const newTodo = Generator.Todo.getUnique(headingId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .patch(`${routes.todo}/${todoId}`)
-      .send(newTodo);
+      .patch(`${routes.heading}/${headingId}`)
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(401);
     expect(res.body).toEqual(expect.objectContaining({
@@ -1013,23 +967,23 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can\'t update todo if he does not have access to it', async (done) => {
+  it('user can\'t update heading if he does not have access to it', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
-    const headingId = firstUser.getRandomHeadingId();
+    const columnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(todo);
+      .send(heading);
 
-    const newTodo = Generator.Todo.getUnique();
+    const newHeading = Generator.Heading.getUnique();
     const res = await request()
-      .patch(`${routes.todo}/${todoId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
-      .send(newTodo);
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({
@@ -1039,21 +993,21 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can\'t update todo by string id', async (done) => {
+  it('user can\'t update heading by string id', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
-    const headingId = user.getRandomHeadingId();
+    const columnId = user.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingId);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnId);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(todo);
+      .send(heading);
 
-    const newTodo = Generator.Todo.getUnique(headingId);
+    const newHeading = Generator.Heading.getUnique(columnId);
     const res = await request()
-      .patch(`${routes.todo}/string_${todoId}`)
-      .send(newTodo);
+      .patch(`${routes.heading}/string_${headingId}`)
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({
@@ -1063,23 +1017,23 @@ describe('update todo', () => {
 
     done();
   });
-  it('user can\'t update todo if he does not have access to heading id', async (done) => {
+  it('user can\'t update heading if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
 
     const secondUser = await helper.createUser(defaultUser);
-    const headingIdWithoutAccessForFirstUser = secondUser.getRandomHeadingId();
+    const columnIdWithoutAccessForFirstUser = secondUser.getRandomColumnId();
 
-    const todo = Generator.Todo.getUnique(headingIdWithoutAccessForFirstUser);
-    const { body: { data: { todoId } } } = await request()
-      .post(`${routes.todo}/`)
+    const heading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);
+    const { body: { data: { headingId } } } = await request()
+      .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
-      .send(todo);
+      .send(heading);
 
-    const newTodo = Generator.Todo.getUnique(headingIdWithoutAccessForFirstUser);
+    const newHeading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);
     const res = await request()
-      .patch(`${routes.todo}/${todoId}`)
+      .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
-      .send(newTodo);
+      .send(newHeading);
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({

@@ -3,8 +3,8 @@ module.exports = {
     name: 'verticals',
     script: './src/index.js',
     exec_mode: 'cluster',
-    // instances: 1,
-    instances: 'max',
+    instances: 1,
+    // instances: 'max',
     node_args: '-r dotenv/config',
     env: {
       LOG_FILE_NAME: `app_${new Date().getTime()}`,

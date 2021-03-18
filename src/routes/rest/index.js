@@ -8,6 +8,7 @@ const { authRouter } = require('../../modules/auth/route');
 const { userRouter } = require('../../modules/user/route');
 const { boardRouter } = require('../../modules/board/route');
 const { columnRouter } = require('../../modules/column/route');
+const { headingRouter } = require('../../modules/heading/route');
 const { todoRouter } = require('../../modules/todo/route');
 const { commentRouter } = require('../../modules/comment/route');
 const { commentAttachmentRouter } = require('../../modules/comment-attachment/route');
@@ -25,6 +26,7 @@ module.exports = {
     fastify.register(authRouter, { prefix: '/api/v1/auth' });
     fastify.register(boardRouter, { prefix: '/api/v1/board' });
     fastify.register(columnRouter, { prefix: '/api/v1/column' });
+    fastify.register(headingRouter, { prefix: '/api/v1/heading' });
     fastify.register(todoRouter, { prefix: '/api/v1/todo' });
     fastify.register(commentRouter, { prefix: '/api/v1/comment' });
     fastify.register(commentAttachmentRouter, { prefix: '/api/v1/comment-attachment' });
