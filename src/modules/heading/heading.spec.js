@@ -655,6 +655,7 @@ describe('get all headings', () => {
     }));
 
     const { headings } = res.body.data;
+    // eslint-disable-next-line no-unused-vars
     const [{ id: headingIdDefault }, _, { id: headingIdCustom }] = headings.entities;
 
     expect(headings.entities).toEqual(

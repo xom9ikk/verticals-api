@@ -1,13 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 const {
   BoardAccessService,
-  ColumnService, HeadingService, TodoService,
+  ColumnService, HeadingService,
   ColumnPositionsService, HeadingPositionsService, TodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
 const { HeadingController } = require('../heading/controller');
-const { TodoController } = require('../todo/controller');
 const { HeadingType } = require('../../constants');
 
 class ColumnController {
@@ -110,6 +109,7 @@ class ColumnController {
 
     const columnPositions = await ColumnPositionsService.getPositionsByBoardIds(boardIdsWithAccess);
 
+    // eslint-disable-next-line no-shadow
     const normalizedPositions = columnPositions.reduce((acc, { boardId, order }) => ({
       ...acc,
       [boardId]: order,
@@ -189,8 +189,8 @@ class ColumnController {
     const headingPositions = await HeadingPositionsService.getPositions(columnId);
 
     const orderedHeadings = [];
-    headingPositions.forEach((id) => {
-      const targetHeading = headings.find((heading) => heading.id === id);
+    headingPositions.forEach((headingId) => {
+      const targetHeading = headings.find((heading) => heading.id === headingId);
       orderedHeadings.push(targetHeading);
     });
     const archivedHeading = await HeadingService.getArchivedByColumnId(columnId);

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 const {
   HeadingService, BoardAccessService, HeadingPositionsService, TodoPositionsService, TodoService,
 } = require('../../services');
@@ -213,6 +214,7 @@ class HeadingController {
 
     if (!newHeadingId) {
       const data = await this.create(userId, { belowId: headingId, ...headingToDuplicate });
+      // eslint-disable-next-line no-param-reassign
       newHeadingId = data.headingId;
     }
 
@@ -220,8 +222,8 @@ class HeadingController {
     const todoPositions = await TodoPositionsService.getPositions(headingId);
 
     const orderedTodos = [];
-    todoPositions.forEach((id) => {
-      const targetTodo = todos.find((todo) => todo.id === id);
+    todoPositions.forEach((todoId) => {
+      const targetTodo = todos.find((todo) => todo.id === todoId);
       orderedTodos.push(targetTodo);
     });
 

@@ -35,7 +35,8 @@ class Metrics {
     promClient.collectDefaultMetrics({ timeout: METRICS_TIMEOUT });
     app.get(METRICS_ROUTE, pm2Cluster);
     app.listen(METRICS_PORT, METRICS_HOST, () => {
-      logger.info(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE} on worker ${NODE_APP_INSTANCE}`);
+      logger.info(`Metrics server has been started on ${METRICS_HOST}:${METRICS_PORT}${METRICS_ROUTE}`
+        + ` on worker ${NODE_APP_INSTANCE}`);
     });
   }
 }
