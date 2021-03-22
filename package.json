@@ -6,7 +6,7 @@
   "scripts": {
     "knex": "knex",
     "start": "node ./src/index.js",
-    "dev": "pm2 start --node-args '-r dotenv/config' --no-daemon --env development",
+    "dev": "concurrently \"pm2 start --node-args '-r dotenv/config' --no-daemon --env development\" \"npx serve uploads\"",
     "lint": "eslint --ext .js ./src",
     "lint:fix": "eslint --ext .js ./src --fix",
     "test": "jest --config ./jest.config.js",
@@ -56,6 +56,7 @@
     "@stryker-mutator/core": "^4.5.0",
     "@stryker-mutator/jest-runner": "^4.5.0",
     "babel-eslint": "^10.1.0",
+    "concurrently": "^6.0.0",
     "cz-conventional-changelog": "^3.2.0",
     "eslint": "^7.4.0",
     "eslint-config-airbnb-base": "^14.2.0",

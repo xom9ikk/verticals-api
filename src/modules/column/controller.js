@@ -161,11 +161,7 @@ class ColumnController {
       }
     }
 
-    const updatedColumn = await ColumnService.update(columnId, patch);
-
-    if (updatedColumn === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this column');
-    }
+    await ColumnService.update(columnId, patch);
 
     return true;
   }

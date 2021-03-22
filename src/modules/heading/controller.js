@@ -192,11 +192,7 @@ class HeadingController {
       }
     }
 
-    const updatedHeading = await HeadingService.update(headingId, patch);
-
-    if (updatedHeading === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this heading');
-    }
+    await HeadingService.update(headingId, patch);
 
     return true;
   }

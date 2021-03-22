@@ -201,11 +201,7 @@ class TodoController {
       }
     }
 
-    const updatedTodo = await TodoService.update(todoId, patch);
-
-    if (updatedTodo === undefined) {
-      throw new BackendError.Forbidden('This account is not allowed to edit this todo');
-    }
+    await TodoService.update(todoId, patch);
 
     return true;
   }
