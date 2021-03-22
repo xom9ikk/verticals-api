@@ -41,10 +41,14 @@ class TodoService extends Database {
       ])
       .countDistinct('comments.id', { as: 'commentsCount' })
       .sum({
-        imagesCount: knex.raw('case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
-        attachmentsCount: knex.raw('case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
+        imagesCount: knex.raw(
+          'case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
+        attachmentsCount: knex.raw(
+          'case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
       })
       .leftJoin('comments', 'comments.todoId', 'todos.id')
       .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
@@ -80,10 +84,14 @@ class TodoService extends Database {
       ])
       .countDistinct('comments.id', { as: 'commentsCount' })
       .sum({
-        imagesCount: knex.raw('case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
-        attachmentsCount: knex.raw('case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
+        imagesCount: knex.raw(
+          'case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
+        attachmentsCount: knex.raw(
+          'case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
       })
       .leftJoin('comments', 'comments.todoId', 'todos.id')
       .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
@@ -140,10 +148,14 @@ class TodoService extends Database {
       ])
       .countDistinct('comments.id', { as: 'commentsCount' })
       .sum({
-        imagesCount: knex.raw('case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
-        attachmentsCount: knex.raw('case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
-          ['image/jpeg', 'image/png']),
+        imagesCount: knex.raw(
+          'case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
+        attachmentsCount: knex.raw(
+          'case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
+          ['image/jpeg', 'image/png'],
+        ),
       })
       .leftJoin('comments', 'comments.todoId', 'todos.id')
       .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')

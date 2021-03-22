@@ -12,7 +12,13 @@ class RoutesHandler {
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
     res.header(
       'Access-Control-Allow-Headers',
-      'access-control-allow-credentials,access-control-allow-headers,access-control-allow-methods,access-control-allow-origin,content-type,authorization,accept',
+      'access-control-allow-credentials,'
+      + 'access-control-allow-headers,'
+      + 'access-control-allow-methods,'
+      + 'access-control-allow-origin,'
+      + 'content-type,'
+      + 'authorization,'
+      + 'accept',
     );
   }
 
