@@ -10,6 +10,7 @@ const { BoardSchema } = require('../modules/board/schemas');
 const { ColumnSchema } = require('../modules/column/schemas');
 const { HeadingSchema } = require('../modules/heading/schemas');
 const { TodoSchema } = require('../modules/todo/schemas');
+const { SubTodoSchema } = require('../modules/sub-todo/schemas');
 const { CommentSchema } = require('../modules/comment/schemas');
 const { CommentAttachmentSchema } = require('../modules/comment-attachment/schemas');
 const { CommentLikeSchema } = require('../modules/comment-like/schemas');
@@ -29,6 +30,7 @@ class SchemaValidator {
     Object.keys(ColumnSchema).map((key) => this.ajv.addSchema(ColumnSchema[key], key));
     Object.keys(HeadingSchema).map((key) => this.ajv.addSchema(HeadingSchema[key], key));
     Object.keys(TodoSchema).map((key) => this.ajv.addSchema(TodoSchema[key], key));
+    Object.keys(SubTodoSchema).map((key) => this.ajv.addSchema(SubTodoSchema[key], key));
     Object.keys(CommentSchema).map((key) => this.ajv.addSchema(CommentSchema[key], key));
     Object.keys(CommentAttachmentSchema).map((key) => this.ajv.addSchema(CommentAttachmentSchema[key], key));
     Object.keys(CommentLikeSchema).map((key) => this.ajv.addSchema(CommentLikeSchema[key], key));

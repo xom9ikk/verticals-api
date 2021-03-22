@@ -5,6 +5,7 @@ const { Board } = require('./entities/board');
 const { Column } = require('./entities/column');
 const { Heading } = require('./entities/heading');
 const { Todo } = require('./entities/todo');
+const { SubTodo } = require('./entities/sub-todo');
 const { routes } = require('../routes');
 
 class Helper {
@@ -157,15 +158,57 @@ class Helper {
           todoId,
         });
       }
+      let subtodos = [];
+      if (todo.subtodos) {
+        subtodos = await this.createSubTodos({
+          token,
+          subtodos: todo.subtodos,
+          todoId,
+        });
+      }
       resTodos.push(new Todo(
         todoId,
         headingId,
+        subtodos,
         comments,
       ));
     }
     return resTodos;
   }
 
+  async createSubTodos({
+    token, subTodos, todoId,
+  }) {
+    const resSubTodos = [];
+    for await (const subTodo of subTodos) {
+      const subTodoData = Generator.SubTodo.getUnique(todoId);
+      const mergedData = this._mergeObject(subTodoData, subTodo);
+      const res = await this._post(`${routes.subTodo}/`, mergedData, token);
+      if (res.statusCode !== 201) {
+        this._logError('createSubTodos', res);
+        return this.createSubTodos({
+          token, subTodos, todoId,
+        });
+      }
+      const { subTodoId } = res.body.data;
+      let comments = [];
+      if (subTodo.comments) {
+        comments = await this.createComments({
+          token,
+          comments: subTodo.comments,
+          subTodoId,
+        });
+      }
+      resSubTodos.push(new SubTodo(
+        subTodoId,
+        todoId,
+        comments,
+      ));
+    }
+    return resSubTodos;
+  }
+
+  // TODO: subtodo
   async createComments({
     token, comments, todoId,
   }) {

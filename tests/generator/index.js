@@ -4,6 +4,7 @@ const { BoardDataGenerator } = require('./board');
 const { ColumnDataGenerator } = require('./column');
 const { HeadingDataGenerator } = require('./heading');
 const { TodoDataGenerator } = require('./todo');
+const { SubTodoDataGenerator } = require('./sub-todo');
 const { CommentDataGenerator } = require('./comment');
 
 module.exports = {
@@ -14,6 +15,7 @@ module.exports = {
     Column: ColumnDataGenerator,
     Heading: HeadingDataGenerator,
     Todo: TodoDataGenerator,
+    SubTodo: SubTodoDataGenerator,
     Comment: CommentDataGenerator,
   },
 };

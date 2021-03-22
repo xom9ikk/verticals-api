@@ -27,50 +27,7 @@ class TodoService extends Database {
       .first();
   }
 
-  async getByHeadingId(headingId) {
-    const response = await this.todos
-      .select([
-        'todos.id',
-        'headingId',
-        'title',
-        'description',
-        'status',
-        'color',
-        'isNotificationsEnabled',
-        'expirationDate',
-      ])
-      .countDistinct('comments.id', { as: 'commentsCount' })
-      .sum({
-        imagesCount: knex.raw(
-          'case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
-          ['image/jpeg', 'image/png'],
-        ),
-        attachmentsCount: knex.raw(
-          'case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
-          ['image/jpeg', 'image/png'],
-        ),
-      })
-      .leftJoin('comments', 'comments.todoId', 'todos.id')
-      .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
-      .where({
-        headingId,
-      })
-      .groupBy('todos.id');
-    return response.map((todo) => ({
-      ...todo,
-      commentsCount: parseInt(todo.commentsCount),
-      imagesCount: parseInt(todo.imagesCount),
-      attachmentsCount: parseInt(todo.attachmentsCount),
-    }));
-  }
-
-  async getByColumnId(columnId) {
-    const getHeadingIds = this.headings
-      .select([
-        'id',
-      ])
-      .whereNot({ type: HeadingType.removed })
-      .andWhere({ columnId });
+  async getTodosWithCounters(headingIds) {
     const response = await this.todos
       .select([
         'todos.id',
@@ -97,7 +54,7 @@ class TodoService extends Database {
       .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
       .whereIn(
         'headingId',
-        getHeadingIds,
+        headingIds,
       )
       .groupBy('todos.id');
     return response.map((todo) => ({
@@ -106,6 +63,20 @@ class TodoService extends Database {
       imagesCount: parseInt(todo.imagesCount),
       attachmentsCount: parseInt(todo.attachmentsCount),
     }));
+  }
+
+  async getByHeadingId(headingId) {
+    return this.getTodosWithCounters([headingId]);
+  }
+
+  async getByColumnId(columnId) {
+    const getHeadingIds = this.headings
+      .select([
+        'id',
+      ])
+      .whereNot({ type: HeadingType.removed })
+      .andWhere({ columnId });
+    return this.getTodosWithCounters(getHeadingIds);
   }
 
   async getByBoardIds(boardIds, isRemoved = false) {
@@ -135,41 +106,8 @@ class TodoService extends Database {
         getColumnIds,
       )
       .andWhereNot({ type: HeadingType.removed });
-    const response = await this.todos
-      .select([
-        'todos.id',
-        'headingId',
-        'title',
-        'description',
-        'status',
-        'color',
-        'isNotificationsEnabled',
-        'expirationDate',
-      ])
-      .countDistinct('comments.id', { as: 'commentsCount' })
-      .sum({
-        imagesCount: knex.raw(
-          'case when comment_files.mime_type = ? or comment_files.mime_type = ? then 1 else 0 end',
-          ['image/jpeg', 'image/png'],
-        ),
-        attachmentsCount: knex.raw(
-          'case when comment_files.mime_type != ? and comment_files.mime_type != ? then 1 else 0 end',
-          ['image/jpeg', 'image/png'],
-        ),
-      })
-      .leftJoin('comments', 'comments.todoId', 'todos.id')
-      .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
-      .whereIn(
-        'headingId',
-        isRemoved ? getHeadingIdsRemoved : getHeadingIdsNotRemoved,
-      )
-      .groupBy('todos.id');
-    return response.map((todo) => ({
-      ...todo,
-      commentsCount: parseInt(todo.commentsCount),
-      imagesCount: parseInt(todo.imagesCount),
-      attachmentsCount: parseInt(todo.attachmentsCount),
-    }));
+    const getHeadingIds = isRemoved ? getHeadingIdsRemoved : getHeadingIdsNotRemoved;
+    return this.getTodosWithCounters(getHeadingIds);
   }
 
   getRemovedByBoardIds(boardIds) {

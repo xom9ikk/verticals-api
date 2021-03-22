@@ -65,6 +65,23 @@ exports.up = async (knex) => {
   `);
 
   await knex.raw(`
+    CREATE FUNCTION get_user_ids_by_sub_todo_id(integer)
+      RETURNS integer[] AS
+    $$
+    DECLARE
+        todoId integer;
+    BEGIN
+        todoId := (SELECT todo_id
+                    FROM sub_todos
+                    WHERE id = $1
+                    LIMIT 1);
+        RETURN get_user_ids_by_todo_id(todoId);
+    END;
+    $$ LANGUAGE plpgsql;
+  `);
+
+  // TODO: subtodo
+  await knex.raw(`
     CREATE FUNCTION get_user_ids_by_comment_id(integer)
       RETURNS integer[] AS
     $$
@@ -102,6 +119,7 @@ exports.down = async (knex) => {
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_column_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_heading_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_todo_id;');
+  await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_sub_todo_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_comment_id;');
   await knex.raw('DROP FUNCTION IF EXISTS get_user_ids_by_comment_file_id;');
 };

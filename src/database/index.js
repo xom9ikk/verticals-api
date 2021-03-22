@@ -29,6 +29,10 @@ class Database {
     return knex(tables.todos);
   }
 
+  get subTodos() {
+    return knex(tables.subTodos);
+  }
+
   get comments() {
     return knex(tables.comments);
   }
@@ -51,6 +55,10 @@ class Database {
 
   get todoPositions() {
     return knex(tables.todoPositions);
+  }
+
+  get subTodoPositions() {
+    return knex(tables.subTodoPositions);
   }
 
   get commentLikes() {

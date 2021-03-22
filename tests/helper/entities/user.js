@@ -111,6 +111,37 @@ class User {
     return todoIds;
   }
 
+  getRandomSubTodo() {
+    return this.getRandomBoard().getRandomColumn().getRandomHeading().getRandomTodo()
+      .getRandomSubTodo();
+  }
+
+  getRandomSubTodoId() {
+    return this.getRandomSubTodo().id;
+  }
+
+  // -
+  getRandomSubTodoIdFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo()
+      .getRandomSubTodo().id;
+  }
+
+  getSubTodoIds() {
+    const subTodoIds = [];
+    this.boards.forEach((board) => {
+      board.columns.forEach((column) => {
+        column.headings.forEach((heading) => {
+          heading.todos.forEach((todo) => {
+            todo.subTodos.forEach((subTodo) => {
+              subTodoIds.push(subTodo.id);
+            });
+          });
+        });
+      });
+    });
+    return subTodoIds;
+  }
+
   getRandomComment() {
     return this.getRandomBoard().getRandomColumn().getRandomHeading().getRandomTodo()
       .getRandomComment();
