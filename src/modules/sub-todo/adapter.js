@@ -23,9 +23,9 @@ class SubTodoAdapter {
     const { userId } = req;
     const { boardId, columnId } = req.query;
 
-    const todos = await SubTodoController.getAll(userId, boardId, columnId);
+    const subTodos = await SubTodoController.getAll(userId, boardId, columnId);
 
-    return BackendResponse.Success(res, 'Subtodos information successfully received', { todos });
+    return BackendResponse.Success(res, 'Subtodos information successfully received', { subTodos });
   }
 
   async updatePosition(req, res) {
@@ -62,9 +62,9 @@ class SubTodoAdapter {
     const { userId } = req;
     const { subTodoId } = req.body;
 
-    const todo = await SubTodoController.duplicate({ userId, subTodoId });
+    const subTodo = await SubTodoController.duplicate({ userId, subTodoId });
 
-    return BackendResponse.Success(res, 'Subtodo successfully duplicated', todo);
+    return BackendResponse.Success(res, 'Subtodo successfully duplicated', subTodo);
   }
 
   async remove(req, res) {

@@ -6,6 +6,10 @@ class CommentSchema {
         type: 'integer',
         minimum: 1,
       },
+      subTodoId: {
+        type: 'integer',
+        minimum: 1,
+      },
       text: {
         type: 'string',
         minLength: 0,
@@ -16,7 +20,10 @@ class CommentSchema {
         minimum: 1,
       },
     },
-    required: ['todoId'],
+    anyOf: [
+      { required: ['todoId'] },
+      { required: ['subTodoId'] },
+    ],
   }
 
   getComment = {

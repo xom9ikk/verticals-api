@@ -1,5 +1,5 @@
 const {
-  TodoService, HeadingService, BoardAccessService, TodoPositionsService,
+  TodoService, HeadingService, BoardAccessService, TodoPositionsService, SubTodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
@@ -31,6 +31,7 @@ class TodoController {
     } = PositionComponent.insert(todoPositions, todoId, belowId);
 
     await TodoPositionsService.updatePositions(headingId, newPositions);
+    await SubTodoPositionsService.create(todoId, []);
 
     return { todoId, position: newPosition };
   }

@@ -1,5 +1,5 @@
 const { Database } = require('../database');
-const { TodoType } = require('../constants');
+const { HeadingType } = require('../constants');
 
 class SubTodoService extends Database {
   async create(subTodo) {
@@ -31,7 +31,7 @@ class SubTodoService extends Database {
     const response = await this.subTodos
       .select([
         'subTodos.id',
-        'todoId',
+        'subTodos.todoId',
         'title',
         'description',
         'status',
@@ -53,7 +53,7 @@ class SubTodoService extends Database {
       .leftJoin('comments', 'comments.subTodoId', 'subTodos.id')
       .leftJoin('commentFiles', 'commentFiles.commentId', 'comments.id')
       .whereIn(
-        'todoId',
+        'subTodos.todoId',
         todoIds,
       )
       .groupBy('subTodos.id');
@@ -70,12 +70,20 @@ class SubTodoService extends Database {
   }
 
   getByColumnId(columnId) {
+    const getHeadingIds = this.headings
+      .select([
+        'id',
+      ])
+      .whereNot({ type: HeadingType.removed })
+      .andWhere({ columnId });
     const getTodoIds = this.todos
       .select([
         'id',
       ])
-      .whereNot({ type: TodoType.removed })
-      .andWhere({ columnId });
+      .whereIn(
+        'headingId',
+        getHeadingIds,
+      );
     return this.getSubTodosWithCounters(getTodoIds);
   }
 
@@ -88,13 +96,22 @@ class SubTodoService extends Database {
         'boardId',
         boardIds,
       );
-    const getTodoIds = this.todos
+    const getHeadingIds = this.headings
       .select([
         'id',
       ])
       .whereIn(
         'columnId',
         getColumnIds,
+      )
+      .andWhereNot({ type: HeadingType.removed });
+    const getTodoIds = this.todos
+      .select([
+        'id',
+      ])
+      .whereIn(
+        'headingId',
+        getHeadingIds,
       );
     return this.getSubTodosWithCounters(getTodoIds);
   }

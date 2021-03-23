@@ -792,7 +792,15 @@ describe('get all subTodos', () => {
     const todoIdFromSecondBoard = firstUser.getRandomTodoIdFromBoard(secondBoardId);
     const columnFromFirstBoard = firstUser.getRandomColumnFromBoard(firstBoardId);
     const columnIdFromFirstBoard = columnFromFirstBoard.id;
-    const todoIdFromFirstBoard = columnFromFirstBoard.getRandomTodoId();
+    const headingIdFromFirstBoard = columnFromFirstBoard.getRandomHeadingId();
+
+    const todo = Generator.Todo.getUnique(headingIdFromFirstBoard);
+    const response = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(todo);
+
+    const todoIdFromFirstBoard = response.body.data.todoId;
 
     await helper.createUser(defaultUser);
 

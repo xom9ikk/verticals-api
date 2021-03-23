@@ -19,7 +19,7 @@ exports.up = async (knex) => {
       THEN
           object := OLD;
       END IF;
-      userIds := get_user_ids_by_todo_id(object.heading_id);
+      userIds := get_user_ids_by_todo_id(object.todo_id);
       PERFORM pg_notify('${triggers.subTodoPositionChange}', json_build_object(
               'userIds', userIds,
               'object', row_to_json(object),

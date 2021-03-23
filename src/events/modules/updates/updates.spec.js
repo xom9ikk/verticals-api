@@ -806,6 +806,7 @@ describe('comment', () => {
               data: {
                 id: expect.any(Number),
                 ...comment,
+                subTodoId: null,
                 replyCommentId: null,
               },
             }),
@@ -842,6 +843,7 @@ describe('comment', () => {
               data: {
                 id: expect.any(Number),
                 ...newComment,
+                subTodoId: null,
                 replyCommentId: null,
               },
             }),
