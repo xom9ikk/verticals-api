@@ -21,7 +21,7 @@ class Helper {
     const userData = Generator.User.getUnique();
     const res = await this._post(`${routes.auth}/register`, userData);
 
-    if (res.statusCode === 409) {
+    if (res.statusCode !== 201) {
       this._logError('createUser', res);
       return this.createUser(config);
     }

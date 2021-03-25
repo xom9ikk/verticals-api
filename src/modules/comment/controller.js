@@ -3,8 +3,13 @@ const { BackendError, TransformerComponent } = require('../../components');
 
 class CommentController {
   async create({ userId, comment }) {
-    const { todoId } = comment;
-    const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
+    const { todoId, subTodoId } = comment;
+    let isAccess;
+    if (todoId) {
+      isAccess = await BoardAccessService.getByTodoId(userId, todoId);
+    } else {
+      isAccess = await BoardAccessService.getBySubTodoId(userId, subTodoId);
+    }
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to create comment for this todo');

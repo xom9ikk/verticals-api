@@ -8,9 +8,11 @@ const { PositionComponent } = require('../../components');
 class SubTodoController {
   async create(userId, { belowId, ...subTodo }) {
     if (belowId) {
-      const isAccessToBelowSubTodoId = await BoardAccessService.getBySubTodoId(userId, belowId);
-      if (!isAccessToBelowSubTodoId) {
-        throw new BackendError.Forbidden('This account is not allowed to create subtodo below this subtodo');
+      if (belowId !== -1) {
+        const isAccessToBelowSubTodoId = await BoardAccessService.getBySubTodoId(userId, belowId);
+        if (!isAccessToBelowSubTodoId) {
+          throw new BackendError.Forbidden('This account is not allowed to create subtodo below this subtodo');
+        }
       }
     }
 
@@ -24,10 +26,17 @@ class SubTodoController {
     const subTodoId = await SubTodoService.create(subTodo);
     const subTodoPositions = await SubTodoPositionsService.getPositions(todoId);
 
-    const {
-      newPosition,
-      newPositions,
-    } = PositionComponent.insert(subTodoPositions, subTodoId, belowId);
+    let newPosition; let
+      newPositions;
+
+    if (belowId === -1) {
+      newPosition = 0;
+      newPositions = [subTodoId, ...subTodoPositions];
+    } else {
+      const moveResult = PositionComponent.insert(subTodoPositions, subTodoId, belowId);
+      newPosition = moveResult.newPosition;
+      newPositions = moveResult.newPositions;
+    }
 
     await SubTodoPositionsService.updatePositions(todoId, newPositions);
 

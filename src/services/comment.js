@@ -191,6 +191,17 @@ class CommentService extends Database {
       .first();
   }
 
+  getSubTodoIdSubQuery(id) {
+    return this.comments
+      .select([
+        'subTodoId',
+      ])
+      .where({
+        id,
+      })
+      .first();
+  }
+
   async getTodoId(id) {
     const res = await this.getTodoIdSubQuery(id);
     return res.todoId;
