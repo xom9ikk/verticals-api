@@ -49,6 +49,9 @@ class CommentSchema {
       todoId: {
         type: 'integer',
       },
+      subTodoId: {
+        type: 'integer',
+      },
     },
   }
 

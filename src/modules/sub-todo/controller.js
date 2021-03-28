@@ -127,6 +127,7 @@ class SubTodoController {
     userId, todoId, sourcePosition, destinationPosition, targetTodoId,
   }) {
     const isAccessToSourceTodo = await BoardAccessService.getByTodoId(userId, todoId);
+    console.log('======updatePosition', userId, todoId, sourcePosition, destinationPosition, targetTodoId);
 
     if (!isAccessToSourceTodo) {
       throw new BackendError.Forbidden('This account does not have access to source todo');
@@ -197,19 +198,29 @@ class SubTodoController {
     return true;
   }
 
-  async duplicate({ userId, subTodoId }) {
+  async duplicate({ userId, subTodoId, newTodoId }) {
     const isAccess = await BoardAccessService.getBySubTodoId(userId, subTodoId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to duplicate this subtodo');
     }
 
-    const { id, ...subTodoToDuplicate } = await SubTodoService.getById(subTodoId);
+    const { id, expirationDate, ...subTodoToDuplicate } = await SubTodoService.getById(subTodoId);
+
+    const dataForCreate = newTodoId !== undefined ? {
+      ...subTodoToDuplicate,
+      expirationDate: new Date(expirationDate),
+      todoId: newTodoId,
+    } : {
+      ...subTodoToDuplicate,
+      expirationDate: new Date(expirationDate),
+      belowId: subTodoId,
+    };
 
     const {
       subTodoId: newSubTodoId,
       position,
-    } = await this.create(userId, { belowId: subTodoId, ...subTodoToDuplicate });
+    } = await this.create(userId, dataForCreate);
 
     return {
       ...subTodoToDuplicate,

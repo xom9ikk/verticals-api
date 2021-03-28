@@ -484,6 +484,7 @@ describe('upload attachment', () => {
       data: expect.objectContaining({
         attachments: [{
           ...resAttach.body.data,
+          subTodoId: null,
         }],
       }),
     }));

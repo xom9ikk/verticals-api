@@ -31,7 +31,7 @@ class SubTodoAdapter {
   async updatePosition(req, res) {
     const { userId } = req;
     const {
-      todoId, sourcePosition, destinationPosition, targetHeadingId,
+      todoId, sourcePosition, destinationPosition, targetTodoId,
     } = req.body;
 
     await SubTodoController.updatePosition({
@@ -39,7 +39,7 @@ class SubTodoAdapter {
       todoId,
       sourcePosition,
       destinationPosition,
-      targetHeadingId,
+      targetTodoId,
     });
 
     return BackendResponse.Success(res, 'Subtodo position successfully updated');

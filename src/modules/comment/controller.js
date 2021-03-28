@@ -31,7 +31,7 @@ class CommentController {
   }
 
   async getAll({
-    userId, boardId, columnId, todoId,
+    userId, boardId, columnId, todoId, subTodoId,
   }) {
     let boardIdsWithAccess;
 
@@ -50,7 +50,13 @@ class CommentController {
     }
 
     let comments;
-    if (todoId) {
+    if (subTodoId) {
+      const isAccessToSubTodo = await BoardAccessService.getBySubTodoId(userId, subTodoId);
+      if (!isAccessToSubTodo) {
+        throw new BackendError.Forbidden('This account is not allowed to receive comments for this subtodo');
+      }
+      comments = await CommentService.getBySubTodoId(subTodoId);
+    } else if (todoId) {
       const isAccessToTodo = await BoardAccessService.getByTodoId(userId, todoId);
       if (!isAccessToTodo) {
         throw new BackendError.Forbidden('This account is not allowed to receive comments for this todo');

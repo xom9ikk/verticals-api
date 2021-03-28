@@ -11,9 +11,11 @@ class CommentAttachmentAdapter {
 
   async getAll(req, res) {
     const { userId } = req;
-    const { boardId, columnId, todoId } = req.query;
+    const {
+      boardId, columnId, todoId, subTodoId,
+    } = req.query;
     const attachments = await CommentAttachmentController.getAll({
-      userId, boardId, columnId, todoId,
+      userId, boardId, columnId, todoId, subTodoId,
     });
     return BackendResponse.Success(res, 'Attachments successfully received', { attachments });
   }

@@ -17,9 +17,11 @@ class CommentAdapter {
 
   async getAll(req, res) {
     const { userId } = req;
-    const { boardId, columnId, todoId } = req.query;
+    const {
+      boardId, columnId, todoId, subTodoId,
+    } = req.query;
     const comments = await CommentController.getAll({
-      userId, boardId, columnId, todoId,
+      userId, boardId, columnId, todoId, subTodoId,
     });
     return BackendResponse.Success(res, 'Comments information successfully received', { comments });
   }

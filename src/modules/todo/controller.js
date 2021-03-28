@@ -1,9 +1,11 @@
+/* eslint-disable no-restricted-syntax */
 const {
   TodoService, HeadingService, BoardAccessService, TodoPositionsService, SubTodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
 const { HeadingType } = require('../../constants');
+const { SubTodoController } = require('../sub-todo/controller');
 
 class TodoController {
   async create(userId, { belowId, ...todo }) {
@@ -23,6 +25,7 @@ class TodoController {
     }
 
     const todoId = await TodoService.create(todo);
+
     const todoPositions = await TodoPositionsService.getPositions(headingId);
 
     const {
@@ -208,19 +211,39 @@ class TodoController {
   }
 
   // TODO: write tests
-  async duplicate({ userId, todoId }) {
+  async duplicate({ userId, todoId, newHeadingId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
     if (!isAccess) {
       throw new BackendError.Forbidden('This account is not allowed to duplicate this todo');
     }
 
-    const { id, ...todoToDuplicate } = await TodoService.getById(todoId);
+    const { id, expirationDate, ...todoToDuplicate } = await TodoService.getById(todoId);
+
+    const dataForCreate = newHeadingId !== undefined ? {
+      ...todoToDuplicate,
+      expirationDate: new Date(expirationDate),
+      headingId: newHeadingId,
+    } : {
+      ...todoToDuplicate,
+      expirationDate: new Date(expirationDate),
+      belowId: todoId,
+    };
 
     const {
       todoId: newTodoId,
       position,
-    } = await this.create(userId, { belowId: todoId, ...todoToDuplicate });
+    } = await this.create(userId, dataForCreate);
+
+    const subTodoPositions = await SubTodoPositionsService.getPositions(todoId);
+
+    for await (const subTodoId of subTodoPositions) {
+      await SubTodoController.duplicate({
+        userId,
+        subTodoId,
+        newTodoId,
+      });
+    }
 
     return {
       ...todoToDuplicate,

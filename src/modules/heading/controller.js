@@ -214,29 +214,15 @@ class HeadingController {
       newHeadingId = data.headingId;
     }
 
-    const todos = await TodoService.getByHeadingId(headingId);
     const todoPositions = await TodoPositionsService.getPositions(headingId);
 
-    const orderedTodos = [];
-    todoPositions.forEach((todoId) => {
-      const targetTodo = todos.find((todo) => todo.id === todoId);
-      orderedTodos.push(targetTodo);
-    });
-
-    const todosToDuplicate = orderedTodos.map((todo) => {
-      const newTodo = { ...todo, headingId: newHeadingId };
-      delete newTodo.id;
-      delete newTodo.commentsCount;
-      delete newTodo.imagesCount;
-      delete newTodo.attachmentsCount;
-      return newTodo;
-    });
-
-    for await (const todo of todosToDuplicate) {
-      await TodoController.create(userId, todo);
+    for await (const todoId of todoPositions) {
+      await TodoController.duplicate({
+        userId,
+        todoId,
+        newHeadingId,
+      });
     }
-
-    // const duplicatedTodos = await TodoController.getAll(userId, undefined, newHeadingId);
 
     return {
       ...headingToDuplicate,

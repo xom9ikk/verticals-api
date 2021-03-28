@@ -61,11 +61,24 @@ class CommentService extends Database {
       .first();
   }
 
+  getBySubTodoId(subTodoId) {
+    return this.getWhere({
+      subTodoId,
+    });
+  }
+
   getByTodoId(todoId) {
+    return this.getWhere({
+      todoId,
+    });
+  }
+
+  getWhere(where) {
     return this.comments
       .select([
         'comments.id',
         'comments.todoId',
+        'comments.subTodoId',
         'comments.text',
         'comments.replyCommentId',
         'comments.updatedAt',
@@ -77,9 +90,7 @@ class CommentService extends Database {
           + '\'surname\', users.surname'
           + ')) FILTER (WHERE users.id IS NOT NULL), \'[]\') AS liked_users'),
       ])
-      .where({
-        todoId,
-      })
+      .where(where)
       .leftJoin('commentLikes', 'commentLikes.commentId', 'comments.id')
       .leftJoin('users', 'users.id', 'commentLikes.userId')
       .groupBy('comments.id')

@@ -22,6 +22,9 @@ class CommentAttachmentSchema {
       todoId: {
         type: 'integer',
       },
+      subTodoId: {
+        type: 'integer',
+      },
     },
   }
 

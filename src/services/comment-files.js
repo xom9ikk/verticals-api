@@ -26,10 +26,32 @@ class CommentFilesService extends Database {
       .first();
   }
 
+  getBySubTodoId(subTodoId) {
+    return this.comments
+      .select([
+        'comments.todoId',
+        'comments.subTodoId',
+        'commentFiles.id',
+        'commentFiles.commentId',
+        'commentFiles.path',
+        'commentFiles.name',
+        'commentFiles.extension',
+        'commentFiles.size',
+        'commentFiles.mimeType',
+        'commentFiles.encoding',
+      ])
+      .rightJoin('commentFiles', 'commentFiles.comment_id', 'comments.id')
+      .where({
+        subTodoId,
+      })
+      .orderBy('comments.createdAt');
+  }
+
   getByTodoId(todoId) {
     return this.comments
       .select([
         'comments.todoId',
+        'comments.subTodoId',
         'commentFiles.id',
         'commentFiles.commentId',
         'commentFiles.path',
@@ -66,6 +88,7 @@ class CommentFilesService extends Database {
     return this.comments
       .select([
         'comments.todoId',
+        'comments.subTodoId',
         'commentFiles.id',
         'commentFiles.commentId',
         'commentFiles.path',
@@ -114,6 +137,7 @@ class CommentFilesService extends Database {
     return this.comments
       .select([
         'comments.todoId',
+        'comments.subTodoId',
         'commentFiles.id',
         'commentFiles.commentId',
         'commentFiles.path',
