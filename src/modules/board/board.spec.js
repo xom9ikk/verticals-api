@@ -337,7 +337,6 @@ describe('create', () => {
 
     done();
   });
-
   it('user can\'t create board with belowId without access', async (done) => {
     const { token: firstUserToken } = await helper.createUser();
     const { token: secondUserToken } = await helper.createUser();
@@ -354,7 +353,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${firstUserToken}`)
       .send(secondBoard);
 
-    const firstBoardId = firstRes.body.data.boardId;
+    const firstBoardIdWithoutAccess = firstRes.body.data.boardId;
 
     const thirdBoard = Generator.Board.getUnique();
     const thirdRes = await request()
@@ -362,7 +361,7 @@ describe('create', () => {
       .set('authorization', `Bearer ${secondUserToken}`)
       .send({
         ...thirdBoard,
-        belowId: firstBoardId,
+        belowId: firstBoardIdWithoutAccess,
       });
 
     expect(thirdRes.statusCode).toEqual(403);

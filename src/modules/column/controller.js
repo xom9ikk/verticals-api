@@ -11,7 +11,6 @@ const { HeadingType } = require('../../constants');
 
 class ColumnController {
   async create(userId, { belowId, ...column }) {
-    // TODO: write tests with belowId
     if (belowId) {
       const isAccessToBelowColumnId = await BoardAccessService.getByColumnId(userId, belowId);
       if (!isAccessToBelowColumnId) {
@@ -92,7 +91,10 @@ class ColumnController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any baords');
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     const columns = await ColumnService.getByBoardIds(boardIdsWithAccess);
@@ -121,7 +123,6 @@ class ColumnController {
     };
   }
 
-  // TODO: write tests for updatePosition
   async updatePosition({
     userId, boardId, sourcePosition, destinationPosition,
   }) {
@@ -166,7 +167,6 @@ class ColumnController {
     return true;
   }
 
-  // TODO: write tests
   async duplicate({ userId, columnId }) {
     const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
 
@@ -223,17 +223,13 @@ class ColumnController {
       });
     }
 
-    // const duplicatedHeadings = await HeadingController.getAll(userId, undefined, newColumnId);
-
     return {
       ...columnToDuplicate,
       columnId: newColumnId,
       position,
-      // headings: duplicatedHeadings,
     };
   }
 
-  // TODO: write tests for reverseOrder
   async reverseOrder({ userId, boardId }) {
     const isAccess = await BoardAccessService.getByBoardId(userId, boardId);
 
