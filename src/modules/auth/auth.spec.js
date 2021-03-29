@@ -355,6 +355,29 @@ describe('login', () => {
 
     done();
   });
+  it('user can\'t login with wrong email', async (done) => {
+    const user = Generator.User.getUnique();
+    const wrongEmail = Generator.User.getUnique().email;
+    await request()
+      .post(`${routes.auth}/register`)
+      .send({
+        password: user.password,
+      });
+    const res = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: wrongEmail,
+        password: user.password,
+      });
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
   it('user can\'t login only with email without password', async (done) => {
     const user = Generator.User.getUnique();
     await request()

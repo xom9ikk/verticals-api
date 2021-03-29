@@ -91,10 +91,7 @@ class AuthController {
   }
 
   async logout({ token }) {
-    const removeTokenPair = await TokenService.removeByToken(token);
-    if (!removeTokenPair) {
-      throw new BackendError.NotFound(`Logout failed. Token ${token} not found`);
-    }
+    await TokenService.removeByToken(token);
     return true;
   }
 

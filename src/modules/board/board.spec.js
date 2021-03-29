@@ -105,6 +105,46 @@ describe('create', () => {
 
     done();
   });
+  it('user can successfully create board with belowId', async (done) => {
+    const { token } = await helper.createUser();
+
+    const firstBoard = Generator.Board.getUnique();
+    const firstRes = await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(firstBoard);
+
+    const secondBoard = Generator.Board.getUnique();
+    const secondRes = await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(secondBoard);
+
+    const firstBoardId = firstRes.body.data.boardId;
+    const secondBoardId = secondRes.body.data.boardId;
+
+    const thirdBoard = Generator.Board.getUnique();
+    const thirdRes = await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...thirdBoard,
+        belowId: firstBoardId,
+      });
+    const thirdBoardId = thirdRes.body.data.boardId;
+
+    const resBoards = await request()
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(resBoards.statusCode).toEqual(200);
+    expect(resBoards.body.data.boards.positions).toEqual(
+      [expect.any(Number), firstBoardId, thirdBoardId, secondBoardId],
+    );
+
+    done();
+  });
   it('user can\'t create board without authorization', async (done) => {
     const board = Generator.Board.getUnique();
     const res = await request()
@@ -297,6 +337,41 @@ describe('create', () => {
 
     done();
   });
+
+  it('user can\'t create board with belowId without access', async (done) => {
+    const { token: firstUserToken } = await helper.createUser();
+    const { token: secondUserToken } = await helper.createUser();
+
+    const firstBoard = Generator.Board.getUnique();
+    const firstRes = await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(firstBoard);
+
+    const secondBoard = Generator.Board.getUnique();
+    await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(secondBoard);
+
+    const firstBoardId = firstRes.body.data.boardId;
+
+    const thirdBoard = Generator.Board.getUnique();
+    const thirdRes = await request()
+      .post(`${routes.board}/`)
+      .set('authorization', `Bearer ${secondUserToken}`)
+      .send({
+        ...thirdBoard,
+        belowId: firstBoardId,
+      });
+
+    expect(thirdRes.statusCode).toEqual(403);
+    expect(thirdRes.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+    done();
+  });
 });
 
 describe('get board by id', () => {
@@ -442,6 +517,35 @@ describe('get all boards', () => {
         },
       ],
       positions: [expect.any(Number), boardIdTwo, boardIdThree],
+    });
+
+    done();
+  });
+  it('user can successfully get empty list of boards after deleting', async (done) => {
+    const { token } = await helper.createUser();
+
+    const resWithDefaultBoard = await request()
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const [defaultBoardIdForDelete] = resWithDefaultBoard.body.data.boards.positions;
+
+    await request()
+      .delete(`${routes.board}/${defaultBoardIdForDelete}`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const res = await request()
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const { boards } = res.body.data;
+
+    expect(boards).toEqual({
+      entities: [],
+      positions: [],
     });
 
     done();
@@ -654,6 +758,131 @@ describe('update board', () => {
     const res = await request()
       .patch(`${routes.board}/string_${boardId}`)
       .send(newBoard);
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('update position', () => {
+  it('user can successfully update position', async (done) => {
+    const { token } = await helper.createUser();
+    await helper.createBoards({
+      token,
+      boards: [{
+        title: 'default-board-1',
+      }, {
+        title: 'default-board-2',
+      }, {
+        title: 'default-board-3',
+      }, {
+        title: 'default-board-4',
+      }, {
+        title: 'default-board-5',
+      }, {
+        title: 'default-board-6',
+      }],
+    });
+
+    const resBoardsBeforeUpdate = await request()
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    await request()
+      .patch(`${routes.board}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    const resBoardsAfterUpdate = await request()
+      .get(`${routes.board}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforePositions = resBoardsBeforeUpdate.body.data.boards.positions;
+    const afterPositions = resBoardsAfterUpdate.body.data.boards.positions;
+
+    expect(afterPositions).toEqual([
+      beforePositions[0],
+      beforePositions[2],
+      beforePositions[3],
+      beforePositions[4],
+      beforePositions[1],
+      beforePositions[5],
+      beforePositions[6],
+    ]);
+
+    done();
+  });
+  it('user can\'t update position with wrong source position', async (done) => {
+    const { token } = await helper.createUser();
+    await helper.createBoards({
+      token,
+      boards: [{
+        title: 'default-board-1',
+      }, {
+        title: 'default-board-2',
+      }, {
+        title: 'default-board-3',
+      }, {
+        title: 'default-board-4',
+      }, {
+        title: 'default-board-5',
+      }, {
+        title: 'default-board-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.board}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        sourcePosition: 7,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t update position with wrong destination position', async (done) => {
+    const { token } = await helper.createUser();
+    await helper.createBoards({
+      token,
+      boards: [{
+        title: 'default-board-1',
+      }, {
+        title: 'default-board-2',
+      }, {
+        title: 'default-board-3',
+      }, {
+        title: 'default-board-4',
+      }, {
+        title: 'default-board-5',
+      }, {
+        title: 'default-board-5',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.board}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        sourcePosition: 1,
+        destinationPosition: 7,
+      });
 
     expect(res.statusCode).toEqual(400);
     expect(res.body).toEqual(expect.objectContaining({

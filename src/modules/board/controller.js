@@ -6,7 +6,6 @@ const { PositionComponent } = require('../../components');
 
 class BoardController {
   async create(userId, { belowId, ...board }) {
-    // TODO: write tests with belowId
     if (belowId) {
       const isAccessToBelowBoardId = await BoardAccessService.getByBoardId(userId, belowId);
       if (!isAccessToBelowBoardId) {
@@ -50,7 +49,10 @@ class BoardController {
     const boardIdsWithAccess = await BoardAccessService.getAllBoardIdsByUserId(userId);
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any boards');
+      return {
+        entities: [],
+        positions: [],
+      };
     }
 
     const boards = await BoardService.getByBoardIds(boardIdsWithAccess);
@@ -62,7 +64,6 @@ class BoardController {
     };
   }
 
-  // TODO: write tests for updatePosition
   async updatePosition({ userId, sourcePosition, destinationPosition }) {
     const boardPositions = await BoardPositionsService.getPositions(userId);
 
