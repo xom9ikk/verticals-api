@@ -99,7 +99,7 @@ class AuthController {
   }
 
   async changePassword({ userId, oldPassword, newPassword }) {
-    const { password } = await UserService.getPasswordById(userId);
+    const password = await UserService.getPasswordById(userId);
 
     const isValidPassword = await PasswordComponent.compare(oldPassword, password);
 

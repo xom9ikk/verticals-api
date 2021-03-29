@@ -644,3 +644,114 @@ describe('logout ', () => {
     done();
   });
 });
+
+describe('change password ', () => {
+  it('user can successfully change password', async (done) => {
+    const user = Generator.User.getUnique();
+    await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+    const resLogin = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+    const { token } = resLogin.body.data;
+
+    const newPassword = 'new-test-password';
+
+    await request()
+      .post(`${routes.auth}/change-password`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        oldPassword: user.password,
+        newPassword,
+      });
+
+    const resLoginAfterChange = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: user.email,
+        password: newPassword,
+      });
+
+    expect(resLoginAfterChange.statusCode).toEqual(200);
+    expect(resLoginAfterChange.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t change password with wrong password', async (done) => {
+    const user = Generator.User.getUnique();
+    await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+    const resLogin = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+    const { token } = resLogin.body.data;
+
+    const newPassword = 'new-test-password';
+    const oldPassword = 'wrong-old-password';
+
+    const resChange = await request()
+      .post(`${routes.auth}/change-password`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        oldPassword,
+        newPassword,
+      });
+
+    expect(resChange.statusCode).toEqual(403);
+    expect(resChange.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t login with old password after change', async (done) => {
+    const user = Generator.User.getUnique();
+    await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+    const resLogin = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+    const { token } = resLogin.body.data;
+
+    const newPassword = 'new-test-password';
+
+    await request()
+      .post(`${routes.auth}/change-password`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        oldPassword: user.password,
+        newPassword,
+      });
+
+    const resLoginAfterChange = await request()
+      .post(`${routes.auth}/login`)
+      .send({
+        email: user.email,
+        password: user.password,
+      });
+
+    expect(resLoginAfterChange.statusCode).toEqual(403);
+    expect(resLoginAfterChange.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});

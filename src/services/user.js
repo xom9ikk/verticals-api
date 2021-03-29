@@ -24,8 +24,8 @@ class UserService extends Database {
       .first();
   }
 
-  getPasswordById(id) {
-    return this.users
+  async getPasswordById(id) {
+    const response = await this.users
       .select([
         'password',
       ])
@@ -33,6 +33,7 @@ class UserService extends Database {
         id,
       })
       .first();
+    return response.password;
   }
 
   getByEmail(email) {
