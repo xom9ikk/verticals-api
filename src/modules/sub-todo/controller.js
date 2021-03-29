@@ -1,3 +1,4 @@
+const { SUB_TODO_ON_TOP } = require('../../constants');
 const {
   SubTodoService, TodoService, BoardAccessService, SubTodoPositionsService,
 } = require('../../services');
@@ -8,7 +9,7 @@ const { PositionComponent } = require('../../components');
 class SubTodoController {
   async create(userId, { belowId, ...subTodo }) {
     if (belowId) {
-      if (belowId !== -1) {
+      if (belowId !== SUB_TODO_ON_TOP) {
         const isAccessToBelowSubTodoId = await BoardAccessService.getBySubTodoId(userId, belowId);
         if (!isAccessToBelowSubTodoId) {
           throw new BackendError.Forbidden('This account is not allowed to create subtodo below this subtodo');
@@ -29,7 +30,7 @@ class SubTodoController {
     let newPosition; let
       newPositions;
 
-    if (belowId === -1) {
+    if (belowId === SUB_TODO_ON_TOP) {
       newPosition = 0;
       newPositions = [subTodoId, ...subTodoPositions];
     } else {
@@ -127,7 +128,6 @@ class SubTodoController {
     userId, todoId, sourcePosition, destinationPosition, targetTodoId,
   }) {
     const isAccessToSourceTodo = await BoardAccessService.getByTodoId(userId, todoId);
-    console.log('======updatePosition', userId, todoId, sourcePosition, destinationPosition, targetTodoId);
 
     if (!isAccessToSourceTodo) {
       throw new BackendError.Forbidden('This account does not have access to source todo');

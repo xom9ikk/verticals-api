@@ -1,3 +1,4 @@
+const { SUB_TODO_ON_TOP } = require('../../constants');
 const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
@@ -356,6 +357,42 @@ describe('create', () => {
         subTodoId: expect.any(Number),
       }),
     }));
+
+    done();
+  });
+  it('user can successfully create subTodo on top of list', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const todoId = user.getRandomTodoId();
+
+    const firstSubTodo = Generator.SubTodo.getUnique(todoId);
+    const firstSubTodoRes = await request()
+      .post(`${routes.subTodo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(firstSubTodo);
+
+    const subTodoOnTop = Generator.SubTodo.getUnique(todoId);
+    const subTodoOnTopRes = await request()
+      .post(`${routes.subTodo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...subTodoOnTop,
+        belowId: SUB_TODO_ON_TOP,
+      });
+
+    const firstCreatedSubTodoId = firstSubTodoRes.body.data.subTodoId;
+    const subTodoIdOnTop = subTodoOnTopRes.body.data.subTodoId;
+
+    const res = await request()
+      .get(`${routes.subTodo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ todoId })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.data.subTodos.positions[todoId]).toEqual(
+      expect.arrayContaining([subTodoIdOnTop, firstCreatedSubTodoId]),
+    );
 
     done();
   });

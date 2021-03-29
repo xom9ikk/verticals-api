@@ -317,11 +317,6 @@ class TodoController {
 
     const destinationPosition = 0;
 
-    console.log(userId,
-      headingId,
-      sourcePosition,
-      destinationPosition,
-      targetHeadingId);
     await this.updatePosition({
       userId,
       headingId,

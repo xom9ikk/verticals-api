@@ -721,6 +721,7 @@ describe('get all comments', () => {
     expect(comments).toEqual([{
       id: commentIdOne,
       ...commentOne,
+      subTodoId: null,
       replyCommentId: null,
       likedUsers: [],
       createdAt: expect.any(Number),

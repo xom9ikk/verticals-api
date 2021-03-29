@@ -40,4 +40,5 @@ module.exports = {
     removed: 2,
     custom: 3,
   },
+  SUB_TODO_ON_TOP: -1,
 };
