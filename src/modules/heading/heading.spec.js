@@ -1020,14 +1020,15 @@ describe('update heading', () => {
   });
   it('user can\'t update heading if he does not have access to column id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
+    const firstUserColumnId = firstUser.getRandomColumnId();
 
     const secondUser = await helper.createUser(defaultUser);
     const columnIdWithoutAccessForFirstUser = secondUser.getRandomColumnId();
 
-    const heading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);
+    const heading = Generator.Heading.getUnique(firstUserColumnId);
     const { body: { data: { headingId } } } = await request()
       .post(`${routes.heading}/`)
-      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(heading);
 
     const newHeading = Generator.Heading.getUnique(columnIdWithoutAccessForFirstUser);

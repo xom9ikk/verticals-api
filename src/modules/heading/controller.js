@@ -74,7 +74,10 @@ class HeadingController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any boards');
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     let headings;

@@ -1225,14 +1225,15 @@ describe('update subTodo', () => {
   });
   it('user can\'t update subTodo if he does not have access to todo id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
+    const firstUserTodoId = firstUser.getRandomTodoId();
 
     const secondUser = await helper.createUser(defaultUser);
     const todoIdWithoutAccessForFirstUser = secondUser.getRandomTodoId();
 
-    const subTodo = Generator.SubTodo.getUnique(todoIdWithoutAccessForFirstUser);
+    const subTodo = Generator.SubTodo.getUnique(firstUserTodoId);
     const { body: { data: { subTodoId } } } = await request()
       .post(`${routes.subTodo}/`)
-      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(subTodo);
 
     const newTodo = Generator.SubTodo.getUnique(todoIdWithoutAccessForFirstUser);

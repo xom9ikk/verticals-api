@@ -97,6 +97,10 @@ class TodoSchema {
   patchTodoBody = {
     type: 'object',
     properties: {
+      headingId: {
+        type: 'integer',
+        minimum: 1,
+      },
       title: {
         type: 'string',
         minLength: 1,
@@ -134,6 +138,7 @@ class TodoSchema {
       },
     },
     anyOf: [
+      { required: ['headingId'] },
       { required: ['title'] },
       { required: ['description'] },
       { required: ['status'] },

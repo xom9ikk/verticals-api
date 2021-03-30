@@ -177,13 +177,13 @@ describe('create', () => {
       });
     const thirdColumnId = thirdRes.body.data.columnId;
 
-    const resBoards = await request()
+    const resColumns = await request()
       .get(`${routes.column}/`)
       .set('authorization', `Bearer ${token}`)
       .send();
 
-    expect(resBoards.statusCode).toEqual(200);
-    expect(resBoards.body.data.columns.positions[boardId]).toEqual(
+    expect(resColumns.statusCode).toEqual(200);
+    expect(resColumns.body.data.columns.positions[boardId]).toEqual(
       [firstColumnId, thirdColumnId, secondColumnId],
     );
 

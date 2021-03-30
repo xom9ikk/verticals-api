@@ -105,6 +105,10 @@ class SubTodoSchema {
   patchSubTodoBody = {
     type: 'object',
     properties: {
+      todoId: {
+        type: 'integer',
+        minimum: 1,
+      },
       title: {
         type: 'string',
         minLength: 1,
@@ -142,6 +146,7 @@ class SubTodoSchema {
       },
     },
     anyOf: [
+      { required: ['todoId'] },
       { required: ['title'] },
       { required: ['description'] },
       { required: ['status'] },

@@ -9,7 +9,6 @@ const { SubTodoController } = require('../sub-todo/controller');
 
 class TodoController {
   async create(userId, { belowId, ...todo }) {
-    // TODO: write tests with belowId
     if (belowId) {
       const isAccessToBelowTodoId = await BoardAccessService.getByTodoId(userId, belowId);
       if (!isAccessToBelowTodoId) {
@@ -43,7 +42,10 @@ class TodoController {
     const boardIdsWithAccess = await BoardAccessService.getAllBoardIdsByUserId(userId);
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any boards');
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     const removedTodos = await TodoService.getRemovedByBoardIds(boardIdsWithAccess);
@@ -87,7 +89,10 @@ class TodoController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any boards');
+      return {
+        entities: [],
+        positions: {},
+      };
     }
 
     let todos;
@@ -135,7 +140,6 @@ class TodoController {
     };
   }
 
-  // TODO: write tests for updatePosition
   async updatePosition({
     userId, headingId, sourcePosition, destinationPosition, targetHeadingId,
   }) {
@@ -210,7 +214,6 @@ class TodoController {
     return true;
   }
 
-  // TODO: write tests
   async duplicate({ userId, todoId, newHeadingId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -252,7 +255,6 @@ class TodoController {
     };
   }
 
-  // TODO: write tests
   async switchArchived({ userId, todoId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 
@@ -290,7 +292,6 @@ class TodoController {
     return true;
   }
 
-  // TODO: write tests
   async switchRemoved({ userId, todoId }) {
     const isAccess = await BoardAccessService.getByTodoId(userId, todoId);
 

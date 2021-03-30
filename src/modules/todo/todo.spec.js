@@ -244,6 +244,48 @@ describe('create', () => {
 
     done();
   });
+  it('user can successfully create todo with belowId', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    const firstTodo = Generator.Todo.getUnique(headingId);
+    const firstRes = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(firstTodo);
+
+    const secondTodo = Generator.Todo.getUnique(headingId);
+    const secondRes = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(secondTodo);
+
+    const firstTodoId = firstRes.body.data.todoId;
+    const secondTodoId = secondRes.body.data.todoId;
+
+    const thirdTodo = Generator.Todo.getUnique(headingId);
+    const thirdRes = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...thirdTodo,
+        belowId: firstTodoId,
+      });
+    const thirdTodoId = thirdRes.body.data.todoId;
+
+    const resTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(resTodos.statusCode).toEqual(200);
+    expect(resTodos.body.data.todos.positions[headingId]).toEqual(
+      [firstTodoId, thirdTodoId, secondTodoId],
+    );
+
+    done();
+  });
   it('user can\'t create todo without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const headingId = user.getRandomHeadingId();
@@ -450,6 +492,45 @@ describe('create', () => {
       data: expect.any(Object),
     }));
 
+    done();
+  });
+  it('user can\'t create todo with belowId without access', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const firstUserToken = firstUser.getToken();
+    const headingIdWithoutAccess = firstUser.getRandomHeadingId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const headingIdWithAccess = secondUser.getRandomHeadingId();
+
+    const firstTodo = Generator.Todo.getUnique(headingIdWithoutAccess);
+    const firstRes = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(firstTodo);
+
+    const secondTodo = Generator.Todo.getUnique(headingIdWithAccess);
+    await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(secondTodo);
+
+    const firstTodoIdWithoutAccess = firstRes.body.data.todoId;
+
+    const thirdTodo = Generator.Todo.getUnique(headingIdWithAccess);
+    const thirdRes = await request()
+      .post(`${routes.todo}/`)
+      .set('authorization', `Bearer ${secondUserToken}`)
+      .send({
+        ...thirdTodo,
+        belowId: firstTodoIdWithoutAccess,
+      });
+
+    expect(thirdRes.statusCode).toEqual(403);
+    expect(thirdRes.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
     done();
   });
 });
@@ -1065,14 +1146,15 @@ describe('update todo', () => {
   });
   it('user can\'t update todo if he does not have access to heading id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
+    const firstUserHeadingId = firstUser.getRandomHeadingId();
 
     const secondUser = await helper.createUser(defaultUser);
     const headingIdWithoutAccessForFirstUser = secondUser.getRandomHeadingId();
 
-    const todo = Generator.Todo.getUnique(headingIdWithoutAccessForFirstUser);
+    const todo = Generator.Todo.getUnique(firstUserHeadingId);
     const { body: { data: { todoId } } } = await request()
       .post(`${routes.todo}/`)
-      .set('authorization', `Bearer ${secondUser.getToken()}`)
+      .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(todo);
 
     const newTodo = Generator.Todo.getUnique(headingIdWithoutAccessForFirstUser);
