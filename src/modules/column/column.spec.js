@@ -1347,46 +1347,6 @@ describe('duplicate', () => {
 
     done();
   });
-  it('user can\'t reverse columns order without access to boardId', async (done) => {
-    const user = await helper.createUser(defaultUser);
-    const token = user.getToken();
-    const boardId = user.getRandomBoardId();
-
-    const secondUser = await helper.createUser(defaultUser);
-    const boardIdWithoutAccess = secondUser.getRandomBoardId();
-
-    await helper.createColumns({
-      token,
-      boardId,
-      columns: [{
-        title: 'default-column-1',
-      }, {
-        title: 'default-column-2',
-      }, {
-        title: 'default-column-3',
-      }, {
-        title: 'default-column-4',
-      }, {
-        title: 'default-column-5',
-      }, {
-        title: 'default-column-6',
-      }],
-    });
-
-    const res = await request()
-      .post(`${routes.column}/reverse`)
-      .set('authorization', `Bearer ${token}`)
-      .send({
-        boardId: boardIdWithoutAccess,
-      });
-
-    expect(res.statusCode).toEqual(403);
-    expect(res.body).toEqual(expect.objectContaining({
-      message: expect.any(String),
-      data: expect.any(Object),
-    }));
-    done();
-  });
   it('user can\'t duplicate column without access to column', async (done) => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();

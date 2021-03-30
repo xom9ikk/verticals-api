@@ -1,3 +1,4 @@
+const { HeadingType } = require('../../constants');
 const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
@@ -934,6 +935,90 @@ describe('get all todos', () => {
   });
 });
 
+describe('get all removed todos', () => {
+  it('user can successfully gets all removed todos to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const [firstHeadingId, secondHeadingId] = user.getHeadingIds();
+    const token = user.getToken();
+
+    const defaultTodos = [{
+      title: 'default-todo-1',
+    }, {
+      title: 'default-todo-2',
+    }, {
+      title: 'default-todo-3',
+    }, {
+      title: 'default-todo-4',
+    }, {
+      title: 'default-todo-5',
+    }, {
+      title: 'default-todo-6',
+    }];
+
+    await helper.createTodos({
+      headingId: firstHeadingId,
+      token,
+      todos: defaultTodos,
+    });
+
+    await helper.createTodos({
+      headingId: secondHeadingId,
+      token,
+      todos: defaultTodos,
+    });
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const secondUserHeadingId = secondUser.getRandomHeadingId();
+
+    await helper.createTodos({
+      headingId: secondUserHeadingId,
+      token: secondUserToken,
+      todos: defaultTodos,
+    });
+
+    const resTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const { todos } = resTodos.body.data;
+
+    const [firstTodoIdForDelete, secondTodoIdForDelete] = todos.positions[firstHeadingId];
+    const [thirdTodoIdForDelete] = todos.positions[secondHeadingId];
+
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: firstTodoIdForDelete });
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForDelete });
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: thirdTodoIdForDelete });
+
+    const res = await request()
+      .get(`${routes.todo}/trash`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.body.data.todos.entities).toEqual([
+      expect.objectContaining({
+        id: firstTodoIdForDelete,
+      }), expect.objectContaining({
+        id: secondTodoIdForDelete,
+      }), expect.objectContaining({
+        id: thirdTodoIdForDelete,
+      }),
+    ]);
+
+    done();
+  });
+});
+
 describe('remove todo', () => {
   it('user can successfully remove todo by id', async (done) => {
     const user = await helper.createUser(defaultUser);
@@ -1162,6 +1247,845 @@ describe('update todo', () => {
       .patch(`${routes.todo}/${todoId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(newTodo);
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('update position', () => {
+  it('user can successfully update position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resTodosBeforeUpdate = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    const resTodosAfterUpdate = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforePositions = resTodosBeforeUpdate.body.data.todos.positions[headingId];
+    const afterPositions = resTodosAfterUpdate.body.data.todos.positions[headingId];
+
+    expect(afterPositions).toEqual([
+      beforePositions[0],
+      beforePositions[2],
+      beforePositions[3],
+      beforePositions[4],
+      beforePositions[1],
+      beforePositions[5],
+    ]);
+
+    done();
+  });
+  it('user can successfully move todo between headings', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstHeadingId, secondHeadingId] = user.getHeadingIds();
+
+    await helper.createTodos({
+      token,
+      headingId: firstHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    await helper.createTodos({
+      token,
+      headingId: secondHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resTodosBeforeUpdate = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId: firstHeadingId,
+        targetHeadingId: secondHeadingId,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    const resTodosAfterUpdate = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforePositionsForFirstHeading = resTodosBeforeUpdate.body.data.todos.positions[firstHeadingId];
+    const afterPositionsForFirstHeading = resTodosAfterUpdate.body.data.todos.positions[firstHeadingId];
+
+    expect(afterPositionsForFirstHeading).toEqual([
+      beforePositionsForFirstHeading[0],
+      beforePositionsForFirstHeading[2],
+      beforePositionsForFirstHeading[3],
+      beforePositionsForFirstHeading[4],
+      beforePositionsForFirstHeading[5],
+    ]);
+
+    const beforePositionsForSecondHeading = resTodosBeforeUpdate.body.data.todos.positions[secondHeadingId];
+    const afterPositionsForSecondHeading = resTodosAfterUpdate.body.data.todos.positions[secondHeadingId];
+
+    expect(afterPositionsForSecondHeading).toEqual([
+      beforePositionsForSecondHeading[0],
+      beforePositionsForSecondHeading[1],
+      beforePositionsForSecondHeading[2],
+      beforePositionsForSecondHeading[3],
+      beforePositionsForFirstHeading[1],
+      beforePositionsForSecondHeading[4],
+      beforePositionsForSecondHeading[5],
+    ]);
+
+    done();
+  });
+  it('user can\'t update position with wrong source position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId,
+        sourcePosition: 6,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t update position with wrong destination position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.column}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId,
+        sourcePosition: 1,
+        destinationPosition: 6,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t update position with headingId without access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const headingIdWithoutAccess = secondUser.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId: headingIdWithoutAccess,
+        sourcePosition: 1,
+        destinationPosition: 6,
+      });
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move todo between headings wrong source position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstHeadingId, secondHeadingId] = user.getHeadingIds();
+
+    await helper.createTodos({
+      token,
+      headingId: firstHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    await helper.createTodos({
+      token,
+      headingId: secondHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId: firstHeadingId,
+        targetHeadingId: secondHeadingId,
+        sourcePosition: 6,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move todo between headings wrong destination position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstHeadingId, secondHeadingId] = user.getHeadingIds();
+
+    await helper.createTodos({
+      token,
+      headingId: firstHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    await helper.createTodos({
+      token,
+      headingId: secondHeadingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId: firstHeadingId,
+        targetHeadingId: secondHeadingId,
+        sourcePosition: 1,
+        destinationPosition: 7, // add entity to new heading, can be +1
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move todo between headings with targetHeadingId without access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const headingIdWithoutAccess = secondUser.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    await helper.createTodos({
+      token: secondUserToken,
+      headingId: headingIdWithoutAccess,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.todo}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId,
+        targetHeadingId: headingIdWithoutAccess,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+    done();
+  });
+});
+
+describe('switch removed', () => {
+  it('user can successfully remove todos to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const headingId = user.getRandomHeadingId();
+    const token = user.getToken();
+
+    await helper.createTodos({
+      headingId,
+      token,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resBeforeTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeTodoPositions = resBeforeTodos.body.data.todos.positions[headingId];
+    const secondTodoIdForDelete = beforeTodoPositions[1];
+
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForDelete });
+
+    const resAfterTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterTodoPositions = resAfterTodos.body.data.todos.positions[headingId];
+
+    expect(afterTodoPositions).toEqual(
+      [
+        beforeTodoPositions[0],
+        beforeTodoPositions[2],
+        beforeTodoPositions[3],
+        beforeTodoPositions[4],
+        beforeTodoPositions[5],
+      ],
+    );
+
+    done();
+  });
+  it('user can successfully restore removed todos to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const column = user.getRandomColumn();
+    const headingId = column.getRandomHeadingId();
+    const token = user.getToken();
+
+    await helper.createTodos({
+      headingId,
+      token,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resHeadings = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: column.id })
+      .send();
+
+    const defaultHeadingId = resHeadings.body.data.headings.entities
+      .find((heading) => heading.type === HeadingType.default).id;
+
+    const resBeforeTodosRes = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeTodoPositions = resBeforeTodosRes.body.data.todos.positions[headingId];
+    const secondTodoIdForDelete = beforeTodoPositions[1];
+
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForDelete });
+
+    await request()
+      .post(`${routes.todo}/switch-removed`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForDelete });
+
+    const afterTodosRes = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterTodoPositions = afterTodosRes.body.data.todos.positions;
+    const afterTodoPositionsInCustomHeading = afterTodoPositions[headingId];
+    const afterTodoPositionsInDefaultHeading = afterTodoPositions[defaultHeadingId];
+
+    expect(afterTodoPositionsInCustomHeading).toEqual(
+      [
+        beforeTodoPositions[0],
+        beforeTodoPositions[2],
+        beforeTodoPositions[3],
+        beforeTodoPositions[4],
+        beforeTodoPositions[5],
+      ],
+    );
+
+    expect(afterTodoPositionsInDefaultHeading).toEqual(
+      [
+        beforeTodoPositions[1],
+      ],
+    );
+
+    done();
+  });
+});
+
+describe('switch archived', () => {
+  it('user can successfully archive todos to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const headingId = user.getRandomHeadingId();
+    const token = user.getToken();
+
+    await helper.createTodos({
+      headingId,
+      token,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resBeforeTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeTodoPositions = resBeforeTodos.body.data.todos.positions[headingId];
+    const secondTodoIdForArchive = beforeTodoPositions[1];
+
+    await request()
+      .post(`${routes.todo}/switch-archived`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForArchive });
+
+    const resAfterTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterTodoPositions = resAfterTodos.body.data.todos.positions[headingId];
+
+    expect(afterTodoPositions).toEqual(
+      [
+        beforeTodoPositions[0],
+        beforeTodoPositions[2],
+        beforeTodoPositions[3],
+        beforeTodoPositions[4],
+        beforeTodoPositions[5],
+      ],
+    );
+
+    done();
+  });
+  it('user can successfully un-archive todos to which he has access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const column = user.getRandomColumn();
+    const headingId = column.getRandomHeadingId();
+    const token = user.getToken();
+
+    await helper.createTodos({
+      headingId,
+      token,
+      todos: [{
+        title: 'default-todo-1',
+      }, {
+        title: 'default-todo-2',
+      }, {
+        title: 'default-todo-3',
+      }, {
+        title: 'default-todo-4',
+      }, {
+        title: 'default-todo-5',
+      }, {
+        title: 'default-todo-6',
+      }],
+    });
+
+    const resHeadings = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ columnId: column.id })
+      .send();
+
+    const defaultHeadingId = resHeadings.body.data.headings.entities
+      .find((heading) => heading.type === HeadingType.default).id;
+
+    const resBeforeTodosRes = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeTodoPositions = resBeforeTodosRes.body.data.todos.positions[headingId];
+    const secondTodoIdForArchive = beforeTodoPositions[1];
+
+    await request()
+      .post(`${routes.todo}/switch-archived`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForArchive });
+
+    await request()
+      .post(`${routes.todo}/switch-archived`)
+      .set('authorization', `Bearer ${token}`)
+      .send({ todoId: secondTodoIdForArchive });
+
+    const afterTodosRes = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterTodoPositions = afterTodosRes.body.data.todos.positions;
+    const afterTodoPositionsInCustomHeading = afterTodoPositions[headingId];
+    const afterTodoPositionsInDefaultHeading = afterTodoPositions[defaultHeadingId];
+
+    expect(afterTodoPositionsInCustomHeading).toEqual(
+      [
+        beforeTodoPositions[0],
+        beforeTodoPositions[2],
+        beforeTodoPositions[3],
+        beforeTodoPositions[4],
+        beforeTodoPositions[5],
+      ],
+    );
+
+    expect(afterTodoPositionsInDefaultHeading).toEqual(
+      [
+        beforeTodoPositions[1],
+      ],
+    );
+
+    done();
+  });
+});
+
+describe('duplicate', () => {
+  it('user can successfully duplicate todo', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+        subTodos: [{ title: 'default-sub-todo-1' }],
+      }, {
+        title: 'default-todo-2',
+        subTodos: [{ title: 'default-sub-todo-2' }],
+      }],
+    });
+
+    const resTodos = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeTodos = resTodos.body.data.todos;
+
+    const todoIds = beforeTodos.positions[headingId];
+    const todoId = todoIds[0];
+    const firstTodo = beforeTodos.entities.find((todo) => todo.id === todoIds[0]);
+    const secondTodo = beforeTodos.entities.find((todo) => todo.id === todoIds[1]);
+
+    const resDuplicate = await request()
+      .post(`${routes.todo}/duplicate`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        todoId,
+      });
+
+    const resTodoAfterDuplicate = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterTodos = resTodoAfterDuplicate.body.data.todos;
+    const duplicatedTodoId = resDuplicate.body.data.todoId;
+
+    expect(afterTodos.positions[headingId]).toEqual([
+      todoIds[0],
+      duplicatedTodoId,
+      todoIds[1],
+    ]);
+
+    expect(afterTodos.entities).toEqual(expect.arrayContaining([
+      firstTodo,
+      secondTodo, {
+        ...firstTodo,
+        id: duplicatedTodoId,
+      },
+    ]));
+
+    done();
+  });
+  it('user can\'t duplicate todo without access to todo', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const headingId = user.getRandomHeadingId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const headingIdWithoutAccess = secondUser.getRandomHeadingId();
+
+    await helper.createTodos({
+      token,
+      headingId,
+      todos: [{
+        title: 'default-todo-1',
+        subTodos: [{ title: 'default-sub-todo-1' }],
+      }, {
+        title: 'default-todo-2',
+        subTodos: [{ title: 'default-sub-todo-2' }],
+      }],
+    });
+
+    await helper.createTodos({
+      token: secondUserToken,
+      headingId: headingIdWithoutAccess,
+      todos: [{
+        title: 'default-todo-1',
+        subTodos: [{ title: 'default-sub-todo-1' }],
+      }, {
+        title: 'default-todo-2',
+        subTodos: [{ title: 'default-sub-todo-2' }],
+      }],
+    });
+
+    const resTodosWithoutAccess = await request()
+      .get(`${routes.todo}/`)
+      .set('authorization', `Bearer ${secondUserToken}`)
+      .send();
+
+    const todoIdWithoutAccess = resTodosWithoutAccess.body.data.todos.positions[headingIdWithoutAccess][0];
+
+    const res = await request()
+      .post(`${routes.todo}/duplicate`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        todoId: todoIdWithoutAccess,
+      });
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({
