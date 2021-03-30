@@ -3,7 +3,6 @@ const {
   UserService,
 } = require('../../services');
 
-// TODO: tests
 class UserController {
   async me({ userId }) {
     const user = await UserService.getById(userId);

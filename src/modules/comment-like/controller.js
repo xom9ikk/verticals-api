@@ -1,7 +1,6 @@
 const { CommentLikesService, BoardAccessService } = require('../../services');
 const { BackendError } = require('../../components');
 
-// TODO: tests
 class CommentLikeController {
   async create({ userId, commentId }) {
     const isAccess = await BoardAccessService.getByCommentId(userId, commentId);

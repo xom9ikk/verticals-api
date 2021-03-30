@@ -1,6 +1,10 @@
 const { TokenComponent } = require('../../src/components');
 
 class AuthDataGenerator {
+  static getTokenPair(data) {
+    return TokenComponent.issueTokenPair(data, '1d');
+  }
+
   static getExpiredTokenPair(data) {
     return TokenComponent.issueTokenPair(data, '1ms');
   }

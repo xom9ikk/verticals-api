@@ -1,3 +1,4 @@
+const path = require('path');
 const { build } = require('../../server');
 const { Knex } = require('../../knex');
 const { Generator } = require('../../../tests/generator');
@@ -20,7 +21,8 @@ afterAll(async (done) => {
   done();
 });
 
-// TODO: fix tests
+const pathToAvatar = path.resolve('tests', 'files', 'node.jpg');
+
 describe('me', () => {
   it('user can get information about himself after register', async (done) => {
     const user = Generator.User.getUnique();
@@ -120,6 +122,85 @@ describe('me', () => {
       .send();
 
     expect(res.statusCode).toEqual(401);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('update', () => {
+  it('user can update information about himself', async (done) => {
+    const user = Generator.User.getUnique();
+
+    const resRegister = await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+
+    const { token } = resRegister.body.data;
+
+    const newUserData = Generator.User.getUnique();
+
+    const res = await request()
+      .patch(`${routes.user}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(newUserData);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('avatar', () => {
+  it('user can upload avatar', async (done) => {
+    const user = Generator.User.getUnique();
+
+    const resRegister = await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+
+    const { token } = resRegister.body.data;
+
+    const res = await request()
+      .post(`${routes.user}/avatar`)
+      .set('authorization', `Bearer ${token}`)
+      .attach('avatar', pathToAvatar);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can remove avatar', async (done) => {
+    const user = Generator.User.getUnique();
+
+    const resRegister = await request()
+      .post(`${routes.auth}/register`)
+      .send(user);
+
+    const { token } = resRegister.body.data;
+
+    await request()
+      .post(`${routes.user}/avatar`)
+      .set('authorization', `Bearer ${token}`)
+      .attach('avatar', pathToAvatar);
+
+    const res = await request()
+      .delete(`${routes.user}/avatar`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(expect.objectContaining({
       message: expect.any(String),
       data: expect.any(Object),
