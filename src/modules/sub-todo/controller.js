@@ -5,7 +5,6 @@ const {
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
 
-// TODO: write tests
 class SubTodoController {
   async create(userId, { belowId, ...subTodo }) {
     if (belowId) {
