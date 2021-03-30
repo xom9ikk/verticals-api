@@ -93,11 +93,12 @@ class BoardAccessService extends Database {
   }
 
   async getByCommentId(userId, commentId) {
-    let { todoId } = await CommentService.getTodoIdSubQuery(commentId);
+    const resTodoId = await CommentService.getTodoIdSubQuery(commentId);
+    let todoId = resTodoId ? resTodoId.todoId : null;
     if (todoId === null) {
       const subTodoId = CommentService.getSubTodoIdSubQuery(commentId);
       const res = await SubTodoService.getTodoIdSubQuery(subTodoId);
-      todoId = res.todoId;
+      todoId = res ? res.todoId : null;
     }
     const headingId = TodoService.getHeadingIdSubQuery(todoId);
     const columnId = HeadingService.getColumnIdSubQuery(headingId);
@@ -116,11 +117,12 @@ class BoardAccessService extends Database {
 
   async getByAttachmentId(userId, attachmentId) {
     const commentId = CommentFilesService.getCommentIdSubQuery(attachmentId);
-    let { todoId } = await CommentService.getTodoIdSubQuery(commentId);
-    if (todoId.todoId === null) {
+    const resTodoId = await CommentService.getTodoIdSubQuery(commentId);
+    let todoId = resTodoId ? resTodoId.todoId : null;
+    if (todoId === null) {
       const subTodoId = CommentService.getSubTodoIdSubQuery(commentId);
       const res = await SubTodoService.getTodoIdSubQuery(subTodoId);
-      todoId = res.todoId;
+      todoId = res ? res.todoId : null;
     }
     const headingId = TodoService.getHeadingIdSubQuery(todoId);
     const columnId = HeadingService.getColumnIdSubQuery(headingId);
