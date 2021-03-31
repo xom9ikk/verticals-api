@@ -17,6 +17,32 @@ class Helper {
     console.log(`helper.${name}`, res.statusCode, res.body);
   }
 
+  static configureUser(config) {
+    return {
+      boards: [...new Array(config.boards || 0)].map((_, boardIndex) => ({
+        title: `default-board-${boardIndex}`,
+        columns: [...new Array(config.columns || 0)].map((_, columnIndex) => ({
+          title: `default-column-${columnIndex + boardIndex * config.columns}`,
+          headings: [...new Array(config.headings || 0)].map((_, headingIndex) => ({
+            title: `default-heading-${headingIndex + columnIndex * config.headings}`,
+            todos: [...new Array(config.todos || 0)].map((_, todoIndex) => ({
+              title: `default-todo-${todoIndex + headingIndex * config.todos}`,
+              comments: [...new Array(config.comments || 0)].map((_, commentIndex) => ({
+                title: `default-comment-${commentIndex + todoIndex * config.comments}`,
+              })),
+              subTodos: [...new Array(config.subTodos || 0)].map((_, subTodoIndex) => ({
+                title: `default-sun-todo-${subTodoIndex + todoIndex * config.subTodos}`,
+                comments: [...new Array(config.comments || 0)].map((_, commentIndex) => ({
+                  title: `default-comment-${commentIndex + todoIndex * config.comments}`,
+                })),
+              })),
+            })),
+          })),
+        })),
+      })),
+    };
+  }
+
   async createUser(config = {}) {
     const userData = Generator.User.getUnique();
     const res = await this._post(`${routes.auth}/register`, userData);
@@ -158,18 +184,18 @@ class Helper {
           todoId,
         });
       }
-      let subtodos = [];
-      if (todo.subtodos) {
-        subtodos = await this.createSubTodos({
+      let subTodos = [];
+      if (todo.subTodos) {
+        subTodos = await this.createSubTodos({
           token,
-          subtodos: todo.subtodos,
+          subTodos: todo.subTodos,
           todoId,
         });
       }
       resTodos.push(new Todo(
         todoId,
         headingId,
-        subtodos,
+        subTodos,
         comments,
       ));
     }
@@ -210,17 +236,17 @@ class Helper {
 
   // TODO: subtodo
   async createComments({
-    token, comments, todoId,
+    token, comments, todoId, subTodoId,
   }) {
     const resComments = [];
     for await (const comment of comments) {
-      const commentData = Generator.Comment.getUnique(todoId);
+      const commentData = Generator.Comment.getUnique({ todoId, subTodoId });
       const mergedData = this._mergeObject(commentData, comment);
       const res = await this._post(`${routes.comment}/`, mergedData, token);
       if (res.statusCode !== 201) {
         console.error('helper.createComments', res.statusCode, res.body);
         return this.createComments({
-          token, comments, todoId,
+          token, comments, todoId, subTodoId,
         });
       }
       const { commentId } = res.body.data;

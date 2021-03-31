@@ -24,35 +24,10 @@ afterAll(async (done) => {
   done();
 });
 
-const defaultUser = {
-  boards: [{
-    title: 'default-board-1',
-    columns: [{
-      title: 'default-column-1',
-    }, {
-      title: 'default-column-2',
-    }],
-  }, {
-    title: 'default-board-2',
-    columns: [{
-      title: 'default-column-3',
-    }, {
-      title: 'default-column-4',
-    }, {
-      title: 'default-column-5',
-    }],
-  }, {
-    title: 'default-board-3',
-    columns: [{
-      title: 'default-column-6',
-    }],
-  }, {
-    title: 'default-board-4',
-    columns: [{
-      title: 'default-column-7',
-    }],
-  }],
-};
+const defaultUser = Helper.configureUser({
+  boards: 4,
+  columns: 2,
+});
 
 describe('create', () => {
   it('user can successfully create heading with all fields', async (done) => {
@@ -641,7 +616,7 @@ describe('get all headings', () => {
       ]),
     );
 
-    expect(Object.keys(headings.positions)).toHaveLength(7); // 7 columns create for default user
+    expect(Object.keys(headings.positions)).toHaveLength(8); // 8 columns create for default user
     expect(Object.keys(headings.positions[firstColumnId])).toHaveLength(2); // 1 default and 1 custom
     expect(Object.keys(headings.positions[secondColumnId])).toHaveLength(2); // 1 default and 1 custom
 

@@ -23,206 +23,12 @@ afterAll(async (done) => {
   done();
 });
 
-const defaultUser = {
-  boards: [{
-    title: 'default-board-1',
-    columns: [{
-      title: 'default-column-1',
-      headings: [{
-        title: 'default-heading-1',
-        todos: [{
-          title: 'todo-1',
-        }, {
-          title: 'todo-2',
-        }],
-      }, {
-        title: 'default-heading-2',
-        todos: [{
-          title: 'todo-3',
-        }, {
-          title: 'todo-4',
-        }],
-      }],
-    }, {
-      title: 'default-column-2',
-      headings: [{
-        title: 'default-heading-3',
-        todos: [{
-          title: 'todo-5',
-        }, {
-          title: 'todo-6',
-        }],
-      }, {
-        title: 'default-heading-4',
-        todos: [{
-          title: 'todo-7',
-        }, {
-          title: 'todo-8',
-        }],
-      }, {
-        title: 'default-heading-5',
-        todos: [{
-          title: 'todo-9',
-        }, {
-          title: 'todo-10',
-        }],
-      }],
-    }],
-  }, {
-    title: 'default-board-2',
-    columns: [{
-      title: 'default-column-3',
-      headings: [{
-        title: 'default-heading-6',
-        todos: [{
-          title: 'todo-11',
-        }, {
-          title: 'todo-12',
-        }],
-      }, {
-        title: 'default-heading-7',
-        todos: [{
-          title: 'todo-13',
-        }, {
-          title: 'todo-14',
-        }],
-      }, {
-        title: 'default-heading-8',
-        todos: [{
-          title: 'todo-15',
-        }, {
-          title: 'todo-16',
-        }],
-      }],
-    }, {
-      title: 'default-column-4',
-      headings: [{
-        title: 'default-heading-9',
-        todos: [{
-          title: 'todo-17',
-        }, {
-          title: 'todo-18',
-        }],
-      }, {
-        title: 'default-heading-10',
-        todos: [{
-          title: 'todo-19',
-        }, {
-          title: 'todo-20',
-        }],
-      }, {
-        title: 'default-heading-11',
-        todos: [{
-          title: 'todo-21',
-        }, {
-          title: 'todo-22',
-        }],
-      }],
-    }],
-  }, {
-    title: 'default-board-3',
-    columns: [{
-      title: 'default-column-5',
-      headings: [{
-        title: 'default-heading-12',
-        todos: [{
-          title: 'todo-23',
-        }, {
-          title: 'todo-24',
-        }],
-      }, {
-        title: 'default-heading-13',
-        todos: [{
-          title: 'todo-25',
-        }, {
-          title: 'todo-26',
-        }],
-      }, {
-        title: 'default-heading-14',
-        todos: [{
-          title: 'todo-27',
-        }, {
-          title: 'todo-28',
-        }],
-      }],
-    }, {
-      title: 'default-column-6',
-      headings: [{
-        title: 'default-heading-15',
-        todos: [{
-          title: 'todo-29',
-        }, {
-          title: 'todo-30',
-        }],
-      }, {
-        title: 'default-heading-16',
-        todos: [{
-          title: 'todo-31',
-        }, {
-          title: 'todo-32',
-        }],
-      }, {
-        title: 'default-heading-17',
-        todos: [{
-          title: 'todo-33',
-        }, {
-          title: 'todo-34',
-        }],
-      }],
-    }],
-  }, {
-    title: 'default-board-4',
-    columns: [{
-      title: 'default-column-7',
-      headings: [{
-        title: 'default-heading-18',
-        todos: [{
-          title: 'todo-35',
-        }, {
-          title: 'todo-36',
-        }],
-      }, {
-        title: 'default-heading-19',
-        todos: [{
-          title: 'todo-37',
-        }, {
-          title: 'todo-38',
-        }],
-      }, {
-        title: 'default-heading-20',
-        todos: [{
-          title: 'todo-39',
-        }, {
-          title: 'todo-40',
-        }],
-      }],
-    }, {
-      title: 'default-column-8',
-      headings: [{
-        title: 'default-heading-21',
-        todos: [{
-          title: 'todo-41',
-        }, {
-          title: 'todo-42',
-        }],
-      }, {
-        title: 'default-heading-22',
-        todos: [{
-          title: 'todo-43',
-        }, {
-          title: 'todo-44',
-        }],
-      }, {
-        title: 'default-heading-23',
-        todos: [{
-          title: 'todo-45',
-        }, {
-          title: 'todo-46',
-        }],
-      }],
-    }],
-  }],
-};
+const defaultUser = Helper.configureUser({
+  boards: 4,
+  columns: 2,
+  headings: 2,
+  todos: 2,
+});
 
 describe('create', () => {
   it('user can successfully create comment with all fields', async (done) => {
@@ -230,7 +36,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -251,7 +57,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     delete comment.text;
     const res = await request()
       .post(`${routes.comment}/`)
@@ -273,7 +79,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     delete comment.updatedAt;
     const res = await request()
       .post(`${routes.comment}/`)
@@ -295,7 +101,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId, 1);
+    const comment = Generator.Comment.getUnique({ todoId }, 1);
     delete comment.replyCommentId;
     const res = await request()
       .post(`${routes.comment}/`)
@@ -317,7 +123,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     delete comment.text;
     delete comment.updatedAt;
     delete comment.replyCommentId;
@@ -340,7 +146,7 @@ describe('create', () => {
     const user = await helper.createUser(defaultUser);
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .post(`${routes.comment}/`)
       .send(comment);
@@ -358,7 +164,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -380,7 +186,7 @@ describe('create', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -404,7 +210,7 @@ describe('create', () => {
     const secondUser = await helper.createUser(defaultUser);
     const todoIdWithoutAccess = secondUser.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoIdWithoutAccess);
+    const comment = Generator.Comment.getUnique({ todoId: todoIdWithoutAccess });
     const res = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -426,7 +232,7 @@ describe('get comment by id', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -458,7 +264,7 @@ describe('get comment by id', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -482,7 +288,7 @@ describe('get comment by id', () => {
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const comment = Generator.Comment.getUnique(firstUserTodoId);
+    const comment = Generator.Comment.getUnique({ todoId: firstUserTodoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
@@ -506,7 +312,7 @@ describe('get comment by id', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -534,19 +340,19 @@ describe('get all comments', () => {
     const secondUser = await helper.createUser(defaultUser);
     const secondUserTodoId = secondUser.getRandomTodoId();
 
-    const secondUserTodo = Generator.Comment.getUnique(secondUserTodoId);
+    const secondUserTodo = Generator.Comment.getUnique({ todoId: secondUserTodoId });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
       .send(secondUserTodo);
 
-    const commentOne = Generator.Comment.getUnique(firstTodoId);
+    const commentOne = Generator.Comment.getUnique({ todoId: firstTodoId });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(secondTodoId);
+    const commentTwo = Generator.Comment.getUnique({ todoId: secondTodoId });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -591,13 +397,13 @@ describe('get all comments', () => {
 
     await helper.createUser(defaultUser);
 
-    const commentOne = Generator.Comment.getUnique(todoIdFromFirstBoard);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFromFirstBoard });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondBoard);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdFromSecondBoard });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -641,13 +447,13 @@ describe('get all comments', () => {
 
     await helper.createUser(defaultUser);
 
-    const commentOne = Generator.Comment.getUnique(todoIdFromFirstColumn);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFromFirstColumn });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondColumn);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdFromSecondColumn });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -691,13 +497,13 @@ describe('get all comments', () => {
 
     await helper.createUser(defaultUser);
 
-    const commentOne = Generator.Comment.getUnique(todoIdFromFirstColumn);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFromFirstColumn });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdFromSecondColumn);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdFromSecondColumn });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -738,13 +544,13 @@ describe('get all comments', () => {
     const todoIdSecondUser = secondUser.getRandomTodoId();
     const boardIdWithoutAccess = secondUser.getRandomBoardId();
 
-    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFirstUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdSecondUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
@@ -772,13 +578,13 @@ describe('get all comments', () => {
     const todoIdSecondUser = secondUser.getRandomTodoId();
     const columnIdWithoutAccess = secondUser.getRandomColumnId();
 
-    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFirstUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdSecondUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
@@ -806,13 +612,13 @@ describe('get all comments', () => {
     const todoIdSecondUser = secondUser.getRandomTodoId();
     const todoIdWithoutAccess = secondUser.getRandomTodoId();
 
-    const commentOne = Generator.Comment.getUnique(todoIdFirstUser);
+    const commentOne = Generator.Comment.getUnique({ todoId: todoIdFirstUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(commentOne);
 
-    const commentTwo = Generator.Comment.getUnique(todoIdSecondUser);
+    const commentTwo = Generator.Comment.getUnique({ todoId: todoIdSecondUser });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${secondUser.getToken()}`)
@@ -868,7 +674,7 @@ describe('get all comments', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -894,7 +700,7 @@ describe('remove comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -918,7 +724,7 @@ describe('remove comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -942,7 +748,7 @@ describe('remove comment', () => {
 
     const secondUser = await helper.createUser();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
@@ -966,7 +772,7 @@ describe('remove comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
@@ -992,13 +798,13 @@ describe('update comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(comment);
 
-    const newComment = Generator.Comment.getUnique(todoId);
+    const newComment = Generator.Comment.getUnique({ todoId });
     const resUpdate = await request()
       .patch(`${routes.comment}/${commentId}`)
       .set('authorization', `Bearer ${token}`)
@@ -1031,13 +837,13 @@ describe('update comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(comment);
 
-    const newComment = Generator.Comment.getUnique(todoId);
+    const newComment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .patch(`${routes.comment}/${commentId}`)
       .send(newComment);
@@ -1056,7 +862,7 @@ describe('update comment', () => {
 
     const secondUser = await helper.createUser(defaultUser);
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
@@ -1081,13 +887,13 @@ describe('update comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const { body: { data: { commentId } } } = await request()
       .post(`${routes.comment}/`)
       .set('authorization', `Bearer ${token}`)
       .send(comment);
 
-    const newComment = Generator.Comment.getUnique(todoId);
+    const newComment = Generator.Comment.getUnique({ todoId });
     const res = await request()
       .patch(`${routes.comment}/string_${commentId}`)
       .send(newComment);

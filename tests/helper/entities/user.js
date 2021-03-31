@@ -93,6 +93,10 @@ class User {
   }
 
   // -
+  getRandomTodoFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo();
+  }
+
   getRandomTodoIdFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo().id;
   }
@@ -121,6 +125,11 @@ class User {
   }
 
   // -
+  getRandomSubTodoFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo()
+      .getRandomSubTodo();
+  }
+
   getRandomSubTodoIdFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo()
       .getRandomSubTodo().id;
@@ -151,11 +160,16 @@ class User {
     return this.getRandomComment().id;
   }
 
+  getRandomCommentIdFromBoard(boardId) {
+    return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo()
+      .getRandomComment().id;
+  }
+
   getCommentIds() {
     const commentIds = [];
     this.boards.forEach((board) => {
       board.columns.forEach((column) => {
-        column.heading.forEach((heading) => {
+        column.headings.forEach((heading) => {
           heading.todos.forEach((todo) => {
             todo.comments.forEach((comment) => {
               commentIds.push(comment.id);

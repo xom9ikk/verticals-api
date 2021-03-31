@@ -27,7 +27,6 @@ class CommentAttachmentController {
     };
   }
 
-  // TODO: tests
   async getAll({
     userId, boardId, columnId, todoId, subTodoId,
   }) {

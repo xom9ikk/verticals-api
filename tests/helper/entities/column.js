@@ -15,6 +15,10 @@ class Column {
   getRandomHeadingId() {
     return this.getRandomHeading().id;
   }
+
+  getRandomCommentId() {
+    return this.getRandomHeading().getRandomTodo().getRandomComment().id;
+  }
 }
 
 module.exports = {

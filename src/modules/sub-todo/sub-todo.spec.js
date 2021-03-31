@@ -24,7 +24,14 @@ afterAll(async (done) => {
   done();
 });
 
-const defaultUser = {
+const defaultUser = Helper.configureUser({
+  boards: 4,
+  columns: 2,
+  headings: 2,
+  todos: 2,
+});
+
+const sdvfb = {
   boards: [{
     title: 'default-board-1',
     columns: [{

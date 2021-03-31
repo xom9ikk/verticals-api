@@ -1,9 +1,10 @@
 const faker = require('faker');
 
 class CommentDataGenerator {
-  static getUnique(todoId, replyCommentId) {
+  static getUnique({ todoId, subTodoId } = {}, replyCommentId) {
     return {
       todoId,
+      subTodoId,
       text: faker.lorem.sentences(),
       replyCommentId,
     };

@@ -23,17 +23,9 @@ afterAll(async (done) => {
   done();
 });
 
-const defaultUser = {
-  boards: [{
-    title: 'default-board-1',
-  }, {
-    title: 'default-board-2',
-  }, {
-    title: 'default-board-3',
-  }, {
-    title: 'default-board-4',
-  }],
-};
+const defaultUser = Helper.configureUser({
+  boards: 4,
+});
 
 describe('create', () => {
   it('user can successfully create column with all fields', async (done) => {

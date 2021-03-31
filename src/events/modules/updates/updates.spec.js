@@ -793,7 +793,7 @@ describe('comment', () => {
     const token = user.getToken();
     const todoId = user.getRandomTodoId();
 
-    const comment = Generator.Comment.getUnique(todoId);
+    const comment = Generator.Comment.getUnique({ todoId });
     const ws = new WS(baseUrlWs)
       .query({ authorization: `Bearer ${token}` })
       .start('updates')
@@ -829,8 +829,9 @@ describe('comment', () => {
     const user = await helper.createUser(defaultUser);
     const token = user.getToken();
     const comment = user.getRandomComment();
+    const { todoId } = comment;
 
-    const newComment = Generator.Comment.getUnique(comment.todoId);
+    const newComment = Generator.Comment.getUnique({ todoId });
     const ws = new WS(baseUrlWs)
       .query({ authorization: `Bearer ${token}` })
       .start('updates')
