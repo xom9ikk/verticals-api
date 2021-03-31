@@ -141,12 +141,13 @@ describe('update', () => {
 
     const { token } = resRegister.body.data;
 
-    const newUserData = Generator.User.getUnique();
-
     const res = await request()
       .patch(`${routes.user}/`)
       .set('authorization', `Bearer ${token}`)
-      .send(newUserData);
+      .send({
+        name: 'Name',
+        surname: 'Surname',
+      });
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(expect.objectContaining({

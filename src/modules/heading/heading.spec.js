@@ -188,6 +188,48 @@ describe('create', () => {
 
     done();
   });
+  it('user can successfully create heading with belowId', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const firstHeading = Generator.Heading.getUnique(columnId);
+    const firstRes = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(firstHeading);
+
+    const secondHeading = Generator.Heading.getUnique(columnId);
+    const secondRes = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(secondHeading);
+
+    const firstHeadingId = firstRes.body.data.headingId;
+    const secondHeadingId = secondRes.body.data.headingId;
+
+    const thirdHeading = Generator.Heading.getUnique(columnId);
+    const thirdRes = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        ...thirdHeading,
+        belowId: firstHeadingId,
+      });
+    const thirdHeadingId = thirdRes.body.data.headingId;
+
+    const resHeadings = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    expect(resHeadings.statusCode).toEqual(200);
+    expect(resHeadings.body.data.headings.positions[columnId]).toEqual(
+      [expect.any(Number), firstHeadingId, thirdHeadingId, secondHeadingId],
+    );
+
+    done();
+  });
   it('user can\'t create heading without authorization', async (done) => {
     const user = await helper.createUser(defaultUser);
     const columnId = user.getRandomColumnId();
@@ -394,6 +436,45 @@ describe('create', () => {
       data: expect.any(Object),
     }));
 
+    done();
+  });
+  it('user can\'t create heading with belowId without access', async (done) => {
+    const firstUser = await helper.createUser(defaultUser);
+    const firstUserToken = firstUser.getToken();
+    const columnIdWithoutAccess = firstUser.getRandomColumnId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const columnIdWithAccess = secondUser.getRandomColumnId();
+
+    const firstHeading = Generator.Heading.getUnique(columnIdWithoutAccess);
+    const firstRes = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(firstHeading);
+
+    const secondHeading = Generator.Heading.getUnique(columnIdWithAccess);
+    await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${firstUserToken}`)
+      .send(secondHeading);
+
+    const firstHeadingIdWithoutAccess = firstRes.body.data.headingId;
+
+    const thirdHeading = Generator.Heading.getUnique(columnIdWithAccess);
+    const thirdRes = await request()
+      .post(`${routes.heading}/`)
+      .set('authorization', `Bearer ${secondUserToken}`)
+      .send({
+        ...thirdHeading,
+        belowId: firstHeadingIdWithoutAccess,
+      });
+
+    expect(thirdRes.statusCode).toEqual(403);
+    expect(thirdRes.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
     done();
   });
 });
@@ -1036,6 +1117,577 @@ describe('update heading', () => {
       .patch(`${routes.heading}/${headingId}`)
       .set('authorization', `Bearer ${firstUser.getToken()}`)
       .send(newHeading);
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+});
+
+describe('update position', () => {
+  it('user can successfully update position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const resHeadingsBeforeUpdate = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    const resHeadingsAfterUpdate = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforePositions = resHeadingsBeforeUpdate.body.data.headings.positions[columnId];
+    const afterPositions = resHeadingsAfterUpdate.body.data.headings.positions[columnId];
+
+    expect(afterPositions).toEqual([
+      beforePositions[0],
+      beforePositions[2],
+      beforePositions[3],
+      beforePositions[4],
+      beforePositions[1],
+      beforePositions[5],
+      beforePositions[6],
+    ]);
+
+    done();
+  });
+  it('user can successfully move heading between columns', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstColumnId, secondColumnId] = user.getColumnIds();
+
+    await helper.createHeadings({
+      token,
+      columnId: firstColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    await helper.createHeadings({
+      token,
+      columnId: secondColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const resHeadingsBeforeUpdate = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId: firstColumnId,
+        targetColumnId: secondColumnId,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    const resHeadingsAfterUpdate = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforePositionsForFirstColumn = resHeadingsBeforeUpdate.body.data.headings.positions[firstColumnId];
+    const afterPositionsForFirstColumn = resHeadingsAfterUpdate.body.data.headings.positions[firstColumnId];
+
+    expect(afterPositionsForFirstColumn).toEqual([
+      beforePositionsForFirstColumn[0],
+      beforePositionsForFirstColumn[2],
+      beforePositionsForFirstColumn[3],
+      beforePositionsForFirstColumn[4],
+      beforePositionsForFirstColumn[5],
+      beforePositionsForFirstColumn[6],
+    ]);
+
+    const beforePositionsForSecondColumn = resHeadingsBeforeUpdate.body.data.headings.positions[secondColumnId];
+    const afterPositionsForSecondColumn = resHeadingsAfterUpdate.body.data.headings.positions[secondColumnId];
+
+    expect(afterPositionsForSecondColumn).toEqual([
+      beforePositionsForSecondColumn[0],
+      beforePositionsForSecondColumn[1],
+      beforePositionsForSecondColumn[2],
+      beforePositionsForSecondColumn[3],
+      beforePositionsForFirstColumn[1],
+      beforePositionsForSecondColumn[4],
+      beforePositionsForSecondColumn[5],
+      beforePositionsForSecondColumn[6],
+    ]);
+
+    done();
+  });
+  it('user can\'t update position with wrong source position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId,
+        sourcePosition: 7,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t update position with wrong destination position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.column}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId,
+        sourcePosition: 1,
+        destinationPosition: 6,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t update position with columnId without access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId: columnIdWithoutAccess,
+        sourcePosition: 1,
+        destinationPosition: 6,
+      });
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move heading between columns wrong source position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstColumnId, secondColumnId] = user.getColumnIds();
+
+    await helper.createHeadings({
+      token,
+      columnId: firstColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    await helper.createHeadings({
+      token,
+      columnId: secondColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId: firstColumnId,
+        targetColumnId: secondColumnId,
+        sourcePosition: 7,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move heading between columns wrong destination position', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const [firstColumnId, secondColumnId] = user.getColumnIds();
+
+    await helper.createHeadings({
+      token,
+      columnId: firstColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    await helper.createHeadings({
+      token,
+      columnId: secondColumnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId: firstColumnId,
+        targetColumnId: secondColumnId,
+        sourcePosition: 1,
+        destinationPosition: 8, // add entity to new column, can be +2 archived, default
+      });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    done();
+  });
+  it('user can\'t move heading between columns with targetColumnId without access', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    await helper.createHeadings({
+      token: secondUserToken,
+      columnId: columnIdWithoutAccess,
+      headings: [{
+        title: 'default-heading-1',
+      }, {
+        title: 'default-heading-2',
+      }, {
+        title: 'default-heading-3',
+      }, {
+        title: 'default-heading-4',
+      }, {
+        title: 'default-heading-5',
+      }, {
+        title: 'default-heading-6',
+      }],
+    });
+
+    const res = await request()
+      .patch(`${routes.heading}/position`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        columnId,
+        targetColumnId: columnIdWithoutAccess,
+        sourcePosition: 1,
+        destinationPosition: 4,
+      });
+
+    expect(res.statusCode).toEqual(403);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+    done();
+  });
+});
+
+describe('duplicate', () => {
+  it('user can successfully duplicate heading', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+        todos: [{ title: 'default-todo-1' }],
+      }, {
+        title: 'default-heading-2',
+        todos: [{ title: 'default-todo-2' }],
+      }],
+    });
+
+    const resHeadings = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const beforeHeadings = resHeadings.body.data.headings;
+
+    const headingIds = beforeHeadings.positions[columnId];
+    const headingId = headingIds[1];
+    const firstHeading = beforeHeadings.entities.find((heading) => heading.id === headingIds[0]);
+    const secondHeading = beforeHeadings.entities.find((heading) => heading.id === headingIds[1]);
+
+    const resDuplicate = await request()
+      .post(`${routes.heading}/duplicate`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId,
+      });
+
+    const resHeadingAfterDuplicate = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send();
+
+    const afterHeadings = resHeadingAfterDuplicate.body.data.headings;
+    const duplicatedHeadingId = resDuplicate.body.data.headingId;
+
+    expect(afterHeadings.positions[columnId]).toEqual([
+      headingIds[0],
+      headingIds[1],
+      duplicatedHeadingId,
+      headingIds[2],
+    ]);
+
+    expect(afterHeadings.entities).toEqual(expect.arrayContaining([
+      firstHeading,
+      secondHeading, {
+        ...secondHeading,
+        id: duplicatedHeadingId,
+      },
+    ]));
+
+    done();
+  });
+  it('user can\'t duplicate heading without access to heading', async (done) => {
+    const user = await helper.createUser(defaultUser);
+    const token = user.getToken();
+    const columnId = user.getRandomColumnId();
+
+    const secondUser = await helper.createUser(defaultUser);
+    const secondUserToken = secondUser.getToken();
+    const columnIdWithoutAccess = secondUser.getRandomColumnId();
+
+    await helper.createHeadings({
+      token,
+      columnId,
+      headings: [{
+        title: 'default-heading-1',
+        subHeadings: [{ title: 'default-sub-heading-1' }],
+      }, {
+        title: 'default-heading-2',
+        subHeadings: [{ title: 'default-sub-heading-2' }],
+      }],
+    });
+
+    await helper.createHeadings({
+      token: secondUserToken,
+      columnId: columnIdWithoutAccess,
+      headings: [{
+        title: 'default-heading-1',
+        subHeadings: [{ title: 'default-sub-heading-1' }],
+      }, {
+        title: 'default-heading-2',
+        subHeadings: [{ title: 'default-sub-heading-2' }],
+      }],
+    });
+
+    const resHeadingsWithoutAccess = await request()
+      .get(`${routes.heading}/`)
+      .set('authorization', `Bearer ${secondUserToken}`)
+      .send();
+
+    const headingIdWithoutAccess = resHeadingsWithoutAccess.body.data.headings.positions[columnIdWithoutAccess][0];
+
+    const res = await request()
+      .post(`${routes.heading}/duplicate`)
+      .set('authorization', `Bearer ${token}`)
+      .send({
+        headingId: headingIdWithoutAccess,
+      });
 
     expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual(expect.objectContaining({

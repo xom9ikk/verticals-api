@@ -7,7 +7,6 @@ const { PositionComponent } = require('../../components');
 const { TodoController } = require('../todo/controller');
 const { HeadingType } = require('../../constants');
 
-// TODO: write tests
 class HeadingController {
   async create(userId, { belowId, ...heading }) {
     if (belowId) {
@@ -127,7 +126,6 @@ class HeadingController {
     };
   }
 
-  // TODO: write tests for updatePosition
   async updatePosition({
     userId, columnId, sourcePosition, destinationPosition, targetColumnId,
   }) {
@@ -201,7 +199,6 @@ class HeadingController {
     return true;
   }
 
-  // TODO: write tests
   async duplicate({ userId, headingId, newHeadingId }) {
     const isAccess = await BoardAccessService.getByHeadingId(userId, headingId);
 
@@ -230,26 +227,7 @@ class HeadingController {
     return {
       ...headingToDuplicate,
       headingId: newHeadingId,
-      // position,
-      // todos: duplicatedTodos,
     };
-  }
-
-  // TODO: write tests for reverseOrder
-  async reverseOrder({ userId, columnId }) {
-    const isAccess = await BoardAccessService.getByColumnId(userId, columnId);
-
-    if (!isAccess) {
-      throw new BackendError.Forbidden('This account is not allowed to reverse headings in this column');
-    }
-
-    const headingPositions = await HeadingPositionsService.getPositions(columnId);
-
-    const newHeadingPositions = PositionComponent.reverse(headingPositions);
-
-    await HeadingPositionsService.updatePositions(columnId, newHeadingPositions);
-
-    return true;
   }
 
   async remove({ userId, headingId }) {

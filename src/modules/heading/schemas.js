@@ -25,6 +25,10 @@ class HeadingSchema {
       isCollapsed: {
         type: 'boolean',
       },
+      belowId: {
+        type: 'integer',
+        minimum: 1,
+      },
     },
     required: ['columnId', 'title'],
   }
