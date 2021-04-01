@@ -1,5 +1,6 @@
 const { swagger } = require('../../swagger');
 const {
+  version,
   allowHeadersHandler,
   errorHandler,
   notFoundHandler,
@@ -35,6 +36,7 @@ module.exports = {
     fastify.register(commentLikeRouter, { prefix: '/api/v1/comment-like' });
     fastify.register(searchRouter, { prefix: '/api/v1/search' });
     fastify.register(swagger);
+    fastify.register(version);
     fastify.setErrorHandler(errorHandler);
     fastify.setNotFoundHandler(notFoundHandler);
     done();

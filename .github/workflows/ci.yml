@@ -50,6 +50,10 @@ jobs:
         working-directory: ${{ env.APP_NAME }}
         run: echo "${{ secrets.ENV_FILE }}" >> .env.production
 
+      - name: Add commit hash to .env 🧠
+        working-directory: ${{ env.APP_NAME }}
+        run: echo "COMMIT_HASH=${{ github.sha }}" >> .env.production
+
       - name: Copy repo ✍️
         uses: appleboy/scp-action@master
         with:

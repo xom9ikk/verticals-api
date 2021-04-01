@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 const { BackendResponse } = require('../../components');
 const { GeneralError } = require('../../components/error');
+const { version } = require('../../../package.json');
 
 const corsOrigin = process.env.CORS_ORIGIN;
 
@@ -20,6 +21,15 @@ class RoutesHandler {
       + 'authorization,'
       + 'accept',
     );
+  }
+
+  version(fastify, opts, done) {
+    fastify.get(
+      '/version',
+      (req, res) => new BackendResponse(res, 200, 'Version received successfully',
+        { version: `Version: ${version}-${process.env.COMMIT_HASH}` }),
+    );
+    done();
   }
 
   errorHandler(error, req, res) {
