@@ -46,7 +46,7 @@ jobs:
         working-directory: ${{ env.APP_NAME }}
         run: npm run test
 
-      - name: Setup .env
+      - name: Setup .env 🧠
         working-directory: ${{ env.APP_NAME }}
         run: echo "${{ secrets.ENV_FILE }}" >> .env.production
 
