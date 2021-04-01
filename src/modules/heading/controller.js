@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 const {
-  HeadingService, BoardAccessService, HeadingPositionsService, TodoPositionsService, TodoService,
+  HeadingService, BoardAccessService, HeadingPositionsService, TodoPositionsService,
 } = require('../../services');
 const { BackendError } = require('../../components/error');
 const { PositionComponent } = require('../../components');
