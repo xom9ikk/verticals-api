@@ -1,9 +1,9 @@
 const swaggerJSDoc = require('swagger-jsdoc');
+const { version } = require('../../package.json');
 
 const {
   SWAGGER_JSON_ROUTE,
   SWAGGER_TITLE,
-  SWAGGER_VERSION,
   SWAGGER_DESCRIPTION,
   SWAGGER_HOST,
   SWAGGER_BASE_PATH,
@@ -18,7 +18,7 @@ module.exports = {
       definition: {
         info: {
           title: SWAGGER_TITLE,
-          version: SWAGGER_VERSION,
+          version,
           description: SWAGGER_DESCRIPTION,
         },
         host: SWAGGER_HOST,
