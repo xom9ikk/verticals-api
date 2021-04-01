@@ -536,6 +536,67 @@ describe('get all comments', () => {
 
     done();
   });
+  it('user can successfully gets all comments to which he has access by sub todo id', async (done) => {
+    const firstUser = await helper.createUser(Helper.configureUser({
+      boards: 4,
+      columns: 2,
+      headings: 2,
+      todos: 2,
+      subTodos: 2,
+    }));
+    const token = firstUser.getToken();
+    const board = firstUser.getRandomBoard();
+    const [firstColumn, secondColumn] = board.getColumns();
+    const headingFromFirstColumn = firstColumn.getRandomHeading();
+    const headingFromSecondColumn = secondColumn.getRandomHeading();
+
+    const todoFromFirstColumn = headingFromFirstColumn.getRandomTodo();
+    const todoFromSecondColumn = headingFromSecondColumn.getRandomTodo();
+
+    const subTodoIdFromFirstColumn = todoFromFirstColumn.getRandomSubTodo().id;
+    const subTodoIdFromSecondColumn = todoFromSecondColumn.getRandomSubTodo().id;
+
+    await helper.createUser(defaultUser);
+
+    const commentOne = Generator.Comment.getUnique({ subTodoId: subTodoIdFromFirstColumn });
+    await request()
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentOne);
+
+    const commentTwo = Generator.Comment.getUnique({ subTodoId: subTodoIdFromSecondColumn });
+    await request()
+      .post(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .send(commentTwo);
+
+    const res = await request()
+      .get(`${routes.comment}/`)
+      .set('authorization', `Bearer ${token}`)
+      .query({ subTodoId: subTodoIdFromFirstColumn })
+      .send();
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      message: expect.any(String),
+      data: expect.any(Object),
+    }));
+
+    const { comments } = res.body.data;
+    const [{ id: commentIdOne }] = comments;
+
+    expect(comments).toEqual([{
+      id: commentIdOne,
+      ...commentOne,
+      todoId: null,
+      replyCommentId: null,
+      likedUsers: [],
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
+    }]);
+
+    done();
+  });
   it('user can\'t get all comments if he does not have access to board id', async (done) => {
     const firstUser = await helper.createUser(defaultUser);
     const todoIdFirstUser = firstUser.getRandomTodoId();
