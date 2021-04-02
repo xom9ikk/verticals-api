@@ -223,15 +223,19 @@ class TodoController {
 
     const { id, expirationDate, ...todoToDuplicate } = await TodoService.getById(todoId);
 
-    const dataForCreate = newHeadingId !== undefined ? {
+    const dataForCreate = {
       ...todoToDuplicate,
-      expirationDate: new Date(expirationDate),
-      headingId: newHeadingId,
-    } : {
-      ...todoToDuplicate,
-      expirationDate: new Date(expirationDate),
-      belowId: todoId,
     };
+
+    if (expirationDate) {
+      dataForCreate.expirationDate = new Date(expirationDate);
+    }
+
+    if (newHeadingId !== undefined) {
+      dataForCreate.headingId = newHeadingId;
+    } else {
+      dataForCreate.belowId = todoId;
+    }
 
     const {
       todoId: newTodoId,

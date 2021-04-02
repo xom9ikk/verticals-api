@@ -209,15 +209,19 @@ class SubTodoController {
 
     const { id, expirationDate, ...subTodoToDuplicate } = await SubTodoService.getById(subTodoId);
 
-    const dataForCreate = newTodoId !== undefined ? {
+    const dataForCreate = {
       ...subTodoToDuplicate,
-      expirationDate: new Date(expirationDate),
-      todoId: newTodoId,
-    } : {
-      ...subTodoToDuplicate,
-      expirationDate: new Date(expirationDate),
-      belowId: subTodoId,
     };
+
+    if (expirationDate) {
+      dataForCreate.expirationDate = new Date(expirationDate);
+    }
+
+    if (newTodoId !== undefined) {
+      dataForCreate.todoId = newTodoId;
+    } else {
+      dataForCreate.belowId = subTodoId;
+    }
 
     const {
       subTodoId: newSubTodoId,
