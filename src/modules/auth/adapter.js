@@ -12,8 +12,7 @@ class AuthAdapter {
 
   async login(req, res) {
     const {
-      body:
-          { password: userInputPassword, email, username },
+      body: { password: userInputPassword, email, username },
       ip,
     } = req;
     const tokens = await AuthController.login({
@@ -24,8 +23,7 @@ class AuthAdapter {
 
   async refresh(req, res) {
     const {
-      body:
-          { refreshToken },
+      body: { refreshToken },
       ip,
     } = req;
     const tokens = await AuthController.refresh({

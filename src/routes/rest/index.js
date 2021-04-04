@@ -1,7 +1,6 @@
 const { swagger } = require('../../swagger');
 const {
   version,
-  allowHeadersHandler,
   errorHandler,
   notFoundHandler,
 } = require('./common');
@@ -19,11 +18,6 @@ const { searchRouter } = require('../../modules/search/route');
 
 module.exports = {
   restRouter: (fastify, opts, done) => {
-    fastify.addHook('onRequest', allowHeadersHandler);
-    fastify.options('*', (req, res) => {
-      res.status(200);
-      res.send();
-    });
     fastify.register(userRouter, { prefix: '/api/v1/user' });
     fastify.register(authRouter, { prefix: '/api/v1/auth' });
     fastify.register(boardRouter, { prefix: '/api/v1/board' });

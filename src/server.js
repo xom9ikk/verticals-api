@@ -3,6 +3,7 @@ const Fastify = require('fastify');
 const middie = require('middie');
 const fastifyMultipart = require('fastify-multipart');
 const helmet = require('fastify-helmet');
+const cors = require('fastify-cors');
 const { WebSocketServer } = require('./lib/ws');
 const { Logger } = require('./logger');
 const { HttpLogger } = require('./logger/http');
@@ -16,6 +17,8 @@ process.on('uncaughtException', (error) => {
   logger.error(error);
   process.exit(1);
 });
+
+const { CORS_ORIGIN } = process.env;
 
 let server;
 const serverFactory = (handler) => {
@@ -55,6 +58,27 @@ const build = (knex) => {
       },
     });
     fastify.register(helmet);
+    fastify.register(cors, {
+      origin: CORS_ORIGIN || '*',
+      credentials: true,
+      methods: [
+        'GET',
+        'PUT',
+        'POST',
+        'DELETE',
+        'PATCH',
+      ],
+      allowedHeaders: [
+        'access-control-allow-credentials',
+        'access-control-allow-headers',
+        'access-control-allow-methods',
+        'access-control-allow-origin',
+        'content-type',
+        'authorization',
+        'accept',
+        'accept-language',
+      ],
+    });
     fastify.decorateRequest('file', '');
     fastify.decorateRequest('user', '');
     fastify.decorateRequest('userId', '');
