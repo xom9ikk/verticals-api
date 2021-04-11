@@ -4,6 +4,7 @@ const middie = require('middie');
 const fastifyMultipart = require('fastify-multipart');
 const helmet = require('fastify-helmet');
 const cors = require('fastify-cors');
+const sjson = require('secure-json-parse');
 const { WebSocketServer } = require('./lib/ws');
 const { Logger } = require('./logger');
 const { HttpLogger } = require('./logger/http');
@@ -42,7 +43,10 @@ const build = (knex) => {
       { parseAs: 'string' },
       async (req, body) => {
         try {
-          return body ? JSON.parse(body) : {};
+          return body ? sjson.parse(body, {
+            protoAction: 'remove',
+            constructorAction: 'remove',
+          }) : {};
         } catch (err) {
           throw new BackendError.BadRequest('Invalid JSON. Change the body and try again');
         }
