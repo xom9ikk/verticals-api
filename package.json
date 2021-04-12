@@ -12,7 +12,8 @@
     "test:watch": "jest --config ./jest.config.js --watch",
     "test:coverage": "jest --config ./jest.config.js --coverage",
     "test:stryker": "npx stryker run",
-    "graph": "npx madge --image graph.svg src/index.js"
+    "graph": "npx madge --image graph.svg src/index.js",
+    "knex": "knex"
   },
   "author": "Max Romanyuta <xom9ik.code@gmail.com>",
   "license": "MIT",

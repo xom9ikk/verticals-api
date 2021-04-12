@@ -10,7 +10,7 @@ ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 COPY / /app
 
-RUN npm i
+RUN npm i --production
 RUN chmod +x ./start.sh
 
 CMD ["./start.sh"]
