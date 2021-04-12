@@ -542,41 +542,6 @@ describe('board', () => {
           .send(board);
       });
   });
-  // it.only('user can be successfully notified on board remove', async (done) => {
-  //   const user = await helper.createUser(defaultUser);
-  //   const token = user.getToken();
-  //   const boardId = user.getRandomBoardId();
-  //
-  //   const ws = new WS(baseUrlWs)
-  //     .query({ authorization: `Bearer ${token}` })
-  //     .start('updates')
-  //     .onMessage((data) => {
-  //       if (data.channel !== 'board') return;
-  //       console.log(data);
-  //       try {
-  //         expect(data).toEqual(expect.objectContaining({
-  //           channel: 'board',
-  //           data: expect.objectContaining({
-  //             operation: Operations.delete,
-  //             data: expect(data.data.data).toMatchObject({
-  //               id: boardId,
-  //             }),
-  //           }),
-  //         }));
-  //         done();
-  //       } catch (error) {
-  //         done(error);
-  //       } finally {
-  //         ws.close();
-  //       }
-  //     })
-  //     .onOpen(async () => {
-  //       await request()
-  //         .delete(`${baseUrl}${routes.board}/${boardId}`)
-  //         .set('authorization', `Bearer ${token}`)
-  //         .send();
-  //     });
-  // });
 });
 
 describe('column', () => {

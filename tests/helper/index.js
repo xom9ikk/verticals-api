@@ -234,7 +234,6 @@ class Helper {
     return resSubTodos;
   }
 
-  // TODO: subtodo
   async createComments({
     token, comments, todoId, subTodoId,
   }) {
@@ -244,7 +243,6 @@ class Helper {
       const mergedData = this._mergeObject(commentData, comment);
       const res = await this._post(`${routes.comment}/`, mergedData, token);
       if (res.statusCode !== 201) {
-        console.error('helper.createComments', res.statusCode, res.body);
         return this.createComments({
           token, comments, todoId, subTodoId,
         });

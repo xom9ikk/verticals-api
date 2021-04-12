@@ -40,7 +40,6 @@ class User {
     return this.getRandomColumn().id;
   }
 
-  // -
   getRandomColumnFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn();
   }
@@ -67,7 +66,6 @@ class User {
     return this.getRandomHeading().id;
   }
 
-  // -
   getRandomHeadingIdFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn().getRandomHeading().id;
   }
@@ -92,7 +90,6 @@ class User {
     return this.getRandomTodo().id;
   }
 
-  // -
   getRandomTodoFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo();
   }
@@ -124,7 +121,6 @@ class User {
     return this.getRandomSubTodo().id;
   }
 
-  // -
   getRandomSubTodoFromBoard(boardId) {
     return this.getBoardById(boardId).getRandomColumn().getRandomHeading().getRandomTodo()
       .getRandomSubTodo();

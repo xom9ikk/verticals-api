@@ -1,6 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
-// const { Metrics } = require('../../metrics');
-
 const type = {
   Error: 'error',
   Data: 'content',

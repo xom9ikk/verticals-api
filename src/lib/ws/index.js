@@ -70,7 +70,6 @@ class WebSocketServer {
 
   destroy(connection, context, status, message) {
     this._decreaseConnection(context);
-    // console.log('router destroy', counter);
     connection.close(status || 1000, message);
   }
 
