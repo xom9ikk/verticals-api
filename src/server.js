@@ -63,7 +63,7 @@ const build = (knex) => {
     });
     fastify.register(helmet);
     fastify.register(cors, {
-      origin: CORS_ORIGIN || '*',
+      origin: CORS_ORIGIN ? JSON.stringify(CORS_ORIGIN) : '*',
       credentials: true,
       methods: [
         'GET',
