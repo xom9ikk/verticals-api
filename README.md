@@ -20,7 +20,7 @@ All server configuration takes place in the `.env` file. You can create your own
 
 `API Docs` - https://doc.backend.verticals.xom9ik.com
 
-`Grafana` - https://grafana.backend.verticals.xom9ik.com credentials: **viewer**:**viewer123**
+`Grafana` - https://grafana.backend.verticals.xom9ik.com **viewer**:**viewer123**
 
 `Prometheus` - https://prometheus.backend.verticals.xom9ik.com
 
