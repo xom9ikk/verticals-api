@@ -16,15 +16,15 @@ All server configuration takes place in the `.env` file. You can create your own
 
 ## Services 
 
-`API` - https://backend.verticals.xom9ik.com
+`API` - [backend.verticals.xom9ik.com](https://backend.verticals.xom9ik.com)
 
-`API Docs` - https://doc.backend.verticals.xom9ik.com
+`API Docs` - [doc.backend.verticals.xom9ik.com](https://doc.backend.verticals.xom9ik.com)
 
-`Grafana` - https://grafana.backend.verticals.xom9ik.com **viewer**:**viewer123**
+`Grafana` - [grafana.backend.verticals.xom9ik.com](https://grafana.backend.verticals.xom9ik.com)  **viewer**:**viewer123**
 
-`Prometheus` - https://prometheus.backend.verticals.xom9ik.com
+`Prometheus` - [prometheus.backend.verticals.xom9ik.com](https://prometheus.backend.verticals.xom9ik.com) https://prometheus.backend.verticals.xom9ik.com
 
-`CDN` - https://cdn.verticals.xom9ik.com
+`CDN` - [cdn.verticals.xom9ik.com](https://cdn.verticals.xom9ik.com)
 
 ## Installation and Development server
 
