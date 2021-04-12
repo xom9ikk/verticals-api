@@ -22,7 +22,7 @@ All server configuration takes place in the `.env` file. You can create your own
 
 `Grafana` - [grafana.backend.verticals.xom9ik.com](https://grafana.backend.verticals.xom9ik.com)  **viewer**:**viewer123**
 
-`Prometheus` - [prometheus.backend.verticals.xom9ik.com](https://prometheus.backend.verticals.xom9ik.com) https://prometheus.backend.verticals.xom9ik.com
+`Prometheus` - [prometheus.backend.verticals.xom9ik.com](https://prometheus.backend.verticals.xom9ik.com)
 
 `CDN` - [cdn.verticals.xom9ik.com](https://cdn.verticals.xom9ik.com)
 
