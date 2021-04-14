@@ -15,6 +15,7 @@ echo "server {
 if [ "$3" = true ] ; then
   echo "location / {
             root $2;
+            add_header Access-Control-Allow-Origin https://verticals.xom9ik.com;
             limit_req zone=req_limit_per_ip burst=50 nodelay;
             limit_conn conn_limit_per_ip 30;
         }
