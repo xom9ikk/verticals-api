@@ -19,8 +19,8 @@ class Logger {
   constructor() {
     const streams = [];
     if (isProd) {
-      streams.push({ level: 'debug', stream: fs.createWriteStream(combinedFile) }); // 186 257
-      streams.push({ level: 'error', stream: fs.createWriteStream(errorFile) }); // 205 215 286
+      streams.push({ level: 'debug', stream: fs.createWriteStream(combinedFile) });
+      streams.push({ level: 'error', stream: fs.createWriteStream(errorFile) });
     }
 
     const prettyStream = pinoms.prettyStream({

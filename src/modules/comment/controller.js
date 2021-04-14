@@ -46,7 +46,7 @@ class CommentController {
     }
 
     if (!boardIdsWithAccess.length) {
-      throw new BackendError.Forbidden('This account does not have access to any boards');
+      return [];
     }
 
     let comments;
@@ -72,15 +72,13 @@ class CommentController {
       comments = await CommentService.getByBoardIds(boardIdsWithAccess);
     }
 
-    // TODO: refactor
-    const commentsWithTransformedLinks = comments.map((comment) => ({
+    return comments.map((comment) => ({
       ...comment,
       likedUsers: comment.likedUsers && comment.likedUsers.map((user) => ({
         ...user,
         avatar: TransformerComponent.transformLink(user.avatar),
       })),
     }));
-    return commentsWithTransformedLinks;
   }
 
   async update({ userId, commentId, patch }) {

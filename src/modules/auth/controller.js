@@ -1,12 +1,12 @@
+const { SeedComponent } = require('../../components/seed');
 const { BackendError, PasswordComponent, TokenComponent } = require('../../components');
-const { BoardController } = require('../board/controller');
 const {
   TokenService, UserService, BoardPositionsService,
 } = require('../../services');
 
 class AuthController {
   async register({
-    email, password, name, surname, username, ip,
+    email, password, name, surname, username, ip, isSetupDefaultBoard,
   }) {
     const hashPassword = await PasswordComponent.hash(password);
 
@@ -22,14 +22,11 @@ class AuthController {
       ip,
     });
 
-    await Promise.all([
-      BoardPositionsService.create(registeredUserId, []),
-      // TODO: move to seed component
-      BoardController.create(registeredUserId, {
-        icon: '/assets/svg/board/star.svg',
-        title: 'Today',
-      }),
-    ]);
+    await BoardPositionsService.create(registeredUserId, []);
+
+    if (isSetupDefaultBoard) {
+      await SeedComponent.setupDefaultBoard(registeredUserId);
+    }
 
     return tokens;
   }

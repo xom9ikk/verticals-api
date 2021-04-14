@@ -24,7 +24,7 @@ class RoutesHandler {
     }
     console.log(error);
     logger.error(error);
-    return new BackendResponse(res, 500, 'Internal');// && process.exit(1);
+    return new BackendResponse(res, 500, 'Internal') && process.exit(1);
   }
 
   notFoundHandler(req, res) {

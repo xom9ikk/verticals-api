@@ -55,6 +55,8 @@ class FileComponent {
         fileName, mimeType, encoding, size, file,
       } = data;
 
+      // console.log('fileName, mimeType, encoding, size, file,', fileName, mimeType, encoding, size, file);
+
       const extension = mime.extension(mimeType) || 'jpeg';
 
       const pathToFile = path.join(pathToFolder, `${path.basename(`${uuidV4()}`)}.${extension}`);

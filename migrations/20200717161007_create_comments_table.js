@@ -21,14 +21,12 @@ exports.up = async (knex) => {
     table
       .integer('todo_id')
       .unsigned()
-      // .notNullable()
       .references('id')
       .inTable('todos')
       .onDelete('CASCADE');
     table
       .integer('sub_todo_id')
       .unsigned()
-      // .notNullable()
       .references('id')
       .inTable('sub_todos')
       .onDelete('CASCADE');

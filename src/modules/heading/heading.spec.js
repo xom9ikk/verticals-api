@@ -711,8 +711,8 @@ describe('get all headings', () => {
     }));
 
     const { headings } = res.body.data;
-    // eslint-disable-next-line no-unused-vars
-    const [{ id: headingIdDefault }, _, { id: headingIdCustom }] = headings.entities;
+
+    const [{ id: headingIdDefault }, { id: headingIdCustom }] = headings.entities;
 
     expect(headings.entities).toEqual(
       expect.arrayContaining([
@@ -728,6 +728,7 @@ describe('get all headings', () => {
         },
       ]),
     );
+
     expect(headings.positions[columnIdFromFirstBoard])
       .toEqual(expect.arrayContaining([headingIdDefault, headingIdCustom]));
 

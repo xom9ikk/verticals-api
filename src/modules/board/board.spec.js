@@ -140,7 +140,7 @@ describe('create', () => {
 
     expect(resBoards.statusCode).toEqual(200);
     expect(resBoards.body.data.boards.positions).toEqual(
-      [expect.any(Number), firstBoardId, thirdBoardId, secondBoardId],
+      [firstBoardId, thirdBoardId, secondBoardId],
     );
 
     done();
@@ -506,7 +506,6 @@ describe('get all boards', () => {
 
     expect(boards).toEqual({
       entities: [
-        expect.any(Object),
         {
           id: boardIdTwo,
           ...boardTwo,
@@ -515,7 +514,7 @@ describe('get all boards', () => {
           ...boardThree,
         },
       ],
-      positions: [expect.any(Number), boardIdTwo, boardIdThree],
+      positions: [boardIdTwo, boardIdThree],
     });
 
     done();
@@ -816,7 +815,6 @@ describe('update position', () => {
       beforePositions[4],
       beforePositions[1],
       beforePositions[5],
-      beforePositions[6],
     ]);
 
     done();
