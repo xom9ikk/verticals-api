@@ -687,7 +687,7 @@ describe('get all headings', () => {
     await helper.createUser(defaultUser);
 
     const headingOne = Generator.Heading.getUnique(columnIdFromFirstBoard);
-    await request()
+    const customHeading = await request()
       .post(`${routes.heading}/`)
       .set('authorization', `Bearer ${token}`)
       .send(headingOne);
@@ -712,7 +712,9 @@ describe('get all headings', () => {
 
     const { headings } = res.body.data;
 
-    const [{ id: headingIdDefault }, { id: headingIdCustom }] = headings.entities;
+    const headingIdCustom = customHeading.body.data.headingId;
+
+    const [{ id: headingIdDefault }] = headings.entities;
 
     expect(headings.entities).toEqual(
       expect.arrayContaining([
