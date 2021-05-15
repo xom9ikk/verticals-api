@@ -62,7 +62,6 @@ const build = (knex) => {
       },
     });
     fastify.register(helmet);
-    console.log('CORS_ORIGIN',typeof CORS_ORIGIN, CORS_ORIGIN)
     fastify.register(cors, {
       origin: CORS_ORIGIN ? JSON.parse(CORS_ORIGIN) : '*',
       credentials: true,
