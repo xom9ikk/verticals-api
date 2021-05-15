@@ -29,6 +29,6 @@ build(knex).listen(PORT, HOST, async (error) => {
   }
 });
 
-if (METRICS_ENABLED) {
+if (METRICS_ENABLED === 'true') {
   Metrics.start();
 }

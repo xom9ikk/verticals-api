@@ -1,0 +1,334 @@
+config:
+  target: 'http://0.0.0.0:3000/api'
+  #  target: 'https://backend.verticals.xom9ik.com/api'
+  processor: "../faker.js"
+  phases:
+    - duration: 300
+      arrivalRate: 1
+  defaults:
+scenarios:
+  - flow:
+      - function: "generateRandomData"
+
+      #      - log: "Request: Registration new user {{ email }}"
+      - post:
+          url: "/v1/auth/register"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+            username: "{{ username }}"
+            name: "{{ name }}"
+            surname: "{{ surname }}"
+          capture:
+            json: "$.message"
+            as: "message"
+      #      - log: "<<<Response: {{ message }}"
+      #      - log: "Request: Login user with {{ email }}"
+      - post:
+          url: "/v1/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.token"
+              as: "token"
+            - json: "$.data.refreshToken"
+              as: "refreshToken"
+            - json: "$.message"
+              as: "message"
+      #      - log: "<<<Response: {{ message }}"
+      #      - log: "Token: {{ token }}"
+      #      - log: "Refresh token: {{ refreshToken }}"
+      #      - log: "Request: Refresh token for {{ refreshToken }}"
+      - post:
+          url: "/v1/auth/refresh"
+          json:
+            refreshToken: "{{ refreshToken }}"
+          capture:
+            - json: "$.data.token"
+              as: "token"
+            - json: "$.data.refreshToken"
+              as: "refreshToken"
+            - json: "$.message"
+              as: "message"
+      #      - log: "<<<Response: {{ message }}"
+      #      - log: "Token: Bearer {{ token }}"
+      #      - log: "Refresh token: {{ refreshToken }}"
+      #      - log: "Request: Logout user {{ token }}"
+
+
+
+      - post:
+          url: "/v1/board"
+          json:
+            title: "{{ title }}"
+            icon: "{{ icon }}"
+            position: "{{ position }}"
+            cardType: "{{ cardType }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data.boardId"
+              as: "boardId"
+      - get:
+          url: "/v1/board/{{ boardId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - get:
+          url: "/v1/board/"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - patch:
+          url: "/v1/board/{{ boardId }}"
+          json:
+            title: "{{ title }}"
+            position: "{{ position }}"
+            cardType: "{{ cardType }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+      - post:
+          url: "/v1/column"
+          json:
+            boardId: "{{ boardId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+            isCollapsed: "{{ isCollapsed }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data.columnId"
+              as: "columnId"
+      - get:
+          url: "/v1/column/{{ columnId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - get:
+          url: "/v1/column/"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - patch:
+          url: "/v1/column/{{ columnId }}"
+          json:
+            #            boardId: "{{ boardId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+            isCollapsed: "{{ isCollapsed }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+
+      - post:
+          url: "/v1/heading"
+          json:
+            columnId: "{{ columnId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data.headingId"
+              as: "headingId"
+      - get:
+          url: "/v1/heading/{{ headingId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - get:
+          url: "/v1/heading/"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - patch:
+          url: "/v1/heading/{{ headingId }}"
+          json:
+            #            boardId: "{{ boardId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+
+      - post:
+          url: "/v1/todo"
+          json:
+            headingId: "{{ headingId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            status: "{{ status }}"
+            color: "{{ color }}"
+            isArchived: "{{ isArchived }}"
+            isNotificationsEnabled: "{{ isNotificationsEnabled }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data.todoId"
+              as: "todoId"
+      - get:
+          url: "/v1/todo/{{ todoId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - get:
+          url: "/v1/todo/"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - patch:
+          url: "/v1/todo/{{ todoId }}"
+          json:
+            #            columnId: "{{ columnId }}"
+            title: "{{ title }}"
+            position: "{{ position }}"
+            description: "{{ description }}"
+            color: "{{ color }}"
+            isCollapsed: "{{ isCollapsed }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+
+      - post:
+          url: "/v1/comment"
+          json:
+            todoId: "{{ todoId }}"
+            text: "{{ title }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data.commentId"
+              as: "commentId"
+      - get:
+          url: "/v1/comment/{{ commentId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - get:
+          url: "/v1/comment/"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            - json: "$.message"
+              as: "message"
+            - json: "$.data"
+              as: "data"
+      - patch:
+          url: "/v1/comment/{{ commentId }}"
+          json:
+            text: "{{ title }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+
+
+      - delete:
+          url: "/v1/todo/{{ todoId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+      - delete:
+          url: "/v1/column/{{ columnId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+      - delete:
+          url: "/v1/board/{{ boardId }}"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+
+      - post:
+          url: "/v1/auth/logout"
+          headers:
+            authorization: "Bearer {{ token }}"
+          capture:
+            json: "$.message"
+            as: "message"
+#      - log: "<<<Response: {{ message }}"
+#      - log: "Request {{ counter }}"
+#      - log: "Token {{ token }}"
+#      - log: "CommentId {{ commentId }}"
+

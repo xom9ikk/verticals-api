@@ -12,3 +12,6 @@
 .stryker-tmp
 /reports
 /coverage
+
+# clinic files
+/.clinic

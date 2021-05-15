@@ -1,0 +1,22 @@
+const Faker = require('faker');
+let counter = 0;
+module.exports.generateRandomData = (userContext, events, done) => {
+    userContext.vars.counter = ++counter;
+    userContext.vars.username = Math.ceil(Math.random()*1000)+`${Faker.name.firstName().replace('\'','')}`;
+    userContext.vars.name = `${Faker.name.firstName().replace('\'','')}`;
+    userContext.vars.surname = `${Faker.name.lastName().replace('\'','')}`;
+    userContext.vars.email = Math.ceil(Math.random()*1000)+Faker.internet.exampleEmail();
+    userContext.vars.password = Faker.internet.password();
+    userContext.vars.fingerprint = Faker.random.uuid();
+    userContext.vars.title = Faker.lorem.words();
+    userContext.vars.icon = Faker.lorem.word();
+    userContext.vars.position = Faker.random.number({ max: 100 });
+    userContext.vars.cardType = Faker.random.number({ max: 4 });
+    userContext.vars.description = Faker.lorem.sentences();
+    userContext.vars.color = Faker.random.number({ max: 5 });
+    userContext.vars.isCollapsed = Faker.random.boolean();
+    userContext.vars.isArchived = Faker.random.boolean();
+    userContext.vars.isNotificationsEnabled = Faker.random.boolean();
+    userContext.vars.status = Faker.random.number({ max: 2 });
+    return done();
+};
