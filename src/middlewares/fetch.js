@@ -1,3 +1,4 @@
+const { BackendError } = require('../components/error/rest');
 const { TokenComponent } = require('../components');
 const { UserService } = require('../services');
 
@@ -7,15 +8,23 @@ class FetchMiddleware {
   }
 
   async getUserId(req) {
-    const { parsedBearerToken } = req;
-    const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
-    req.userId = userId;
+    try {
+      const { parsedBearerToken } = req;
+      const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
+      req.userId = userId;
+    } catch (e) {
+      throw new BackendError.Unauthorized('Invalid token signature');
+    }
   }
 
   async getUser(req) {
-    const { parsedBearerToken } = req;
-    const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
-    req.user = await UserService.getById(userId);
+    try {
+      const { parsedBearerToken } = req;
+      const { userId } = FetchMiddleware.getDataFromToken(parsedBearerToken);
+      req.user = await UserService.getById(userId);
+    } catch (e) {
+      throw new BackendError.Unauthorized('Invalid token signature');
+    }
   }
 }
 

@@ -12,7 +12,12 @@
     "test:watch": "jest --config ./jest.config.js --watch",
     "test:coverage": "jest --config ./jest.config.js --coverage",
     "test:stryker": "npx stryker run",
-    "graph": "npx madge --image graph.svg src/index.js"
+    "graph": "npx madge --image graph.svg src/index.js",
+    "artillery": "artillery run ./tests/artillery/scenarios/backend.yml",
+    "clinic:env": "export $(cat .env | xargs)",
+    "clinic:doctor": "npm run clinic:env && clinic doctor --on-port 'npm run artillery' -- node ./src/index.js",
+    "clinic:bubbleproof": "npm run clinic:env && clinic bubbleproof --on-port 'npm run artillery' -- node ./src/index.js",
+    "clinic:flame": "npm run clinic:env && clinic flame --on-port 'npm run artillery' -- node ./src/index.js"
   },
   "author": "Max Romanyuta <xom9ik.code@gmail.com>",
   "license": "MIT",
@@ -42,6 +47,7 @@
     "chalk": "^4.1.0",
     "date-fns": "^2.15.0",
     "dotenv": "^8.2.0",
+    "dotenv-cli": "^4.0.0",
     "fastify": "^3.1.1",
     "fastify-cors": "^5.2.0",
     "fastify-helmet": "^4.0.2",
@@ -74,6 +80,7 @@
   "devDependencies": {
     "@stryker-mutator/core": "^4.5.0",
     "@stryker-mutator/jest-runner": "^4.5.0",
+    "artillery": "^1.6.0-29",
     "babel-eslint": "^10.1.0",
     "concurrently": "^6.0.0",
     "cz-conventional-changelog": "^3.2.0",
